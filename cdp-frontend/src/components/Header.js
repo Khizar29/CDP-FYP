@@ -1,18 +1,56 @@
 // src/components/Header.js
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes, faHome, faInfoCircle, faGraduationCap, faCalendar, faUser, faPhone, faGift } from '@fortawesome/free-solid-svg-icons';
 import logo from '../Images/logo-FAST-NU.png';
 import { UserContext } from '../contexts/UserContext';
+import axios from 'axios';
 
 const Header = ({ scrollToSection }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useContext(UserContext);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { user, setUser } = useContext(UserContext);
+  const dropdownRef = useRef(null);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post('http://localhost:8000/api/v1/users/logout', {}, { withCredentials: true });
+      if (response.status === 200) {
+        console.log('User logged out');
+        setUser(null);
+        setIsDropdownOpen(false);
+        alert('Log out Successful');
+      }
+    } catch (error) {
+      console.error("Error during logout", error);
+    }
+  };
+
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsDropdownOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
 
   return (
     <header className="bg-blue-900 text-white py-4">
@@ -39,9 +77,33 @@ const Header = ({ scrollToSection }) => {
           <Link to="/contact" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
           </Link>
-          <Link to="/signin" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
-            <FontAwesomeIcon icon={faUser} /> <span>{user ? user.name : 'Login'}</span>
-          </Link>
+          {user ? (
+            <div className="relative">
+              <div
+                className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer"
+                onClick={handleDropdownToggle}
+              >
+                <FontAwesomeIcon icon={faUser} /> <span>{user.fullName}</span>
+              </div>
+              {isDropdownOpen && (
+                <div
+                  ref={dropdownRef}
+                  className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50"
+                >
+                  <Link to="/change-password" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                    Change Password
+                  </Link>
+                  <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
+                    Logout
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/signin" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
+              <FontAwesomeIcon icon={faUser} /> <span>Login</span>
+            </Link>
+          )}
         </nav>
         <div className="md:hidden">
           <button onClick={toggleMenu} className="text-white focus:outline-none">
@@ -50,7 +112,6 @@ const Header = ({ scrollToSection }) => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isOpen && (
         <div className="fixed inset-0 z-30 transform md:hidden">
           <div className="fixed inset-0 bg-black opacity-50" onClick={toggleMenu}></div>
@@ -77,9 +138,33 @@ const Header = ({ scrollToSection }) => {
             <Link to="/contact" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
               <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
             </Link>
-            <Link to="/signin" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-              <FontAwesomeIcon icon={faUser} /> <span>{user ? user.name : 'Login'}</span>
-            </Link>
+            {user ? (
+              <div className="relative">
+                <div
+                  className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer"
+                  onClick={handleDropdownToggle}
+                >
+                  <FontAwesomeIcon icon={faUser} /> <span>{user.fullName}</span>
+                </div>
+                {isDropdownOpen && (
+                  <div
+                    ref={dropdownRef}
+                    className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50"
+                  >
+                    <Link to="/change-password" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                      Change Password
+                    </Link>
+                    <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
+                      Logout
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link to="/signin" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+                <FontAwesomeIcon icon={faUser} /> <span>Login</span>
+              </Link>
+            )}
           </nav>
         </div>
       )}
@@ -88,98 +173,3 @@ const Header = ({ scrollToSection }) => {
 };
 
 export default Header;
-
-
-
-
-
-// // src/components/Header.js
-// import React, { useState } from 'react';
-// import { Link } from 'react-router-dom'; // Use react-router-dom for navigation
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faBars, faTimes, faHome, faInfoCircle, faGraduationCap, faCalendar, faUser, faPhone, faGift } from '@fortawesome/free-solid-svg-icons';
-// import logo from '../Images/logo-FAST-NU.png';
-
-// const Header = () => {
-//   const [isOpen, setIsOpen] = useState(false);
-
-//   const toggleMenu = () => {
-//     setIsOpen(!isOpen);
-//   };
-
-//   return (
-//     <header className="bg-blue-900 text-white py-4">
-//       <div className="container mx-auto flex justify-between items-center px-5">
-//         <div className="flex items-center">
-//           <img src={logo} alt="FAST University Logo" className="h-10 md:h-12" />
-//         </div>
-//         <nav className="hidden md:flex flex-grow justify-end space-x-6">
-//           <Link to="/" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
-//             <FontAwesomeIcon icon={faHome} /> <span>Home</span>
-//           </Link>
-          
-//           <Link to="/about" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
-//             <FontAwesomeIcon icon={faInfoCircle} /> <span>About Us</span>
-//           </Link>
-//           <Link to="/benefits" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
-//             <FontAwesomeIcon icon={faGift} /> <span>Benefits</span>
-//           </Link>
-//           <Link to="/alumni" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
-//             <FontAwesomeIcon icon={faGraduationCap} /> <span>Alumni</span>
-//           </Link>
-//           <Link to="/events" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
-//             <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
-//           </Link>
-//           <Link to="/signin" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
-//             <FontAwesomeIcon icon={faUser} /> <span>Login</span>
-//           </Link>
-//           <Link to="/contact" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
-//             <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
-//           </Link>
-//         </nav>
-//         <div className="md:hidden">
-//           <button onClick={toggleMenu} className="text-white focus:outline-none">
-//             <FontAwesomeIcon icon={faBars} className="h-6 w-6" />
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* Mobile Menu */}
-//       {isOpen && (
-//         <div className="fixed inset-0 z-30 transform md:hidden">
-//           <div className="fixed inset-0 bg-black opacity-50" onClick={toggleMenu}></div>
-//           <nav className="relative bg-blue-900 h-full w-64 py-4 flex flex-col">
-//             <button onClick={toggleMenu} className="absolute top-4 right-4 text-white">
-//               <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
-//             </button>
-//             <img src={logo} alt="FAST University Logo" className="h-10 mx-auto mb-6" />
-//             <Link to="/" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-//               <FontAwesomeIcon icon={faHome} /> <span>Home</span>
-//             </Link>
-            
-//             <Link to="/about" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-//               <FontAwesomeIcon icon={faInfoCircle} /> <span>About Us</span>
-//             </Link>
-//             <Link to="/benefits" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-//               <FontAwesomeIcon icon={faGift} /> <span>Benefits</span>
-//             </Link>
-//             <Link to="/alumni" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-//               <FontAwesomeIcon icon={faGraduationCap} /> <span>Alumni</span>
-//             </Link>
-//             <Link to="/events" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-//               <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
-//             </Link>
-//             <Link to="/signin" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-//               <FontAwesomeIcon icon={faUser} /> <span>Login</span>
-//             </Link>
-//             <Link to="/contact" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-//               <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
-//             </Link>
-//           </nav>
-//         </div>
-//       )}
-//     </header>
-//   );
-// };
-
-// export default Header;
