@@ -36,11 +36,12 @@ export default function SignIn() {
       }, {
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        withCredentials: true,
       });
 
       console.log('User logged in:', response.data);
-      setUser(response.data.user); // Set the user context
+      setUser(response.data.data.user); // Set the user context
       navigate('/'); // Redirect to home or another page after successful login
     } catch (error) {
       if (error.response) {
