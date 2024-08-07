@@ -1,3 +1,5 @@
+// src/middlewares/auth.middleware.js
+
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
@@ -24,4 +26,11 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
   } catch (error) {
     throw new ApiError(401, error?.message || "Invalid access token");
   }
+});
+
+export const verifyAdmin = asyncHandler(async (req, _, next) => {
+  if (req.user.role !== 'admin') {
+    throw new ApiError(403, "Forbidden: Admins only");
+  }
+  next();
 });

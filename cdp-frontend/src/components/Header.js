@@ -96,6 +96,11 @@ const Header = ({ scrollToSection }) => {
                   <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
                     Logout
                   </div>
+                  {user.role === 'admin' && (
+                    <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                      Admin Panel
+                    </Link>
+                  )}
                 </div>
               )}
             </div>
@@ -157,6 +162,11 @@ const Header = ({ scrollToSection }) => {
                     <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
                       Logout
                     </div>
+                    {user.role === 'admin' && (
+                      <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                        Admin Panel
+                      </Link>
+                    )}
                   </div>
                 )}
               </div>
