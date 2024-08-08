@@ -1,0 +1,20 @@
+
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  margin-left: 5px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #cbd5e0; /* Tailwind color gray-300 */
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #fbbf24; /* Tailwind color blue-700 */
+  border-radius: 9999px; /* Rounded scrollbar */
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #aad0ff; /* Tailwind color blue-800 */
+}
