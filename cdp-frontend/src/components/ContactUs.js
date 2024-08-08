@@ -8,7 +8,7 @@ const ContactUs = () => {
   const longitude = 67.2646838;
 
   return (
-    <div className="bg-[#c7ecfc] p-8 lg:p-31 flex flex-col lg:flex-row items-center justify-between">
+    <div className="bg-white p-8 lg:p-31 flex flex-col lg:flex-row items-center justify-between">
       <div className="text-left lg:w-1/2">
         <h3 className="text-green-600 text-sm mb-2">How can we help you?</h3>
         <h1 className="text-4xl font-bold mb-3">Contact Us</h1>
