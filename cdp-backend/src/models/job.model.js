@@ -1,9 +1,13 @@
-// src/models/jobs.model.js
 import mongoose, { Schema } from "mongoose";
 
 const jobSchema = new Schema(
   {
     title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    company_name: { // Added company_name field
       type: String,
       required: true,
       trim: true,
