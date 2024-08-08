@@ -9,6 +9,9 @@ import Benefits from './components/AlumniBenefits';
 import Alumni from './components/AlumniPage';
 import Contact from './components/ContactUs';
 import SignUp from './components/SignUp';
+import JobList from './components/JobList';
+import JobDetails from './components/JobDetails';
+import Footer from './components/Footer';
 
 function App() {
   const aboutRef = useRef(null);
@@ -31,7 +34,10 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/jobs" element={<JobList />} />
+          <Route path="/jobs/:jobId" element={<JobDetails />} />
         </Routes>
+        <Footer />
       </Router>
     </UserProvider>
   );
