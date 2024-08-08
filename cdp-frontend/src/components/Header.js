@@ -6,6 +6,7 @@ import { faBars, faTimes, faHome, faInfoCircle, faGraduationCap, faCalendar, faU
 import logo from '../Images/logo-FAST-NU.png';
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
+import { faBriefcase, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
 
 const Header = ({ scrollToSection }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -53,28 +54,31 @@ const Header = ({ scrollToSection }) => {
   }, [isDropdownOpen]);
 
   return (
-    <header className="bg-blue-900 text-white py-4">
+    <header className="bg-gradient-to-r from-blue-100 to-sky-600  text-white py-4">
       <div className="container mx-auto flex justify-between items-center px-5">
         <div className="flex items-center">
           <img src={logo} alt="FAST University Logo" className="h-10 md:h-12" />
         </div>
         <nav className="hidden md:flex flex-grow justify-end space-x-6">
-          <Link to="/" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
+          <Link to="/" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faHome} /> <span>Home</span>
           </Link>
-          <div onClick={() => scrollToSection('about')} className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
+          <div onClick={() => scrollToSection('about')} className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faInfoCircle} /> <span>About Us</span>
           </div>
-          <Link to="/benefits" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
+          <Link to="/benefits" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faGift} /> <span>Benefits</span>
           </Link>
-          <Link to="/alumni" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
+          <Link to="/jobs" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
+          <FontAwesomeIcon icon={faBriefcase} /> <span>Jobs</span>
+          </Link>
+          <Link to="/alumni" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faGraduationCap} /> <span>Alumni</span>
           </Link>
-          <Link to="/events" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
+          <Link to="/events" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
           </Link>
-          <Link to="/contact" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
+          <Link to="/contact" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
           </Link>
           {user ? (
@@ -120,7 +124,7 @@ const Header = ({ scrollToSection }) => {
       {isOpen && (
         <div className="fixed inset-0 z-30 transform md:hidden">
           <div className="fixed inset-0 bg-black opacity-50" onClick={toggleMenu}></div>
-          <nav className="relative bg-blue-900 h-full w-64 py-4 flex flex-col">
+          <nav className="relative bg-gradient-to-bl from-blue-100 to-sky-600  h-full w-64 py-4 flex flex-col">
             <button onClick={toggleMenu} className="absolute top-4 right-4 text-white">
               <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
             </button>
@@ -133,6 +137,9 @@ const Header = ({ scrollToSection }) => {
             </div>
             <Link to="/benefits" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
               <FontAwesomeIcon icon={faGift} /> <span>Benefits</span>
+            </Link>
+            <Link to="/jobs" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+            <FontAwesomeIcon icon={faBriefcase} /> <span>Jobs</span>
             </Link>
             <Link to="/alumni" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
               <FontAwesomeIcon icon={faGraduationCap} /> <span>Alumni</span>
