@@ -12,6 +12,8 @@ import SignUp from './components/SignUp';
 import JobList from './components/JobList';
 import JobDetails from './components/JobDetails';
 import Footer from './components/Footer';
+import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 
 function App() {
   const aboutRef = useRef(null);
@@ -36,6 +38,7 @@ function App() {
           <Route path="/contact" element={<Contact />} />
           <Route path="/jobs" element={<JobList />} />
           <Route path="/jobs/:jobId" element={<JobDetails />} />
+          <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
         </Routes>
         <Footer />
       </Router>
