@@ -92,10 +92,22 @@ const getJobById = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, job, 'Job fetched successfully'));
 });
 
+
+const getJobCount = async (req, res) => {
+  try {
+    const count = await Job.countDocuments(); // Count the documents in the Job collection
+    return res.status(200).json(new ApiResponse(200, { count }, 'Job count retrieved successfully'));
+  } catch (error) {
+    console.error('Error counting jobs:', error);
+    return res.status(500).json(new ApiError(500, 'Error counting jobs', error.message));
+  }
+};
+
 export {
   createJob,
   updateJob,
   deleteJob,
   getAllJobs,
   getJobById,
+  getJobCount
 };
