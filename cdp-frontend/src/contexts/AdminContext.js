@@ -1,11 +1,10 @@
-// src/contexts/UserContext.js
 import React, { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
-export const UserContext = createContext();
+export const AdminContext = createContext();
 
-export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+export const AdminProvider = ({ children }) => {
+  const [admin, setAdmin] = useState(null);
 
   useEffect(() => {
     const getCookies = () => {
@@ -25,28 +24,23 @@ export const UserProvider = ({ children }) => {
       })
       .then(response => {
         if (response.data.status === 200) {
-          console.log('User fetched:', response.data.data);
-          setUser(response.data.data);
+          setAdmin(response.data.data);
         }
       })
       .catch(error => {
-        console.error("Error fetching current user", error);
+        console.error("Error fetching current admin", error);
       });
     }
   }, []);
 
-  const logout = async () => {
-    try {
-      await axios.post('http://localhost:8000/api/v1/users/logout', {}, { withCredentials: true });
-      setUser(null);
-    } catch (error) {
-      console.error("Error during logout:", error);
-    }
+  const logout = () => {
+    setAdmin(null);
+    // Additional logout logic (e.g., clearing cookies) can go here.
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, logout }}>
+    <AdminContext.Provider value={{ admin, logout }}>
       {children}
-    </UserContext.Provider>
+    </AdminContext.Provider>
   );
 };

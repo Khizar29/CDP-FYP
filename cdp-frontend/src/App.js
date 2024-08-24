@@ -1,8 +1,8 @@
-// src/App.js
 import React, { useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { UserProvider } from './contexts/UserContext'; // Corrected path
+import { UserProvider } from './contexts/UserContext';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import SignIn from './components/SignIn';
 import Home from './components/Home';
 import Benefits from './components/AlumniBenefits';
@@ -11,9 +11,22 @@ import Contact from './components/ContactUs';
 import SignUp from './components/SignUp';
 import JobList from './components/JobList';
 import JobDetails from './components/JobDetails';
-import Footer from './components/Footer';
 import ForgotPassword from './components/ForgotPassword';
 import ResetPassword from './components/ResetPassword';
+import AdminLayout from './components/admin/AdminLayout';
+import ProtectedRoute from './components/ProtectedRoute';
+import DashboardHome from './components/admin/DashboardHome';
+import AdminJobs from './components/admin/AdminJobs';
+import AddJob from './components/admin/manage/Jobs/AddJob';
+
+// User Layout Component
+const UserLayout = ({ children, scrollToSection }) => (
+  <>
+    <Header scrollToSection={scrollToSection} />
+    {children}
+    <Footer />
+  </>
+);
 
 function App() {
   const aboutRef = useRef(null);
@@ -27,66 +40,36 @@ function App() {
   return (
     <UserProvider>
       <Router>
-        <Header scrollToSection={scrollToSection} />
         <Routes>
-          <Route path="/" element={<Home aboutRef={aboutRef} />} />
-          <Route path="/about" element={<Home aboutRef={aboutRef} />} /> {/* Optional: separate About route */}
-          <Route path="/benefits" element={<Benefits />} />
-          <Route path="/alumni" element={<Alumni />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/jobs" element={<JobList />} />
-          <Route path="/jobs/:jobId" element={<JobDetails />} />
-          <Route path="/reset-password/:id/:token" element={<ResetPassword />} />
+          {/* User Routes */}
+          <Route path="/" element={<UserLayout scrollToSection={scrollToSection}><Home aboutRef={aboutRef} /></UserLayout>} />
+          <Route path="/about" element={<UserLayout scrollToSection={scrollToSection}><Home aboutRef={aboutRef} /></UserLayout>} />
+          <Route path="/benefits" element={<UserLayout scrollToSection={scrollToSection}><Benefits /></UserLayout>} />
+          <Route path="/alumni" element={<UserLayout scrollToSection={scrollToSection}><Alumni /></UserLayout>} />
+          <Route path="/signin" element={<UserLayout scrollToSection={scrollToSection}><SignIn /></UserLayout>} />
+          <Route path="/signup" element={<UserLayout scrollToSection={scrollToSection}><SignUp /></UserLayout>} />
+          <Route path="/contact" element={<UserLayout scrollToSection={scrollToSection}><Contact /></UserLayout>} />
+          <Route path="/jobs" element={<UserLayout scrollToSection={scrollToSection}><JobList /></UserLayout>} />
+          <Route path="/jobs/:jobId" element={<UserLayout scrollToSection={scrollToSection}><JobDetails /></UserLayout>} />
+          <Route path="/reset-password/:id/:token" element={<UserLayout scrollToSection={scrollToSection}><ResetPassword /></UserLayout>} />
+
+         
+          {/* Admin Routes */}
+          <Route path="/admin/*" element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }>
+            <Route path="" element={<DashboardHome />} />
+            <Route path="jobs" element={<AdminJobs/>} />
+            <Route path="jobs/manage" element={<AddJob />} />
+            <Route path="jobs/manage/:id" element={<AddJob />} />
+
+          </Route>
         </Routes>
-        <Footer />
       </Router>
     </UserProvider>
   );
 }
 
 export default App;
-
-
-
-
-
-
-// import React from 'react';
-// import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-// import { UserProvider } from './contexts/UserContext'; // Corrected path
-// import Home from './components/Home';
-// import SignIn from './components/SignIn';
-// import SignUp from './components/SignUp';
-// import Header from './components/Header';
-// import Footer from './components/Footer';
-// import About from './components/About';
-
-// import AlumniPage from './components/AlumniPage';
-
-// function App() {
-//   return (
-
-//     <UserProvider>
-//       <div className="flex flex-col min-h-screen">
-//       <Router>
-//         <Header />
-//         <div className="flex-grow">
-//           <Routes>
-//             <Route path="/" element={<Home />} />
-//             <Route path="/about" element={<About />} />
-//             <Route path="/signin" element={<SignIn />} />
-//             <Route path="/signup" element={<SignUp />} />
-//             <Route path="/alumni" element={<AlumniPage />} />
-//           </Routes>
-//         </div>
-//         <Footer />
-//       </Router>
-//     </div>
-//     </UserProvider>
-    
-//   );
-// }
-
-// export default App;

@@ -1,4 +1,3 @@
-// src/components/Header.js
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -6,7 +5,7 @@ import { faBars, faTimes, faHome, faInfoCircle, faGraduationCap, faCalendar, faU
 import logo from '../Images/logo-FAST-NU.png';
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
-import { faBriefcase, faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
+import { faBriefcase } from '@fortawesome/free-solid-svg-icons';
 
 const Header = ({ scrollToSection }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +53,7 @@ const Header = ({ scrollToSection }) => {
   }, [isDropdownOpen]);
 
   return (
-    <header className="bg-gradient-to-r from-blue-100 to-sky-600  text-white py-4">
+    <header className="bg-gradient-to-r from-blue-100 to-sky-600 text-white py-4">
       <div className="container mx-auto flex justify-between items-center px-5">
         <div className="flex items-center">
           <img src={logo} alt="FAST University Logo" className="h-10 md:h-12" />
@@ -70,7 +69,7 @@ const Header = ({ scrollToSection }) => {
             <FontAwesomeIcon icon={faGift} /> <span>Benefits</span>
           </Link>
           <Link to="/jobs" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
-          <FontAwesomeIcon icon={faBriefcase} /> <span>Jobs</span>
+            <FontAwesomeIcon icon={faBriefcase} /> <span>Jobs</span>
           </Link>
           <Link to="/alumni" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faGraduationCap} /> <span>Alumni</span>
@@ -97,14 +96,16 @@ const Header = ({ scrollToSection }) => {
                   <Link to="/change-password" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                     Change Password
                   </Link>
-                  <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
-                    Logout
-                  </div>
+                 
                   {user.role === 'admin' && (
                     <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                       Admin Panel
                     </Link>
                   )}
+
+                  <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
+                    Logout
+                  </div>
                 </div>
               )}
             </div>
@@ -121,70 +122,76 @@ const Header = ({ scrollToSection }) => {
         </div>
       </div>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-30 transform md:hidden">
-          <div className="fixed inset-0 bg-black opacity-50" onClick={toggleMenu}></div>
-          <nav className="relative bg-gradient-to-bl from-blue-100 to-sky-600  h-full w-64 py-4 flex flex-col">
-            <button onClick={toggleMenu} className="absolute top-4 right-4 text-white">
-              <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
-            </button>
-            <img src={logo} alt="FAST University Logo" className="h-10 mx-auto mb-6" />
-            <Link to="/" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-              <FontAwesomeIcon icon={faHome} /> <span>Home</span>
-            </Link>
-            <div onClick={() => { toggleMenu(); scrollToSection('about'); }} className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer">
-              <FontAwesomeIcon icon={faInfoCircle} /> <span>About Us</span>
-            </div>
-            <Link to="/benefits" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-              <FontAwesomeIcon icon={faGift} /> <span>Benefits</span>
-            </Link>
-            <Link to="/jobs" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-            <FontAwesomeIcon icon={faBriefcase} /> <span>Jobs</span>
-            </Link>
-            <Link to="/alumni" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-              <FontAwesomeIcon icon={faGraduationCap} /> <span>Alumni</span>
-            </Link>
-            <Link to="/events" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-              <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
-            </Link>
-            <Link to="/contact" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-              <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
-            </Link>
-            {user ? (
-              <div className="relative">
-                <div
-                  className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer"
-                  onClick={handleDropdownToggle}
-                >
-                  <FontAwesomeIcon icon={faUser} /> <span>{user.fullName}</span>
-                </div>
-                {isDropdownOpen && (
-                  <div
-                    ref={dropdownRef}
-                    className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50"
-                  >
-                    <Link to="/change-password" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                      Change Password
-                    </Link>
-                    <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
-                      Logout
-                    </div>
-                    {user.role === 'admin' && (
-                      <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                        Admin Panel
-                      </Link>
-                    )}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <Link to="/signin" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-                <FontAwesomeIcon icon={faUser} /> <span>Login</span>
+      <div
+        className={`fixed inset-0 z-30 transform md:hidden transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
+        {isOpen && (
+          <>
+            <div className="fixed inset-0 bg-black opacity-50" onClick={toggleMenu}></div>
+            <nav className="relative bg-gradient-to-bl from-blue-100 to-sky-600 h-full w-64 py-4 flex flex-col transition-transform duration-300 transform">
+              <button onClick={toggleMenu} className="absolute top-4 right-4 text-white">
+                <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
+              </button>
+              <img src={logo} alt="FAST University Logo" className="h-10 mx-auto mb-6" />
+              <Link to="/" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+                <FontAwesomeIcon icon={faHome} /> <span>Home</span>
               </Link>
-            )}
-          </nav>
-        </div>
-      )}
+              <div onClick={() => { toggleMenu(); scrollToSection('about'); }} className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer">
+                <FontAwesomeIcon icon={faInfoCircle} /> <span>About Us</span>
+              </div>
+              <Link to="/benefits" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+                <FontAwesomeIcon icon={faGift} /> <span>Benefits</span>
+              </Link>
+              <Link to="/jobs" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+                <FontAwesomeIcon icon={faBriefcase} /> <span>Jobs</span>
+              </Link>
+              <Link to="/alumni" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+                <FontAwesomeIcon icon={faGraduationCap} /> <span>Alumni</span>
+              </Link>
+              <Link to="/events" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+                <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
+              </Link>
+              <Link to="/contact" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+                <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
+              </Link>
+              {user ? (
+                <div className="relative">
+                  <div
+                    className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer"
+                    onClick={handleDropdownToggle}
+                  >
+                    <FontAwesomeIcon icon={faUser} /> <span>{user.fullName}</span>
+                  </div>
+                  {isDropdownOpen && (
+                    <div
+                      ref={dropdownRef}
+                      className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50"
+                    >
+                      <Link to="/change-password" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                        Change Password
+                      </Link>
+                      
+                      {user.role === 'admin' && (
+                        <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                          Admin Panel
+                        </Link>
+                      )}
+
+                      <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
+                        Logout
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link to="/signin" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+                  <FontAwesomeIcon icon={faUser} /> <span>Login</span>
+                </Link>
+              )}
+            </nav>
+          </>
+        )}
+      </div>
     </header>
   );
 };
