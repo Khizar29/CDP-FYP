@@ -42,6 +42,7 @@ export default function SignIn() {
 
       console.log('User logged in:', response.data);
       setUser(response.data.data.user); // Set the user context
+      localStorage.setItem('accessToken', response.data.data.accessToken);
       navigate('/'); // Redirect to home or another page after successful login
     } catch (error) {
       if (error.response) {
