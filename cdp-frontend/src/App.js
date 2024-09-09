@@ -6,7 +6,7 @@ import Footer from './components/Footer';
 import SignIn from './components/SignIn';
 import Home from './components/Home';
 import Benefits from './components/AlumniBenefits';
-import Alumni from './components/AlumniPage';
+import Alumni from './components/Graduates/AlumniPage';
 import Contact from './components/ContactUs';
 import SignUp from './components/SignUp';
 import JobList from './components/JobList';
