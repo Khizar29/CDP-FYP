@@ -1,12 +1,14 @@
 // src/components/SignIn.js
 import React, { useState, useContext } from 'react';
-import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container } from '@mui/material';
+import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container, IconButton, InputAdornment } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import ForgotPasswordModal from './ForgotPassword'; // Import the modal component
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const defaultTheme = createTheme();
 
@@ -25,6 +27,7 @@ export default function SignIn() {
   const [password, setPassword] = useState('');
   const [openForgotPassword, setOpenForgotPassword] = useState(false); // State for modal
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const { setUser } = useContext(UserContext);
 
   const handleSubmit = async (event) => {
@@ -55,6 +58,7 @@ export default function SignIn() {
 
   const handleOpenForgotPassword = () => setOpenForgotPassword(true);
   const handleCloseForgotPassword = () => setOpenForgotPassword(false);
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -93,11 +97,24 @@ export default function SignIn() {
               fullWidth
               name="password"
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'} // Toggle between 'text' and 'password'
               id="password"
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
