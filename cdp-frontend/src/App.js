@@ -18,6 +18,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DashboardHome from './components/admin/DashboardHome';
 import AdminJobs from './components/admin/AdminJobs';
 import AddJob from './components/admin/manage/Jobs/AddJob';
+import ChangePassword from './components/ChangePassword';
 
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
@@ -50,6 +51,7 @@ function App() {
           <Route path="/signup" element={<UserLayout scrollToSection={scrollToSection}><SignUp /></UserLayout>} />
           <Route path="/contact" element={<UserLayout scrollToSection={scrollToSection}><Contact /></UserLayout>} />
           <Route path="/jobs" element={<UserLayout scrollToSection={scrollToSection}><JobList /></UserLayout>} />
+          <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/jobs/:jobId" element={<UserLayout scrollToSection={scrollToSection}><JobDetails /></UserLayout>} />
           <Route path="/reset-password/:id/:token" element={<UserLayout scrollToSection={scrollToSection}><ResetPassword /></UserLayout>} />
 

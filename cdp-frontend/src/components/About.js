@@ -1,43 +1,47 @@
-// src/components/About.js
 import React from 'react';
-import buildingImage from '../Images/career.png'; // Replace with your image path
 import { Link } from "react-router-dom";
 
 const About = React.forwardRef((props, ref) => (
-  <div ref={ref} id="about" className="bg-white py-12"> {/* Add id="about" */}
+  <div ref={ref} id="about" className="bg-[#E3F6FD] py-16"> {/* Changed the full section background to bg-blue-100 */}
     <div className="container mx-auto px-4 lg:px-8">
-      <div className="flex flex-col md:flex-row items-start md:space-x-8">
-        <div className="md:w-1/2">
-          <h6 className="text-gray-600 uppercase tracking-widest text-sm">All About Our Campus</h6>
-          <h2 className="text-3xl font-bold text-gray-800 mt-2">
-            About Career Development Portal
-          </h2>
-          <h4 className="text-xl font-semibold text-blue-600 mt-4">
-            Welcome to the Career Services and Industrial Liaison Office Portal of FAST National University Karachi.
-          </h4>
-          <p className="text-gray-700 mt-4">
-            We are passionate about connecting talented individuals with their dream careers and empowering organizations to find the perfect fit for their teams.
-            <br />
-            <br />
-            <span className="font-bold">Our mission</span> is simple: to bridge the gap between job seekers and employers, fostering mutually beneficial connections that lead to personal and professional growth. We're committed to helping job seekers find meaningful employment opportunities that align with their skills, goals, and values.
+      <div className="md:w-3/4 mx-auto">
+        {/* Intro Section */}
+        <h6 className="text-blue-600 uppercase tracking-widest text-sm font-semibold">Career Development</h6>
+        <h2 className="text-4xl font-bold text-gray-900 mt-2 leading-tight">
+          About the Career Development Portal
+        </h2>
+        <p className="text-lg text-gray-600 mt-4 leading-relaxed">
+          Welcome to the Career Services and Industrial Liaison Office Portal of FAST National University Karachi. Our platform is designed to assist students, alumni, and employers in building successful career connections. We are dedicated to empowering individuals and organizations by bridging the gap between job seekers and employers.
+        </p>
+
+        {/* Mission Section */}
+        <div className="bg-white shadow-lg rounded-lg p-8 mt-8">
+          <h3 className="text-2xl font-semibold text-gray-800">Our Mission</h3>
+          <p className="text-gray-700 mt-4 leading-relaxed">
+            At the heart of our mission is the desire to connect talented individuals with meaningful career opportunities. We aim to foster a community where job seekers find roles that align with their skills, goals, and values, while also helping employers discover top-tier talent to enhance their organizations.
           </p>
-          <p className="text-gray-700 mt-4">
-            Simultaneously, we assist employers in identifying top talent to drive their businesses forward. Whether you're taking the first step on your career journey or looking to take it to the next level, FAST National University Career Services and Industrial Liaison Office is here to support you every step of the way.
+          <p className="text-gray-700 mt-4 leading-relaxed">
+            Whether you're a student taking your first steps toward a career or an alumnus looking for growth opportunities, our portal is here to support you at every stage. Employers can also rely on us to connect them with graduates who are prepared to make a difference in their industry.
           </p>
-          <blockquote className="border-l-4 border-blue-500 pl-4 mt-4 italic text-gray-600">
-            "Thank you for choosing us as your partner in career growth. We look forward to helping you achieve your aspirations and connect you with the opportunities that will shape your future."
-          </blockquote>
-          <div className="mt-6">
-            <h2 className="text-2xl font-semibold mb-4">Get Started</h2>
-            <p className="text-gray-700">
-              Ready to embark on your career journey with us?{" "}
-              <Link to="/signup" className="text-blue-500">Sign Up</Link> / <Link to="/signin" className="text-blue-500">Log In</Link> today!
-            </p>
-          </div>
         </div>
-        <div className="md:w-1/2 mt-8 md:mt-0">
-          <img src={buildingImage} alt="FAST National University" className="w-full h-auto rounded-lg shadow-md" />
+
+        {/* Value Proposition Section */}
+        <div className="bg-blue-100 rounded-lg p-8 mt-8"> {/* Kept the background color here for contrast */}
+          <h3 className="text-2xl font-semibold text-blue-900">Why Choose Us?</h3>
+          <ul className="list-disc list-inside text-gray-700 mt-4 leading-relaxed">
+            <li><strong>Comprehensive Job Listings:</strong> Access a wide range of job opportunities tailored to your skills and interests.</li>
+            <li><strong>Professional Development:</strong> Explore workshops, seminars, and resources to boost your career readiness.</li>
+            <li><strong>Industry Connections:</strong> Build lasting relationships with employers and industry leaders.</li>
+            <li><strong>Personalized Career Guidance:</strong> Receive one-on-one counseling and resume review services.</li>
+            <li><strong>Alumni Network:</strong> Tap into a robust network of FAST alumni who are making strides in their respective fields.</li>
+          </ul>
         </div>
+
+        {/* Quote Section */}
+        <blockquote className="bg-gray-200 rounded-lg p-6 mt-8 text-gray-700 italic border-l-4 border-blue-500">
+          "Thank you for choosing us as your partner in career growth. We look forward to helping you achieve your aspirations and connect you with opportunities that will shape your future."
+        </blockquote>
+
       </div>
     </div>
   </div>
