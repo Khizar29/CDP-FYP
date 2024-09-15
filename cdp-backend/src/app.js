@@ -27,10 +27,12 @@ app.use(express.static(path.join(__dirname, '../../cdp-frontend/build')));
 // Routes import
 import userRouter from './routes/user.routes.js';
 import jobRouter from './routes/job.routes.js';
+import graduateRouter from './routes/graduate.routes.js';
 
 // Routes declaration
 app.use("/api/v1/users", userRouter);
-app.use('/api/v1/jobs', jobRouter);
+app.use("/api/v1/jobs", jobRouter);
+app.use("/api/v1/graduates", graduateRouter);
 
 
 

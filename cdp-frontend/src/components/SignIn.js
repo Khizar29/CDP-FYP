@@ -142,6 +142,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import ForgotPasswordModal from './ForgotPassword'; // Import the modal component
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const defaultTheme = createTheme();
 
@@ -161,6 +163,7 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
   const [openForgotPassword, setOpenForgotPassword] = useState(false); // State for modal
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
   const { setUser } = useContext(UserContext);
 
   const handleSubmit = async (event) => {
@@ -190,6 +193,7 @@ export default function SignIn() {
 
   const handleOpenForgotPassword = () => setOpenForgotPassword(true);
   const handleCloseForgotPassword = () => setOpenForgotPassword(false);
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
