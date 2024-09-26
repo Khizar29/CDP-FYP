@@ -21,11 +21,13 @@ import AddJob from './components/admin/manage/Jobs/AddJob';
 
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
-  <>
+  <div className="min-h-screen flex flex-col">
     <Header scrollToSection={scrollToSection} />
-    {children}
+    <main className="flex-grow">
+      {children}
+    </main>
     <Footer />
-  </>
+  </div>
 );
 
 function App() {
@@ -53,7 +55,6 @@ function App() {
           <Route path="/jobs/:jobId" element={<UserLayout scrollToSection={scrollToSection}><JobDetails /></UserLayout>} />
           <Route path="/reset-password/:id/:token" element={<UserLayout scrollToSection={scrollToSection}><ResetPassword /></UserLayout>} />
 
-         
           {/* Admin Routes */}
           <Route path="/admin/*" element={
             <ProtectedRoute>
@@ -61,10 +62,9 @@ function App() {
             </ProtectedRoute>
           }>
             <Route path="" element={<DashboardHome />} />
-            <Route path="jobs" element={<AdminJobs/>} />
+            <Route path="jobs" element={<AdminJobs />} />
             <Route path="jobs/manage" element={<AddJob />} />
             <Route path="jobs/manage/:id" element={<AddJob />} />
-
           </Route>
         </Routes>
       </Router>
