@@ -7,7 +7,6 @@ import fs from 'fs'; // To work with the filesystem
 
 // Import graduates from Excel file (Admin only)
 const importGraduates = asyncHandler(async (req, res) => {
-  
   if (!req.user || req.user.role !== 'admin') {
     throw new ApiError(403, 'Forbidden: Admins only');
   }
@@ -41,41 +40,84 @@ const importGraduates = asyncHandler(async (req, res) => {
 
 // Update a graduate's information (Admin only)
 const updateGraduate = asyncHandler(async (req, res) => {
-    const { nuId } = req.params;
-    const { firstName, lastName, nuEmail, personalEmail, discipline, yearOfGraduation, cgpa, profilePic, contact, tagline, personalExperience, certificate, fyp } = req.body;
-  
-    // Check if the user is an admin
-    if (!req.user || req.user.role !== 'admin') {
-      throw new ApiError(403, 'Forbidden: Admins only');
-    }
-  
-    const graduate = await Graduate.findOne({ nuId });
-  
-    if (!graduate) {
-      throw new ApiError(404, 'Graduate not found');
-    }
-  
-    // Update the fields that are provided in the request body
-    graduate.firstName = firstName || graduate.firstName;
-    graduate.lastName = lastName || graduate.lastName;
-    graduate.nuEmail = nuEmail || graduate.nuEmail;
-    graduate.personalEmail = personalEmail || graduate.personalEmail;
-    graduate.discipline = discipline || graduate.discipline;
-    graduate.yearOfGraduation = yearOfGraduation || graduate.yearOfGraduation;
-    graduate.cgpa = cgpa || graduate.cgpa;
-    graduate.profilePic = profilePic || graduate.profilePic;
-    graduate.contact = contact || graduate.contact;
-    graduate.tagline = tagline || graduate.tagline;
-    graduate.personalExperience = personalExperience || graduate.personalExperience;
-    graduate.certificate = certificate || graduate.certificate;
-    graduate.fyp = fyp || graduate.fyp;
-  
-    await graduate.save();
-  
-    return res.status(200).json(new ApiResponse(200, graduate, 'Graduate updated successfully'));
-  });
-  
+  const { nuId } = req.params;
+  const { firstName, lastName, nuEmail, personalEmail, discipline, yearOfGraduation, cgpa, profilePic, contact, tagline, personalExperience, certificate, fyp } = req.body;
+
+  if (!req.user || req.user.role !== 'admin') {
+    throw new ApiError(403, 'Forbidden: Admins only');
+  }
+
+  const graduate = await Graduate.findOne({ nuId });
+
+  if (!graduate) {
+    throw new ApiError(404, 'Graduate not found');
+  }
+
+  // Update the fields that are provided in the request body
+  graduate.firstName = firstName || graduate.firstName;
+  graduate.lastName = lastName || graduate.lastName;
+  graduate.nuEmail = nuEmail || graduate.nuEmail;
+  graduate.personalEmail = personalEmail || graduate.personalEmail;
+  graduate.discipline = discipline || graduate.discipline;
+  graduate.yearOfGraduation = yearOfGraduation || graduate.yearOfGraduation;
+  graduate.cgpa = cgpa || graduate.cgpa;
+  graduate.profilePic = profilePic || graduate.profilePic;
+  graduate.contact = contact || graduate.contact;
+  graduate.tagline = tagline || graduate.tagline;
+  graduate.personalExperience = personalExperience || graduate.personalExperience;
+  graduate.certificate = certificate || graduate.certificate;
+  graduate.fyp = fyp || graduate.fyp;
+
+  await graduate.save();
+
+  return res.status(200).json(new ApiResponse(200, graduate, 'Graduate updated successfully'));
+});
+
+// Delete a graduate profile (Admin only)
+const deleteGraduate = asyncHandler(async (req, res) => {
+  const { nuId } = req.params;
+
+  if (!req.user || req.user.role !== 'admin') {
+    throw new ApiError(403, 'Forbidden: Admins only');
+  }
+
+  const graduate = await Graduate.findOneAndDelete({ nuId });
+
+  if (!graduate) {
+    throw new ApiError(404, 'Graduate not found');
+  }
+
+  return res.status(200).json(new ApiResponse(200, null, 'Graduate deleted successfully'));
+});
+
+// Fetch all graduates information (Public route)
+const fetchGraduates = asyncHandler(async (req, res) => {
+  try {
+    const graduates = await Graduate.find();
+    return res.status(200).json(new ApiResponse(200, graduates, 'Graduates fetched successfully'));
+  } catch (error) {
+    console.error('Error fetching graduates:', error);
+    return res.status(500).json(new ApiError(500, 'Failed to fetch graduates', error.message));
+  }
+});
+
+// Fetch a single Graduate by ID
+const getGraduateById = asyncHandler(async (req, res) => {
+  const { nuId } = req.params;
+
+  const graduate = await Graduate.findOne({ nuId });
+
+  if (!graduate) {
+    throw new ApiError(404, 'Graduate not found');
+  }
+
+  return res.status(200).json(new ApiResponse(200, graduate, 'Graduate fetched successfully'));
+});
+
 export {
   importGraduates,
-  updateGraduate
+  updateGraduate,
+  deleteGraduate,
+  fetchGraduates,
+  getGraduateById
 };
