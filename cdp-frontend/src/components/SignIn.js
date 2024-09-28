@@ -1,14 +1,17 @@
 // src/components/SignIn.js
 import React, { useState, useContext } from 'react';
-import { Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link, Grid, Box, Typography, Container, IconButton, InputAdornment } from '@mui/material';
+import {
+  Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link,
+  Grid, Box, Typography, Container, IconButton, InputAdornment, Alert
+} from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import ForgotPasswordModal from './ForgotPassword'; // Import the modal component
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const defaultTheme = createTheme();
 
@@ -26,6 +29,7 @@ export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [openForgotPassword, setOpenForgotPassword] = useState(false); // State for modal
+  const [errorMessage, setErrorMessage] = useState(''); // State for error message
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const { setUser } = useContext(UserContext);
@@ -33,6 +37,7 @@ export default function SignIn() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
+      setErrorMessage(''); // Clear any previous error message
       const response = await axios.post('http://localhost:8000/api/v1/users/login', {
         email,
         password,
@@ -48,10 +53,10 @@ export default function SignIn() {
       localStorage.setItem('accessToken', response.data.data.accessToken);
       navigate('/'); // Redirect to home or another page after successful login
     } catch (error) {
-      if (error.response) {
-        console.error('Error logging in:', error.response.data);
+      if (error.response && error.response.status === 401) {
+        setErrorMessage('The password you entered is incorrect.');
       } else {
-        console.error('Error logging in:', error.message);
+        setErrorMessage(error.response ? error.response.data.message : 'An error occurred. Please try again.');
       }
     }
   };
@@ -128,6 +133,14 @@ export default function SignIn() {
             >
               Sign In
             </Button>
+
+            {/* Error message display */}
+            {errorMessage && (
+              <Box sx={{ mt: 2, mb: 2 }}>
+                <Alert severity="error">{errorMessage}</Alert>
+              </Box>
+            )}
+
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2" onClick={handleOpenForgotPassword}>

@@ -1,3 +1,4 @@
+// src/components/Header.js
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -77,9 +78,9 @@ const Header = ({ scrollToSection }) => {
           <Link to="/events" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
           </Link>
-          <Link to="/contact" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
+          <div onClick={() => scrollToSection('contact')} className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
-          </Link>
+          </div>
           {user ? (
             <div className="relative">
               <div
@@ -151,9 +152,9 @@ const Header = ({ scrollToSection }) => {
               <Link to="/events" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
               </Link>
-              <Link to="/contact" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+              <div onClick={() => { toggleMenu(); scrollToSection('contact'); }} className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer">
                 <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
-              </Link>
+              </div>
               {user ? (
                 <div className="relative">
                   <div

@@ -1,63 +1,83 @@
-// src/components/AlumniPage.js
+// src/components/Graduates/AlumniPage.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Typography, Grid, Box } from '@mui/material';
-import SearchBar from './SearchBar';
+import { Typography, Grid, Box, CircularProgress } from '@mui/material';
 import AlumniCard from './AlumniCard';
 import Pagination from './Pagination';
-
-const alumniData = [
-  { id: 1, name: 'Mohammad Ahsan', title: 'BSc Social Development & Policy', image: 'https://via.placeholder.com/150', classOf: 2018 },
-  { id: 2, name: 'Syed Ahsan Ahmed', title: 'BS Computer Science', image: 'https://via.placeholder.com/150', classOf: 2020 },
-  { id: 3, name: 'Ali Raza', title: 'BBA', image: 'https://via.placeholder.com/150', classOf: 2019 },
-  { id: 4, name: 'Fatima Zahra', title: 'BS Accounting', image: 'https://via.placeholder.com/150', classOf: 2021 },
-  { id: 5, name: 'Usman Tariq', title: 'BS Computer Engineering', image: 'https://via.placeholder.com/150', classOf: 2017 },
-  { id: 6, name: 'Sara Khan', title: 'BSc Psychology', image: 'https://via.placeholder.com/150', classOf: 2016 },
-  { id: 7, name: 'Ahmed Ali', title: 'BS Civil Engineering', image: 'https://via.placeholder.com/150', classOf: 2020 },
-  { id: 8, name: 'Zainab Fatima', title: 'BS Chemical Engineering', image: 'https://via.placeholder.com/150', classOf: 2018 },
-  { id: 9, name: 'Hassan Raza', title: 'BS Mechanical Engineering', image: 'https://via.placeholder.com/150', classOf: 2019 },
-  { id: 10, name: 'Ayesha Siddiqui', title: 'BBA Marketing', image: 'https://via.placeholder.com/150', classOf: 2021 },
-  { id: 11, name: 'Muhammad Ali', title: 'BSc Mathematics', image: 'https://via.placeholder.com/150', classOf: 2020 },
-  { id: 12, name: 'Mariam Nawaz', title: 'BS Physics', image: 'https://via.placeholder.com/150', classOf: 2017 },
-  // Add more alumni data items here if needed
-];
-
-const shuffleArray = (array) => {
-  return array.sort(() => Math.random() - 0.5);
-};
+import SearchBar from '../SearchBar';
 
 const AlumniPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [alumniPerPage] = useState(10); // 2 rows * 5 cards per row
-  const [shuffledData, setShuffledData] = useState([]);
+  const [alumniData, setAlumniData] = useState([]); // Initialize as an empty array
+  const [totalPages, setTotalPages] = useState(1);
+  const [alumniPerPage] = useState(10); // Number of cards per page
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Shuffle the data and limit to 50 entries for 5 pages
-    const shuffled = shuffleArray(alumniData).slice(0, 50);
-    setShuffledData(shuffled);
+    const fetchAlumniData = async () => {
+      try {
+        setError(null);
+        setLoading(true);
+
+        // Fetch data from the backend API
+        const response = await axios.get('http://localhost:8000/api/v1/graduates');
+
+        if (response.data && Array.isArray(response.data.data)) {
+          setAlumniData(response.data.data); // Access the 'data' field in response
+          setTotalPages(Math.ceil(response.data.data.length / alumniPerPage)); // Calculate total pages
+        } else {
+          throw new Error('Unexpected response format from server');
+        }
+      } catch (error) {
+        setError(error.message || 'Error fetching alumni data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAlumniData();
   }, []);
 
   // Pagination logic
   const indexOfLastAlumni = currentPage * alumniPerPage;
   const indexOfFirstAlumni = indexOfLastAlumni - alumniPerPage;
-  const currentAlumni = shuffledData.slice(indexOfFirstAlumni, indexOfLastAlumni);
-  const totalPages = 5; // Fixed at 5 pages
+  const currentAlumni = alumniData.slice(indexOfFirstAlumni, indexOfLastAlumni);
 
+  // Handle page change
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
+  // Handle card click
+  const handleCardClick = (nuId) => {
+    navigate(`/profile/${nuId}`); // Navigate to profile page
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+        <Typography variant="h6" color="error">
+          {error}
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
-    <Box
-      sx={{
-        width: '100%', // Full width of the screen
-        padding: 0,
-        margin: 0,
-        overflowX: 'hidden',
-      }}
-    >
+    <Box sx={{ width: '100%', padding: 0, margin: 0, overflowX: 'hidden' }}>
       <Box
         sx={{
           position: 'relative',
-          backgroundImage: 'url(https://via.placeholder.com/1500x500)', // Replace with your banner image
+          backgroundImage: 'url(https://via.placeholder.com/1500x500)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           height: 300,
@@ -94,12 +114,13 @@ const AlumniPage = () => {
       </Box>
       <Grid container spacing={4} mt={2} sx={{ px: 3 }}>
         {currentAlumni.map((alumni) => (
-          <Grid item key={alumni.id} xs={12} sm={6} md={2.4}>
+          <Grid item key={alumni.nuId} xs={12} sm={6} md={2.4}>
             <AlumniCard
-              name={alumni.name}
-              title={alumni.title}
-              image={alumni.image}
-              classOf={alumni.classOf}
+              name={`${alumni.firstName} ${alumni.lastName}`}
+              title={alumni.discipline}
+              image={alumni.profilePic || 'https://via.placeholder.com/150'}
+              classOf={alumni.yearOfGraduation}
+              onClick={() => handleCardClick(alumni.nuId)}
             />
           </Grid>
         ))}
