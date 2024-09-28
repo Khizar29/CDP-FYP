@@ -4,28 +4,25 @@ import {
     updateGraduate,
     deleteGraduate,
     fetchGraduates,
-    getGraduateById
+    getGraduateById,
+    getGraduateCount
 } from '../controllers/graduate.controller.js';
 import { verifyJWT, verifyAdmin } from '../middlewares/auth.middleware.js';
 import { upload } from '../middlewares/multer.middleware.js'; // Import multer middleware for file handling
 
 const router = Router();
 
-// Admin routes
-router.use(verifyJWT);
-router.use(verifyAdmin);
-
-// Route to import graduates from an Excel file
-router.post('/import', upload.single('file'), importGraduates);
-
-// Route to update a graduate's information by nuId (Admin only)
-router.put('/:nuId', updateGraduate);
-
-// Route to delete a graduate's profile by nuId (Admin only)
-router.delete('/:nuId', deleteGraduate);
-
 // Public routes
-router.get('/', fetchGraduates); // Route to fetch all graduate profiles
-router.route('/:nuId').get(getGraduateById); // Route to fetch graduate by ID
+router.get('/count', getGraduateCount); // Fetch the count of graduates
+router.get('/', fetchGraduates); // Fetch all graduate profiles
+router.get('/:nuId', getGraduateById); // Fetch a single graduate by ID
+
+// Admin routes
+router.use(verifyJWT); // Apply JWT verification for all routes below this point
+router.use(verifyAdmin); // Apply admin verification for the following routes
+
+router.post('/import', upload.single('file'), importGraduates); // Import graduates from an Excel file
+router.put('/:nuId', updateGraduate); // Update a graduate's information
+router.delete('/:nuId', deleteGraduate); // Delete a graduate's profile
 
 export default router;
