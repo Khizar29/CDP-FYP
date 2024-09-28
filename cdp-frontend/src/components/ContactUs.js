@@ -7,29 +7,37 @@ const ContactUs = () => {
   const longitude = 67.2646838;
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-900 px-20 py-16">
-      <div className="w-full max-w-7xl bg-gray-800 rounded-lg shadow-lg flex overflow-hidden flex-col lg:flex-row">
+    <div className="min-h-screen flex justify-center items-center bg-gray-900 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="w-full max-w-7xl bg-gray-800 rounded-lg shadow-lg flex flex-col lg:flex-row overflow-hidden">
         {/* Left Section - Contact Info */}
-        <div className="w-full lg:w-1/2 p-16 bg-gradient-to-b from-blue-500 to-blue-200 text-white">
-          <h2 className="text-3xl font-bold mb-6">Get in touch</h2>
+        <div className="w-full lg:w-1/2 p-6 md:p-12 lg:p-16 bg-gradient-to-b from-blue-500 to-blue-200 text-white">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6">Get in touch</h2>
           <div className="mb-8">
-            <h3 className="text-lg font-semibold">Visit us</h3>
-            <p>Office of Industrial Liaison, Career Services and Digital Media, FAST National University of Computer and Emerging Sciences, Karachi</p>
-            <p>St-4, Sector 17-D, NH 5, Karachi, Karachi City, Sindh</p>
+            <h3 className="text-md md:text-lg font-semibold">Visit us</h3>
+            <p className="text-sm md:text-base">
+              Office of Industrial Liaison, Career Services and Digital Media, FAST National University of Computer and Emerging Sciences, Karachi
+            </p>
+            <p className="text-sm md:text-base">St-4, Sector 17-D, NH 5, Karachi, Karachi City, Sindh</p>
           </div>
           <div className="mb-8">
-            <h3 className="text-lg font-semibold">Chat to us</h3>
-            <p>Our friendly team is here to help.</p>
-            <p><a href="mailto:aysha.siddiqui@nu.edu.pk" className="text-white">aysha.siddiqui@nu.edu.pk</a></p>
-            <p><a href="mailto:cso.khi@nu.edu.pk" className="text-white">cso.khi@nu.edu.pk</a></p>
+            <h3 className="text-md md:text-lg font-semibold">Chat to us</h3>
+            <p className="text-sm md:text-base">Our friendly team is here to help.</p>
+            <p className="text-sm md:text-base">
+              <a href="mailto:aysha.siddiqui@nu.edu.pk" className="text-white hover:underline">aysha.siddiqui@nu.edu.pk</a>
+            </p>
+            <p className="text-sm md:text-base">
+              <a href="mailto:cso.khi@nu.edu.pk" className="text-white hover:underline">cso.khi@nu.edu.pk</a>
+            </p>
           </div>
           <div className="mb-8">
-            <h3 className="text-lg font-semibold">Call us</h3>
-            <p>Mon-Fri from 9am to 3:30pm</p>
-            <p><a href="tel:+92-21-111-128-128" className="text-white">+92-21-111-128-128</a></p>
+            <h3 className="text-md md:text-lg font-semibold">Call us</h3>
+            <p className="text-sm md:text-base">Mon-Fri from 9am to 3:30pm</p>
+            <p className="text-sm md:text-base">
+              <a href="tel:+92-21-111-128-128" className="text-white hover:underline">+92-21-111-128-128</a>
+            </p>
           </div>
           <div className="mb-8">
-            <h3 className="text-lg font-semibold">Social media</h3>
+            <h3 className="text-md md:text-lg font-semibold">Social media</h3>
             <div className="flex space-x-4">
               <a href="https://www.linkedin.com/in/aysha-siddiqui-9880451a2/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300">
                 <FaLinkedin size={24} />
@@ -38,7 +46,7 @@ const ContactUs = () => {
             </div>
           </div>
           <div className="mb-8">
-            <h3 className="text-lg font-semibold">Location</h3>
+            <h3 className="text-md md:text-lg font-semibold">Location</h3>
             <iframe
               title="Google Maps"
               width="100%"
@@ -52,9 +60,9 @@ const ContactUs = () => {
         </div>
 
         {/* Right Section - Contact Form */}
-        <div className="w-full lg:w-1/2 p-16 bg-gray-900 text-white">
+        <div className="w-full lg:w-1/2 p-6 md:p-12 lg:p-16 bg-gray-900 text-white">
           <form>
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block mb-2 text-lg">First Name</label>
                 <input
@@ -73,7 +81,7 @@ const ContactUs = () => {
               </div>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-6">
               <label className="block mb-2 text-lg">Subject</label>
               <input
                 type="text"
@@ -82,7 +90,7 @@ const ContactUs = () => {
               />
             </div>
 
-            <div className="mt-8">
+            <div className="mt-6">
               <label className="block mb-2 text-lg">Email</label>
               <input
                 type="email"
@@ -91,7 +99,7 @@ const ContactUs = () => {
               />
             </div>
 
-            <div className="mt-8">
+            <div className="mt-6">
               <label className="block mb-2 text-lg">Message</label>
               <textarea
                 placeholder="Tell us what we can help you with"
@@ -100,11 +108,11 @@ const ContactUs = () => {
               ></textarea>
             </div>
 
-            <div className="mt-8">
+            <div className="mt-6">
               <label className="inline-flex items-center">
                 <input type="checkbox" className="form-checkbox bg-gray-800 border border-gray-700 text-blue-500" />
                 <span className="ml-3 text-lg">
-                  I'd like to receive more information about the company. I understand and agree to the{' '}
+                  I understand and agree to the{' '}
                   <a href="#" className="text-blue-500">Privacy Policy</a>.
                 </span>
               </label>
