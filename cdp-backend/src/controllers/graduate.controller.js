@@ -5,7 +5,6 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import XLSX from 'xlsx'; // Library to parse Excel files
 import fs from 'fs'; // To work with the filesystem
 
-// Import graduates from Excel file (Admin only)
 const importGraduates = asyncHandler(async (req, res) => {
   if (!req.user || req.user.role !== 'admin') {
     throw new ApiError(403, 'Forbidden: Admins only');
@@ -23,20 +22,68 @@ const importGraduates = asyncHandler(async (req, res) => {
     const worksheet = workbook.Sheets[sheetName];
 
     // Convert the sheet data to JSON format
-    const graduatesData = XLSX.utils.sheet_to_json(worksheet);
+    let graduatesData = XLSX.utils.sheet_to_json(worksheet);
 
-    // Insert each graduate record into the database
-    const graduates = await Graduate.insertMany(graduatesData);
+    // Validate and process each graduate record
+    const validGraduates = [];
+    const errors = [];
+    for (let i = 0; i < graduatesData.length; i++) {
+      let graduate = graduatesData[i];
+
+      // Convert nuId and nuEmail to lowercase
+      graduate.nuId = graduate.nuId ? graduate.nuId.toLowerCase().trim() : null;
+      graduate.nuEmail = graduate.nuEmail ? graduate.nuEmail.toLowerCase().trim() : null;
+
+      // Check for missing required fields
+      if (
+        !graduate.nuId ||
+        !graduate.firstName ||
+        !graduate.lastName ||
+        !graduate.nuEmail ||
+        !graduate.discipline ||
+        !graduate.yearOfGraduation ||
+        !graduate.cgpa
+      ) {
+        errors.push(`Row ${i + 1}: Missing required field(s).`);
+        continue; // Skip to the next record
+      }
+
+      // Check for duplicates in the database by nuId
+      const existingGraduateByNuId = await Graduate.findOne({ nuId: graduate.nuId });
+      if (existingGraduateByNuId) {
+        errors.push(`Row ${i + 1}: Duplicate nuId "${graduate.nuId}" found in the database.`);
+        continue; // Skip to the next record
+      }
+
+      // Check for duplicates in the database by nuEmail
+      const existingGraduateByNuEmail = await Graduate.findOne({ nuEmail: graduate.nuEmail });
+      if (existingGraduateByNuEmail) {
+        errors.push(`Row ${i + 1}: Duplicate nuEmail "${graduate.nuEmail}" found in the database.`);
+        continue; // Skip to the next record
+      }
+
+      // Add the valid record to the array
+      validGraduates.push(graduate);
+    }
+
+    // If there are no valid graduates, return error response
+    if (validGraduates.length === 0) {
+      return res.status(400).json(new ApiError(400, 'No valid records to import. Errors: ' + errors.join(', ')));
+    }
+
+    // Insert valid graduates into the database
+    const graduates = await Graduate.insertMany(validGraduates);
 
     // Optionally, delete the file after processing to save space
     fs.unlinkSync(`./public/temp/${req.file.originalname}`);
 
-    return res.status(201).json(new ApiResponse(201, graduates, 'Graduates imported successfully'));
+    return res.status(201).json(new ApiResponse(201, graduates, 'Graduates imported successfully. Errors: ' + errors.join(', ')));
   } catch (error) {
     console.error('Error importing graduates:', error);
     return res.status(500).json(new ApiError(500, 'Failed to import graduates', error.message));
   }
 });
+
 
 // Update a graduate's information (Admin only)
 const updateGraduate = asyncHandler(async (req, res) => {
@@ -114,10 +161,20 @@ const getGraduateById = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, graduate, 'Graduate fetched successfully'));
 });
 
+const getGraduateCount = async (req, res) => {
+  try {
+    const count = await Graduate.countDocuments(); // Count the documents in the Graduate collection
+    return res.status(200).json(new ApiResponse(200, { count }, 'Graduate count retrieved successfully'));
+  } catch (error) {
+    console.error('Error counting Graduates:', error);
+    return res.status(500).json(new ApiError(500, 'Error counting Graduate', error.message));
+  }
+};
 export {
   importGraduates,
   updateGraduate,
   deleteGraduate,
   fetchGraduates,
-  getGraduateById
+  getGraduateById,
+  getGraduateCount
 };
