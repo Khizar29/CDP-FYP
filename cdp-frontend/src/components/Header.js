@@ -1,16 +1,17 @@
-// src/components/Header.js
 import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faHome, faInfoCircle, faGraduationCap, faCalendar, faUser, faPhone, faGift } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faHome, faInfoCircle, faGraduationCap, faCalendar, faUser, faPhone, faGift, faBriefcase } from '@fortawesome/free-solid-svg-icons';
 import logo from '../Images/logo-FAST-NU.png';
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
-import { faBriefcase } from '@fortawesome/free-solid-svg-icons';
+import SignIn from './SignIn'; // Import the SignIn component
+import { Box, Button, Modal } from '@mui/material';
 
 const Header = ({ scrollToSection }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isSignInOpen, setIsSignInOpen] = useState(false); // State for sign-in modal
   const { user, setUser } = useContext(UserContext);
   const dropdownRef = useRef(null);
 
@@ -41,6 +42,10 @@ const Header = ({ scrollToSection }) => {
       setIsDropdownOpen(false);
     }
   };
+
+  // Handlers to control SignIn modal
+  const handleOpenSignIn = () => setIsSignInOpen(true);
+  const handleCloseSignIn = () => setIsSignInOpen(false);
 
   useEffect(() => {
     if (isDropdownOpen) {
@@ -97,7 +102,7 @@ const Header = ({ scrollToSection }) => {
                   <Link to="/change-password" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                     Change Password
                   </Link>
-                 
+
                   {user.role === 'admin' && (
                     <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                       Admin Panel
@@ -111,9 +116,9 @@ const Header = ({ scrollToSection }) => {
               )}
             </div>
           ) : (
-            <Link to="/signin" className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
+            <div onClick={handleOpenSignIn} className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
               <FontAwesomeIcon icon={faUser} /> <span>Login</span>
-            </Link>
+            </div>
           )}
         </nav>
         <div className="md:hidden">
@@ -193,6 +198,24 @@ const Header = ({ scrollToSection }) => {
           </>
         )}
       </div>
+
+      {/* SignIn Modal */}
+      <Modal open={isSignInOpen} onClose={handleCloseSignIn}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            
+            bgcolor: 'background.paper',
+            borderRadius: 2,
+            boxShadow: 24,
+          }}
+        >
+          <SignIn />
+        </Box>
+      </Modal>
     </header>
   );
 };
