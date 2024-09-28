@@ -1,3 +1,4 @@
+// src/App.js
 import React, { useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { UserProvider } from './contexts/UserContext';
@@ -7,7 +8,7 @@ import SignIn from './components/SignIn';
 import Home from './components/Home';
 import Benefits from './components/AlumniBenefits';
 import Alumni from './components/Graduates/AlumniPage';
-import Contact from './components/ContactUs';
+import ProfilePage from './components/Graduates/ProfilePage';
 import SignUp from './components/SignUp';
 import JobList from './components/JobList';
 import JobDetails from './components/JobDetails';
@@ -19,6 +20,7 @@ import DashboardHome from './components/admin/DashboardHome';
 import AdminJobs from './components/admin/AdminJobs';
 import AddJob from './components/admin/manage/Jobs/AddJob';
 import ChangePassword from './components/ChangePassword';
+import ContactUs from './components/ContactUs';
 
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
@@ -33,10 +35,13 @@ const UserLayout = ({ children, scrollToSection }) => (
 
 function App() {
   const aboutRef = useRef(null);
+  const contactRef = useRef(null); // Add this reference for Contact Us
 
   const scrollToSection = (section) => {
     if (section === 'about' && aboutRef.current) {
       aboutRef.current.scrollIntoView({ behavior: 'smooth' });
+    } else if (section === 'contact' && contactRef.current) {
+      contactRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
@@ -45,13 +50,14 @@ function App() {
       <Router>
         <Routes>
           {/* User Routes */}
-          <Route path="/" element={<UserLayout scrollToSection={scrollToSection}><Home aboutRef={aboutRef} /></UserLayout>} />
-          <Route path="/about" element={<UserLayout scrollToSection={scrollToSection}><Home aboutRef={aboutRef} /></UserLayout>} />
+          <Route path="/" element={<UserLayout scrollToSection={scrollToSection}><Home aboutRef={aboutRef} contactRef={contactRef} /></UserLayout>} />
+          <Route path="/about" element={<UserLayout scrollToSection={scrollToSection}><Home aboutRef={aboutRef} contactRef={contactRef} /></UserLayout>} />
           <Route path="/benefits" element={<UserLayout scrollToSection={scrollToSection}><Benefits /></UserLayout>} />
           <Route path="/alumni" element={<UserLayout scrollToSection={scrollToSection}><Alumni /></UserLayout>} />
+          <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/signin" element={<UserLayout scrollToSection={scrollToSection}><SignIn /></UserLayout>} />
           <Route path="/signup" element={<UserLayout scrollToSection={scrollToSection}><SignUp /></UserLayout>} />
-          <Route path="/contact" element={<UserLayout scrollToSection={scrollToSection}><Contact /></UserLayout>} />
+          <Route path="/contactUs" element={<UserLayout scrollToSection={scrollToSection}><ContactUs /></UserLayout>} />
           <Route path="/jobs" element={<UserLayout scrollToSection={scrollToSection}><JobList /></UserLayout>} />
           <Route path="/jobs/:jobId" element={<UserLayout scrollToSection={scrollToSection}><JobDetails /></UserLayout>} />
           <Route path="/reset-password/:id/:token" element={<UserLayout scrollToSection={scrollToSection}><ResetPassword /></UserLayout>} />
