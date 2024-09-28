@@ -1,4 +1,4 @@
-// src/components/Pagination.js
+// src/components/Graduates/Pagination.js
 import React from 'react';
 import { Pagination as MuiPagination } from '@mui/material';
 
