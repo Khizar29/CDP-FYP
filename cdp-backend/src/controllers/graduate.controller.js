@@ -10,79 +10,81 @@ const importGraduates = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'Forbidden: Admins only');
   }
 
-  // Check if a file is provided
   if (!req.file) {
     throw new ApiError(400, 'No file uploaded');
   }
 
   try {
-    // Read the Excel file from the local temp directory
     const workbook = XLSX.readFile(`./public/temp/${req.file.originalname}`);
-    const sheetName = workbook.SheetNames[0]; // Get the first sheet
+    const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
 
-    // Convert the sheet data to JSON format
     let graduatesData = XLSX.utils.sheet_to_json(worksheet);
 
-    // Validate and process each graduate record
     const validGraduates = [];
     const errors = [];
+    const duplicateNuIds = [];
+    const duplicateNuEmails = [];
+
     for (let i = 0; i < graduatesData.length; i++) {
       let graduate = graduatesData[i];
 
-      // Convert nuId and nuEmail to lowercase
+      // Normalize and trim data
       graduate.nuId = graduate.nuId ? graduate.nuId.toLowerCase().trim() : null;
       graduate.nuEmail = graduate.nuEmail ? graduate.nuEmail.toLowerCase().trim() : null;
 
       // Check for missing required fields
-      if (
-        !graduate.nuId ||
-        !graduate.firstName ||
-        !graduate.lastName ||
-        !graduate.nuEmail ||
-        !graduate.discipline ||
-        !graduate.yearOfGraduation ||
-        !graduate.cgpa
-      ) {
+      if (!graduate.nuId || !graduate.firstName || !graduate.lastName || !graduate.nuEmail || !graduate.discipline || !graduate.yearOfGraduation || !graduate.cgpa) {
         errors.push(`Row ${i + 1}: Missing required field(s).`);
-        continue; // Skip to the next record
+        continue;
       }
 
       // Check for duplicates in the database by nuId
       const existingGraduateByNuId = await Graduate.findOne({ nuId: graduate.nuId });
       if (existingGraduateByNuId) {
-        errors.push(`Row ${i + 1}: Duplicate nuId "${graduate.nuId}" found in the database.`);
-        continue; // Skip to the next record
+        duplicateNuIds.push(graduate.nuId);
+        continue;
       }
 
       // Check for duplicates in the database by nuEmail
       const existingGraduateByNuEmail = await Graduate.findOne({ nuEmail: graduate.nuEmail });
       if (existingGraduateByNuEmail) {
-        errors.push(`Row ${i + 1}: Duplicate nuEmail "${graduate.nuEmail}" found in the database.`);
-        continue; // Skip to the next record
+        duplicateNuEmails.push(graduate.nuEmail);
+        continue;
       }
 
-      // Add the valid record to the array
+      // Add valid graduate to array
       validGraduates.push(graduate);
     }
 
-    // If there are no valid graduates, return error response
-    if (validGraduates.length === 0) {
-      return res.status(400).json(new ApiError(400, 'No valid records to import. Errors: ' + errors.join(', ')));
+    // If no valid records found
+    if (validGraduates.length === 0 && (duplicateNuIds.length > 0 || duplicateNuEmails.length > 0)) {
+      return res.status(400).json(
+        new ApiError(
+          400,
+          `No new records to import. Duplicate nuId(s): ${duplicateNuIds.join(', ')}. Duplicate nuEmail(s): ${duplicateNuEmails.join(', ')}.`
+        )
+      );
     }
 
-    // Insert valid graduates into the database
+    // Insert valid records into the database
     const graduates = await Graduate.insertMany(validGraduates);
-
-    // Optionally, delete the file after processing to save space
     fs.unlinkSync(`./public/temp/${req.file.originalname}`);
 
-    return res.status(201).json(new ApiResponse(201, graduates, 'Graduates imported successfully. Errors: ' + errors.join(', ')));
+    // Return detailed response with errors
+    return res.status(201).json(
+      new ApiResponse(
+        201,
+        graduates,
+        `Graduates imported successfully. ${errors.length} records skipped. Duplicate nuId(s): ${duplicateNuIds.join(', ')}. Duplicate nuEmail(s): ${duplicateNuEmails.join(', ')}.`
+      )
+    );
   } catch (error) {
     console.error('Error importing graduates:', error);
     return res.status(500).json(new ApiError(500, 'Failed to import graduates', error.message));
   }
 });
+
 
 
 // Update a graduate's information (Admin only)
