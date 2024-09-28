@@ -59,12 +59,12 @@ const Header = ({ scrollToSection }) => {
   }, [isDropdownOpen]);
 
   return (
-    <header className="bg-gradient-to-r from-blue-100 to-sky-600 text-white py-4">
-      <div className="container mx-auto flex justify-between items-center px-5">
+    <header className="bg-gradient-to-r from-blue-100 to-sky-600 text-white py-2 md:py-4"> {/* Adjusted padding for mobile and desktop views */}
+      <div className="container mx-auto flex justify-between items-center px-4 md:px-8">
         <div className="flex items-center">
-          <img src={logo} alt="FAST University Logo" className="h-10 md:h-12" />
+          <img src={logo} alt="FAST University Logo" className="h-8 md:h-10 lg:h-12" /> {/* Adjust logo size for different screens */}
         </div>
-        <nav className="hidden md:flex flex-grow justify-end space-x-6">
+        <nav className="hidden md:flex flex-grow justify-end space-x-4 lg:space-x-6">
           <Link to="/" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faHome} /> <span>Home</span>
           </Link>
@@ -102,13 +102,11 @@ const Header = ({ scrollToSection }) => {
                   <Link to="/change-password" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                     Change Password
                   </Link>
-
                   {user.role === 'admin' && (
                     <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                       Admin Panel
                     </Link>
                   )}
-
                   <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
                     Logout
                   </div>
@@ -176,13 +174,11 @@ const Header = ({ scrollToSection }) => {
                       <Link to="/change-password" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                         Change Password
                       </Link>
-                      
                       {user.role === 'admin' && (
                         <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                           Admin Panel
                         </Link>
                       )}
-
                       <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
                         Logout
                       </div>
@@ -207,10 +203,11 @@ const Header = ({ scrollToSection }) => {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            
+            width: 400,
             bgcolor: 'background.paper',
             borderRadius: 2,
             boxShadow: 24,
+            p: 4,
           }}
         >
           <SignIn />
