@@ -74,13 +74,14 @@ const AlumniPage = () => {
 
   return (
     <Box sx={{ width: '100%', padding: 0, margin: 0, overflowX: 'hidden' }}>
+      {/* Banner Section */}
       <Box
         sx={{
           position: 'relative',
           backgroundImage: 'url(https://via.placeholder.com/1500x500)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          height: 300,
+          height: { xs: 200, sm: 250, md: 300 }, // Responsive height
           borderRadius: 0,
           mb: 4,
           display: 'flex',
@@ -100,21 +101,27 @@ const AlumniPage = () => {
           },
         }}
       >
-        <Typography variant="h2" align="center" sx={{ position: 'relative', zIndex: 2 }}>
+        <Typography variant="h3" align="center" sx={{ position: 'relative', zIndex: 2, fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' } }}>
           Graduates Directory
         </Typography>
       </Box>
-      <Box sx={{ maxWidth: '100%', px: 3 }}>
+
+      {/* Search Bar Section */}
+      <Box sx={{ maxWidth: '100%', px: { xs: 2, sm: 3, md: 4 }, mb: 4 }}>
         <SearchBar onSearch={() => {}} /> {/* Implement search as needed */}
       </Box>
-      <Box sx={{ mt: 4, mb: 2, px: 3 }}>
-        <Typography variant="h6" component="div" sx={{ textAlign: 'center', color: 'gray' }}>
+
+      {/* Alumni Showcase Title */}
+      <Box sx={{ mt: 4, mb: 2, px: { xs: 2, sm: 3, md: 4 } }}>
+        <Typography variant="h6" component="div" sx={{ textAlign: 'center', color: 'gray', fontSize: { xs: '1rem', sm: '1.2rem' } }}>
           Alumni Showcase
         </Typography>
       </Box>
-      <Grid container spacing={4} mt={2} sx={{ px: 3 }}>
+
+      {/* Alumni Cards Grid */}
+      <Grid container spacing={4} mt={2} sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
         {currentAlumni.map((alumni) => (
-          <Grid item key={alumni.nuId} xs={12} sm={6} md={2.4}>
+          <Grid item key={alumni.nuId} xs={12} sm={6} md={4} lg={3}>
             <AlumniCard
               name={`${alumni.firstName} ${alumni.lastName}`}
               title={alumni.discipline}
@@ -125,6 +132,8 @@ const AlumniPage = () => {
           </Grid>
         ))}
       </Grid>
+
+      {/* Pagination Component */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 4 }}>
         <Pagination
           currentPage={currentPage}

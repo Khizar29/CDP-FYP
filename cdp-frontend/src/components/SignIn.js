@@ -1,8 +1,20 @@
-// src/components/SignIn.js
 import React, { useState, useContext } from 'react';
 import {
-  Avatar, Button, CssBaseline, TextField, FormControlLabel, Checkbox, Link,
-  Grid, Box, Typography, Container, IconButton, InputAdornment, Alert
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  FormControlLabel,
+  Checkbox,
+  Link,
+  Grid,
+  Box,
+  Typography,
+  Container,
+  IconButton,
+  InputAdornment,
+  Alert,
+  Paper
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -11,7 +23,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
-import ForgotPasswordModal from './ForgotPassword'; // Import the modal component
+import ForgotPasswordModal from './ForgotPassword';
 
 const defaultTheme = createTheme();
 
@@ -28,8 +40,8 @@ function Copyright(props) {
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [openForgotPassword, setOpenForgotPassword] = useState(false); // State for modal
-  const [errorMessage, setErrorMessage] = useState(''); // State for error message
+  const [openForgotPassword, setOpenForgotPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const { setUser } = useContext(UserContext);
@@ -37,7 +49,7 @@ export default function SignIn() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      setErrorMessage(''); // Clear any previous error message
+      setErrorMessage(''); 
       const response = await axios.post('http://localhost:8000/api/v1/users/login', {
         email,
         password,
@@ -49,9 +61,9 @@ export default function SignIn() {
       });
 
       console.log('User logged in:', response.data);
-      setUser(response.data.data.user); // Set the user context
+      setUser(response.data.data.user);
       localStorage.setItem('accessToken', response.data.data.accessToken);
-      navigate('/'); // Redirect to home or another page after successful login
+      navigate('/');
     } catch (error) {
       if (error.response && error.response.status === 401) {
         setErrorMessage('The password you entered is incorrect.');
@@ -70,20 +82,15 @@ export default function SignIn() {
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
+          className="mt-8 flex flex-col items-center px-1 py-1 sm:px-1 sm:py-1 md:px-4 md:py-1 bg-white rounded-lg shadow-lg"
         >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
           </Avatar>
-          <Typography component="h1" variant="h5">
+          <Typography component="h1" variant="h5" className="font-bold text-center text-gray-800">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }} className="w-full space-y-4">
             <TextField
               margin="normal"
               required
@@ -95,6 +102,7 @@ export default function SignIn() {
               autoFocus
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="bg-gray-100 rounded-md"
             />
             <TextField
               margin="normal"
@@ -102,11 +110,12 @@ export default function SignIn() {
               fullWidth
               name="password"
               label="Password"
-              type={showPassword ? 'text' : 'password'} // Toggle between 'text' and 'password'
+              type={showPassword ? 'text' : 'password'}
               id="password"
               autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="bg-gray-100 rounded-md"
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
@@ -129,14 +138,15 @@ export default function SignIn() {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              sx={{ mt: 2, mb: 2 }}
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-full py-2 text-lg transition duration-300"
             >
               Sign In
             </Button>
 
             {/* Error message display */}
             {errorMessage && (
-              <Box sx={{ mt: 2, mb: 2 }}>
+              <Box sx={{ mt: 1, mb: 1 }}>
                 <Alert severity="error">{errorMessage}</Alert>
               </Box>
             )}
@@ -156,7 +166,7 @@ export default function SignIn() {
           </Box>
         </Box>
         <ForgotPasswordModal open={openForgotPassword} handleClose={handleCloseForgotPassword} />
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        <Copyright sx={{ mt: 2, mb: 0.5 }} />
       </Container>
     </ThemeProvider>
   );
