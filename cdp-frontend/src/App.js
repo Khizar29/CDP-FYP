@@ -1,4 +1,3 @@
-// src/App.js
 import React, { useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { UserProvider } from './contexts/UserContext';
@@ -19,8 +18,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DashboardHome from './components/admin/DashboardHome';
 import AdminJobs from './components/admin/AdminJobs';
 import AddJob from './components/admin/manage/Jobs/AddJob';
+import AdminGraduates from './components/admin/manage/Graduates/AdminGraduate'; // Main page for managing graduates
+import AddGraduate from './components/admin/manage/Graduates/AddGraduate'; // Component for importing graduates via Excel file
 import ChangePassword from './components/ChangePassword';
 import ContactUs from './components/ContactUs';
+import UpdateGraduate from './components/admin/manage/Graduates/UpdateGraduate';
+import ViewGraduate from './components/admin/manage/Graduates/ViewGraduate';
 
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
@@ -35,7 +38,7 @@ const UserLayout = ({ children, scrollToSection }) => (
 
 function App() {
   const aboutRef = useRef(null);
-  const contactRef = useRef(null); // Add this reference for Contact Us
+  const contactRef = useRef(null);
 
   const scrollToSection = (section) => {
     if (section === 'about' && aboutRef.current) {
@@ -73,6 +76,13 @@ function App() {
             <Route path="jobs" element={<AdminJobs />} />
             <Route path="jobs/manage" element={<AddJob />} />
             <Route path="jobs/manage/:id" element={<AddJob />} />
+
+            {/* Graduate Routes */}
+            <Route path="graduates" element={<AdminGraduates />} /> {/* Displays all graduates and options */}
+            <Route path="graduates/import" element={<AddGraduate />} /> {/* Bulk import graduates via Excel */}
+            <Route path="graduates/view/:nuId" element={<ViewGraduate />} /> {/* Add view route */}
+            <Route path="graduates/edit/:nuId" element={<UpdateGraduate />} /> {/* Add edit route */}
+
           </Route>
         </Routes>
       </Router>
