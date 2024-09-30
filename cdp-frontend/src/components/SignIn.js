@@ -37,7 +37,7 @@ function Copyright(props) {
   );
 }
 
-export default function SignIn() {
+export default function SignIn({ onClose }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [openForgotPassword, setOpenForgotPassword] = useState(false);
@@ -49,7 +49,7 @@ export default function SignIn() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      setErrorMessage(''); 
+      setErrorMessage('');
       const response = await axios.post('http://localhost:8000/api/v1/users/login', {
         email,
         password,
@@ -63,6 +63,13 @@ export default function SignIn() {
       console.log('User logged in:', response.data);
       setUser(response.data.data.user);
       localStorage.setItem('accessToken', response.data.data.accessToken);
+
+      // Close the modal if onClose is provided
+      if (onClose) {
+        onClose();
+      }
+
+      // Redirect to home page
       navigate('/');
     } catch (error) {
       if (error.response && error.response.status === 401) {
@@ -79,10 +86,10 @@ export default function SignIn() {
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Container component="main" maxWidth="xs">
+      <Container component="main" className="md:max-w-md lg:max-w-lg mx-auto">
         <CssBaseline />
         <Box
-          className="mt-8 flex flex-col items-center px-1 py-1 sm:px-1 sm:py-1 md:px-4 md:py-1 bg-white rounded-lg shadow-lg"
+          className="mt-8 flex flex-col items-center px-4 py-6 bg-white rounded-lg shadow-lg"
         >
           <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
             <LockOutlinedIcon />
@@ -90,9 +97,8 @@ export default function SignIn() {
           <Typography component="h1" variant="h5" className="font-bold text-center text-gray-800">
             Sign in
           </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }} className="w-full space-y-4">
+          <Box component="form" onSubmit={handleSubmit} noValidate className="w-full space-y-4 mt-4">
             <TextField
-              margin="normal"
               required
               fullWidth
               id="email"
@@ -105,7 +111,6 @@ export default function SignIn() {
               className="bg-gray-100 rounded-md"
             />
             <TextField
-              margin="normal"
               required
               fullWidth
               name="password"
@@ -130,23 +135,21 @@ export default function SignIn() {
                 )
               }}
             />
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
-            />
+            /> */}
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 2, mb: 2 }}
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-full py-2 text-lg transition duration-300"
             >
               Sign In
             </Button>
 
-            {/* Error message display */}
             {errorMessage && (
-              <Box sx={{ mt: 1, mb: 1 }}>
+              <Box className="mt-2 mb-2">
                 <Alert severity="error">{errorMessage}</Alert>
               </Box>
             )}

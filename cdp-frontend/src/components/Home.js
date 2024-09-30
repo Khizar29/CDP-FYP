@@ -1,30 +1,28 @@
-// src/components/Home.js
 import React, { useState, useContext, useEffect } from 'react';
 import { Link as ScrollLink } from 'react-scroll';
 import { Link as RouterLink } from 'react-router-dom';
-import backgroundImage1 from '../Images/FAST_PIC_1.jpg'; // First background image
-import backgroundImage2 from '../Images/FAST_PIC_2.jpg'; // Second background image
-import backgroundImage3 from '../Images/FAST_PIC_3.jpg'; // Third background image
+import backgroundImage1 from '../Images/FAST_PIC_1.jpg';
+import backgroundImage2 from '../Images/FAST_PIC_2.jpg';
+import backgroundImage3 from '../Images/FAST_PIC_3.jpg';
 import About from './About';
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
 import ContactUs from './ContactUs';
 import SignIn from './SignIn'; // Import the SignIn component
 
-
 const Home = ({ aboutRef, contactRef }) => {
   const { user, setUser } = useContext(UserContext);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0); // To track the current background image index
-  const [signInOpen, setSignInOpen] = useState(false); // State for SignIn popup
-  const backgroundImages = [backgroundImage1, backgroundImage2, backgroundImage3]; // Array of background images
-  const transitionInterval = 5000; // Image change interval in milliseconds
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [signInOpen, setSignInOpen] = useState(false);
+  const backgroundImages = [backgroundImage1, backgroundImage2, backgroundImage3];
+  const transitionInterval = 5000;
 
   useEffect(() => {
     const changeBackgroundImage = () => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
     };
     const interval = setInterval(changeBackgroundImage, transitionInterval);
-    return () => clearInterval(interval); // Clear interval on component unmount
+    return () => clearInterval(interval);
   }, [backgroundImages.length]);
 
   const handleLogout = async () => {
@@ -45,10 +43,7 @@ const Home = ({ aboutRef, contactRef }) => {
 
   return (
     <div>
-    
-
       <section id="home" className="relative h-screen rounded-3xl m-4 lg:m-10 overflow-hidden">
-        {/* Background Image Container with Smooth Transition */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="flex transition-all ease-linear duration-[5000ms] h-full" style={{ transform: `translateX(-${currentImageIndex * 100}%)` }}>
             {backgroundImages.map((image, index) => (
@@ -94,15 +89,12 @@ const Home = ({ aboutRef, contactRef }) => {
         </div>
       </section>
 
-      {/* About Section */}
       <About ref={aboutRef} />
 
-      {/* Contact Us Section */}
       <div ref={contactRef}>
         <ContactUs />
       </div>
 
-      {/* SignIn Popup */}
       {signInOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white rounded-lg p-4 shadow-lg relative max-w-md w-full">
@@ -112,12 +104,10 @@ const Home = ({ aboutRef, contactRef }) => {
             >
               &times;
             </button>
-            <SignIn />
+            <SignIn onClose={handleCloseSignIn} />
           </div>
         </div>
       )}
-
-      
     </div>
   );
 };
