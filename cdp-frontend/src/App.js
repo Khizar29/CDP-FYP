@@ -16,7 +16,7 @@ import ResetPassword from './components/ResetPassword';
 import AdminLayout from './components/admin/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import DashboardHome from './components/admin/DashboardHome';
-import AdminJobs from './components/admin/AdminJobs';
+import AdminJobs from './components/admin/manage/Jobs/AdminJobs';
 import AddJob from './components/admin/manage/Jobs/AddJob';
 import AdminGraduates from './components/admin/manage/Graduates/AdminGraduate'; // Main page for managing graduates
 import AddGraduate from './components/admin/manage/Graduates/AddGraduate'; // Component for importing graduates via Excel file
