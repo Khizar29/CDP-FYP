@@ -5,10 +5,12 @@ import { UserContext } from '../contexts/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBriefcase, faCalendarAlt, faArrowLeft, faSearch, faTimes, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { motion, AnimatePresence } from 'framer-motion';
-import '../styles/JobList.css'
+import '../styles/JobList.css';
+import SignIn from './SignIn';
 
 const JobList = () => {
   const [jobs, setJobs] = useState([]);
+  const [signInOpen, setSignInOpen] = useState(false);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState({
@@ -22,14 +24,22 @@ const JobList = () => {
   const jobTypes = ['Remote', 'Onsite', 'Hybrid', 'Internship'];
   const niches = ['Backend Developer', 'Frontend Developer', 'Data Science', 'FullStack Developer', 'DevOps Engineer'];
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/signin');
-    } else {
-      fetchJobs();
-    }
-  }, [user, navigate]);
+  // Toggle sign-in modal
+  const handleOpenSignIn = () => setSignInOpen(true);
+  const handleCloseSignIn = () => setSignInOpen(false);
 
+  // Fetch jobs from API
+  const fetchJobs = async () => {
+    try {
+      const response = await axios.get('http://localhost:8000/api/v1/jobs');
+      setJobs(response.data.data);
+      setFilteredJobs(response.data.data);
+    } catch (error) {
+      console.error('Error fetching jobs:', error);
+    }
+  };
+
+  // Apply search and filters
   const applyFilters = useCallback(() => {
     let filtered = jobs;
 
@@ -59,20 +69,7 @@ const JobList = () => {
     setFilteredJobs(filtered);
   }, [jobs, searchTerm, filters]);
 
-  useEffect(() => {
-    applyFilters();
-  }, [searchTerm, filters, jobs, applyFilters]);
-
-  const fetchJobs = async () => {
-    try {
-      const response = await axios.get('http://localhost:8000/api/v1/jobs');
-      setJobs(response.data.data);
-      setFilteredJobs(response.data.data);
-    } catch (error) {
-      console.error('Error fetching jobs:', error);
-    }
-  };
-
+  // Handle filter changes
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
     setFilters(prevFilters => ({
@@ -80,6 +77,20 @@ const JobList = () => {
       [name]: value,
     }));
   };
+
+  // Fetch jobs if user is logged in, otherwise open sign-in modal
+  useEffect(() => {
+    if (!user) {
+      handleOpenSignIn();
+    } else {
+      fetchJobs();
+    }
+  }, [user]);
+
+  // Apply filters on searchTerm and filters change
+  useEffect(() => {
+    applyFilters();
+  }, [searchTerm, filters, jobs, applyFilters]);
 
   const handleJobClick = (job) => {
     setSelectedJob(job);
@@ -108,6 +119,7 @@ const JobList = () => {
 
   return (
     <div className="flex flex-col p-6 h-screen overflow-hidden">
+      {/* Search and Filters */}
       <div className="flex justify-between items-center mb-6">
         <div className="relative flex-1 mr-4">
           <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
@@ -126,6 +138,7 @@ const JobList = () => {
             />
           )}
         </div>
+        {/* Filter Select */}
         <div className="flex space-x-4">
           <div className="relative">
             <FontAwesomeIcon icon={faFilter} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
@@ -157,7 +170,11 @@ const JobList = () => {
           </div>
         </div>
       </div>
-      <h1 className="text-4xl font-bold text-center mb-8 text-blue-900">Find your <span className='text-blue-400'>Job</span> here.</h1>
+
+      {/* Jobs List */}
+      <h1 className="text-4xl font-bold text-center mb-8 text-blue-900">
+        Find your <span className="text-blue-400">Job</span> here.
+      </h1>
       <div className="flex flex-col md:flex-row h-full overflow-hidden">
         <div className="flex-1 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-blue-700 scrollbar-track-blue-300">
           {filteredJobs.length > 0 ? (
@@ -179,10 +196,10 @@ const JobList = () => {
                   <h2 className="text-2xl font-bold text-blue-900 mb-2">{job.title}</h2>
                   <p className="text-xl font-semibold mb-2 text-amber-400">{job.company_name}</p>
                   <p className="text-gray-700 mb-2">
-                  <FontAwesomeIcon icon={faBriefcase} /> {job.job_type}
+                    <FontAwesomeIcon icon={faBriefcase} /> {job.job_type}
                   </p>
                   <p className="text-gray-700 mb-2">
-                  <FontAwesomeIcon icon={faCalendarAlt} /> {new Date(job.posted_on).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    <FontAwesomeIcon icon={faCalendarAlt} /> {new Date(job.posted_on).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                   </p>
                   <Link to="#" className="text-blue-600 hover:underline">Click here to apply</Link>
                   <Link to="#" className="block w-[66px] mt-4 bg-blue-900 text-white py-2 px-4 rounded-full hover:bg-blue-600 transition duration-300">View</Link>
@@ -195,6 +212,7 @@ const JobList = () => {
         </div>
       </div>
 
+      {/* Job Details Modal */}
       <AnimatePresence>
         {selectedJob && (
           <motion.div
@@ -220,6 +238,21 @@ const JobList = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Sign In Modal */}
+      {signInOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-lg p-4 shadow-lg relative max-w-md w-full">
+            <button
+              onClick={handleCloseSignIn}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-800"
+            >
+              &times;
+            </button>
+            <SignIn onClose={handleCloseSignIn} />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
