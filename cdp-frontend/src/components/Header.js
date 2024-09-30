@@ -1,5 +1,5 @@
-import React, { useState, useContext, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useContext, useEffect, useRef} from 'react';
+import { Link, useNavigate } from 'react-router-dom'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes, faHome, faInfoCircle, faGraduationCap, faCalendar, faUser, faPhone, faGift, faBriefcase } from '@fortawesome/free-solid-svg-icons';
 import logo from '../Images/logo-FAST-NU.png';
@@ -8,29 +8,31 @@ import axios from 'axios';
 import SignIn from './SignIn'; // Import the SignIn component
 
 const Header = ({ scrollToSection }) => {
+  const navigate = useNavigate(); // Initialize navigate for programmatic navigation
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
   const { user, setUser } = useContext(UserContext);
   const dropdownRef = useRef(null);
 
+  
+
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
-
   const handleLogout = async () => {
     try {
       const response = await axios.post('http://localhost:8000/api/v1/users/logout', {}, { withCredentials: true });
       if (response.status === 200) {
-        console.log('User logged out');
-        setUser(null);
-        setIsDropdownOpen(false);
+        setUser(null); // Clear the user context
+        navigate('/'); // Redirect to Home page after logout
         alert('Log out Successful');
       }
     } catch (error) {
       console.error("Error during logout", error);
     }
   };
+
 
   const handleDropdownToggle = () => {
     setIsDropdownOpen(!isDropdownOpen);
