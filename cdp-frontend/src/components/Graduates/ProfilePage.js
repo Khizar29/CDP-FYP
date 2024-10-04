@@ -41,6 +41,11 @@ const ProfilePage = () => {
     return <div>No alumni data available</div>;
   }
 
+  // Generate the correct Google Drive thumbnail link format
+  const profileImageUrl = alumni.profilePic
+  ? `https://drive.google.com/thumbnail?id=${alumni.profilePic.split('/d/')[1]?.split('/')[0]}&sz=s4000`
+  : 'https://via.placeholder.com/300';
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Header */}
@@ -53,7 +58,7 @@ const ProfilePage = () => {
           {/* Profile Image */}
           <Box className="flex-shrink-0 w-full md:w-1/3 mb-6 md:mb-0 text-center md:text-left">
             <img
-              src={alumni.profilePic || 'https://via.placeholder.com/300'}
+              src={profileImageUrl || 'https://via.placeholder.com/300'}
               alt={`${alumni.firstName} ${alumni.lastName} profile`}
               className="w-64 h-64 object-cover rounded-full mx-auto md:mx-0"
             />
