@@ -165,8 +165,6 @@ const deleteGraduate = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, 'Graduate deleted successfully'));
 });
 
-// Fetch all graduates information (Public route)
-// graduate.controller.js
 
 // Fetch paginated graduates information (Public route)
 const fetchGraduates = asyncHandler(async (req, res) => {
