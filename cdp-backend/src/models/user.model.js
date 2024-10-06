@@ -27,8 +27,16 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ['user', 'admin'],
+      enum: ['user', 'admin', 'recruiter'], // Added 'recruiter'
       default: 'user',
+    },
+    nuId: {
+      type: String,
+      required: function() {
+        return this.role === 'user'; // Required only for graduates
+      },
+      unique: true,
+      sparse: true, // Allows null values for recruiters and admins
     },
   },
   {
@@ -36,9 +44,9 @@ const userSchema = new Schema(
   }
 );
 
+// Password encryption logic remains the same
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-
   this.password = await bcrypt.hash(this.password, 10);
   next();
 });
@@ -54,6 +62,7 @@ userSchema.methods.generateAccessToken = function () {
       email: this.email,
       fullName: this.fullName,
       role: this.role,
+      nuId: this.nuId, // Include nuId in the token for easier access
     },
     process.env.ACCESS_TOKEN_SECRET,
     {

@@ -45,6 +45,11 @@ const ProfilePage = () => {
     },
   ];
 
+   // Generate the correct Google Drive thumbnail link format
+   const profileImageUrl = alumni.profilePic
+   ? `https://drive.google.com/thumbnail?id=${alumni.profilePic.split('/d/')[1]?.split('/')[0]}&sz=s4000`
+   : 'https://via.placeholder.com/300';
+
   return (
     <div className="min-h-screen bg-[#C1E4FB] flex flex-col">
       {/* Header */}
@@ -97,7 +102,7 @@ const ProfilePage = () => {
         {/* Left Section - Profile Image and Basic Info */}
         <div className="w-full md:w-1/3 flex flex-col items-center">
           <img 
-            src={alumni.profilePic || 'https://placehold.co/300x300'} 
+            src={profileImageUrl|| 'https://placehold.co/300x300'} 
             alt={`Profile of ${alumni.firstName} ${alumni.lastName}`} 
             className="rounded-lg w-64 h-64 object-cover mb-6 shadow-md"
           />

@@ -72,12 +72,24 @@ const deleteJob = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, 'Job deleted successfully'));
 });
 
-// Fetch all jobs
-const getAllJobs = asyncHandler(async (req, res) => {
-  const jobs = await Job.find();
 
-  return res.status(200).json(new ApiResponse(200, jobs, 'Jobs fetched successfully'));
+// Fetch all jobs with pagination
+const getAllJobs = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // Default to page 1
+  const limit = parseInt(req.query.limit) || 10; // Default to 10 jobs per page
+
+  const startIndex = (page - 1) * limit;
+  const total = await Job.countDocuments(); // Count total jobs
+  const jobs = await Job.find().skip(startIndex).limit(limit);
+
+  return res.status(200).json({
+    data: jobs,
+    totalPages: Math.ceil(total / limit), // Total number of pages
+    currentPage: page,
+    totalJobs: total,
+  });
 });
+
 
 // Fetch a single job by ID
 const getJobById = asyncHandler(async (req, res) => {

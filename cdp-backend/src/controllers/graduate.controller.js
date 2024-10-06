@@ -5,6 +5,8 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 import XLSX from 'xlsx'; // Library to parse Excel files
 import fs from 'fs'; // To work with the filesystem
 
+const BATCH_SIZE = 100; // Adjust batch size according to your needs
+
 const importGraduates = asyncHandler(async (req, res) => {
   if (!req.user || req.user.role !== 'admin') {
     throw new ApiError(403, 'Forbidden: Admins only');
@@ -39,44 +41,48 @@ const importGraduates = asyncHandler(async (req, res) => {
         continue;
       }
 
-      // Check for duplicates in the database by nuId
-      const existingGraduateByNuId = await Graduate.findOne({ nuId: graduate.nuId });
-      if (existingGraduateByNuId) {
-        duplicateNuIds.push(graduate.nuId);
-        continue;
-      }
-
-      // Check for duplicates in the database by nuEmail
-      const existingGraduateByNuEmail = await Graduate.findOne({ nuEmail: graduate.nuEmail });
-      if (existingGraduateByNuEmail) {
-        duplicateNuEmails.push(graduate.nuEmail);
-        continue;
-      }
-
-      // Add valid graduate to array
       validGraduates.push(graduate);
     }
 
-    // If no valid records found
-    if (validGraduates.length === 0 && (duplicateNuIds.length > 0 || duplicateNuEmails.length > 0)) {
-      return res.status(400).json(
-        new ApiError(
-          400,
-          `No new records to import. Duplicate nuId(s): ${duplicateNuIds.join(', ')}. Duplicate nuEmail(s): ${duplicateNuEmails.join(', ')}.`
-        )
-      );
+    if (validGraduates.length === 0) {
+      return res.status(400).json(new ApiError(400, 'No valid records to import.'));
     }
 
-    // Insert valid records into the database
-    const graduates = await Graduate.insertMany(validGraduates);
+    let totalInserted = 0;
+    let totalFailed = 0;
+
+    for (let i = 0; i < validGraduates.length; i += BATCH_SIZE) {
+      const batch = validGraduates.slice(i, i + BATCH_SIZE);
+      try {
+        const result = await Graduate.insertMany(batch, { ordered: false }); // Continue on error
+        totalInserted += result.length;
+      } catch (error) {
+        // Handle duplicate key errors and log specific duplicates
+        if (error.code === 11000) {
+          const dupKeyError = error.writeErrors || [];
+          dupKeyError.forEach(err => {
+            const { keyValue } = err.err || {};
+            if (keyValue && keyValue.nuEmail) {
+              duplicateNuEmails.push(keyValue.nuEmail);
+            } else if (keyValue && keyValue.nuId) {
+              duplicateNuIds.push(keyValue.nuId);
+            }
+          });
+          totalFailed += error.writeErrors.length;  // Increment failed insert count
+        } else {
+          console.error('Error inserting batch:', error);
+        }
+      }
+    }
+
     fs.unlinkSync(`./public/temp/${req.file.originalname}`);
 
-    // Return detailed response with errors
+    // Return a more accurate response message
     return res.status(201).json(
       new ApiResponse(
         201,
-        graduates,
-        `Graduates imported successfully. ${errors.length} records skipped. Duplicate nuId(s): ${duplicateNuIds.join(', ')}. Duplicate nuEmail(s): ${duplicateNuEmails.join(', ')}.`
+        { totalInserted, totalFailed },
+        `Successfully imported ${totalInserted} graduates. ${totalFailed} records failed. Duplicates: nuId(s): ${duplicateNuIds.join(', ')}. nuEmail(s): ${duplicateNuEmails.join(', ')}.`
       )
     );
   } catch (error) {
@@ -92,30 +98,50 @@ const updateGraduate = asyncHandler(async (req, res) => {
   const { nuId } = req.params;
   const { firstName, lastName, nuEmail, personalEmail, discipline, yearOfGraduation, cgpa, profilePic, contact, tagline, personalExperience, certificate, fyp } = req.body;
 
-  if (!req.user || req.user.role !== 'admin') {
-    throw new ApiError(403, 'Forbidden: Admins only');
+  // Ensure the user is authenticated
+  if (!req.user) {
+    throw new ApiError(403, 'Unauthorized: User not authenticated');
   }
 
+  // Find the graduate by nuId
   const graduate = await Graduate.findOne({ nuId });
 
   if (!graduate) {
     throw new ApiError(404, 'Graduate not found');
   }
 
-  // Update the fields that are provided in the request body
-  graduate.firstName = firstName || graduate.firstName;
-  graduate.lastName = lastName || graduate.lastName;
-  graduate.nuEmail = nuEmail || graduate.nuEmail;
-  graduate.personalEmail = personalEmail || graduate.personalEmail;
-  graduate.discipline = discipline || graduate.discipline;
-  graduate.yearOfGraduation = yearOfGraduation || graduate.yearOfGraduation;
-  graduate.cgpa = cgpa || graduate.cgpa;
-  graduate.profilePic = profilePic || graduate.profilePic;
-  graduate.contact = contact || graduate.contact;
-  graduate.tagline = tagline || graduate.tagline;
-  graduate.personalExperience = personalExperience || graduate.personalExperience;
-  graduate.certificate = certificate || graduate.certificate;
-  graduate.fyp = fyp || graduate.fyp;
+  // Ensure the graduate can only update their own profile (if the user is a graduate)
+  if (req.user.role === 'user' && req.user.nuId !== graduate.nuId) {
+    throw new ApiError(403, 'Forbidden: You can only update your own profile');
+  }
+
+  // Fields that can be updated by a graduate (non-admin user)
+  const allowedFieldsForGraduate = {
+    personalEmail: personalEmail || graduate.personalEmail,
+    contact: contact || graduate.contact,
+    tagline: tagline || graduate.tagline,
+    profilePic: profilePic || graduate.profilePic,
+    personalExperience: personalExperience || graduate.personalExperience,
+    certificate: certificate || graduate.certificate,
+    fyp: fyp || graduate.fyp,
+  };
+
+  // Check the role of the user
+  if (req.user.role === 'admin') {
+    // Admins can update all fields
+    graduate.firstName = firstName || graduate.firstName;
+    graduate.lastName = lastName || graduate.lastName;
+    graduate.nuEmail = nuEmail || graduate.nuEmail;
+    graduate.discipline = discipline || graduate.discipline;
+    graduate.yearOfGraduation = yearOfGraduation || graduate.yearOfGraduation;
+    graduate.cgpa = cgpa || graduate.cgpa;
+
+    // Admins can also update the fields that graduates can update
+    Object.assign(graduate, allowedFieldsForGraduate);
+  } else if (req.user.role === 'user') {
+    // Non-admin (graduate) users can only update certain fields
+    Object.assign(graduate, allowedFieldsForGraduate);
+  }
 
   await graduate.save();
 
@@ -139,16 +165,28 @@ const deleteGraduate = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, 'Graduate deleted successfully'));
 });
 
-// Fetch all graduates information (Public route)
+
+// Fetch paginated graduates information (Public route)
 const fetchGraduates = asyncHandler(async (req, res) => {
+  const page = parseInt(req.query.page) || 1; // Default to page 1
+  const limit = parseInt(req.query.limit) || 10; // Default to 10 graduates per page
+  const skip = (page - 1) * limit; // Calculate how many records to skip
+
   try {
-    const graduates = await Graduate.find();
-    return res.status(200).json(new ApiResponse(200, graduates, 'Graduates fetched successfully'));
+    const totalGraduates = await Graduate.countDocuments(); // Get total count of graduates
+    const graduates = await Graduate.find().skip(skip).limit(limit); // Fetch paginated graduates
+
+    return res.status(200).json({
+      data: graduates,
+      totalPages: Math.ceil(totalGraduates / limit),
+      currentPage: page,
+    });
   } catch (error) {
     console.error('Error fetching graduates:', error);
     return res.status(500).json(new ApiError(500, 'Failed to fetch graduates', error.message));
   }
 });
+
 
 // Fetch a single Graduate by ID
 const getGraduateById = asyncHandler(async (req, res) => {

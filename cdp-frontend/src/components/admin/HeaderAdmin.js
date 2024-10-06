@@ -21,7 +21,7 @@ const HeaderAdmin = ({ onToggleSidebar }) => {
                 logout();
                 setUser(null);
                 alert('Log out Successful');
-                navigate("/signin", { state: { action: "homelogout" } });
+                navigate("/", { state: { action: "homelogout" } });
             }
         } catch (error) {
             console.error("Error during logout", error);

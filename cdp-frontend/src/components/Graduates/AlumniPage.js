@@ -125,7 +125,11 @@ const AlumniPage = () => {
             <AlumniCard
               name={`${alumni.firstName} ${alumni.lastName}`}
               title={alumni.discipline}
-              image={alumni.profilePic || 'https://via.placeholder.com/150'}
+              image={
+                alumni.profilePic
+                  ? `https://drive.google.com/thumbnail?id=${alumni.profilePic.split('/d/')[1]?.split('/')[0]}&sz=s4000`
+                  : 'https://via.placeholder.com/150'
+              }
               classOf={alumni.yearOfGraduation}
               onClick={() => handleCardClick(alumni.nuId)}
             />
