@@ -28,12 +28,13 @@ app.use(express.static(path.join(__dirname, '../../cdp-frontend/build')));
 import userRouter from './routes/user.routes.js';
 import jobRouter from './routes/job.routes.js';
 import graduateRouter from './routes/graduate.routes.js';
+import testimonialRouter from "./Routes/testimonial.routes.js";
 
 // Routes declaration
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/jobs", jobRouter);
 app.use("/api/v1/graduates", graduateRouter);
-
+app.use("/api/v1/testimonials",testimonialRouter);
 
 
 // The "catchall" handler: for any request that doesn't match any route,
