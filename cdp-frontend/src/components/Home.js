@@ -9,7 +9,7 @@ import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
 import ContactUs from './ContactUs';
 import SignIn from './SignIn';
-import NewsFeed from './Newsfeeds/NewsFeed'; // Import NewsFeed component
+import NewsFeed from './Newsfeeds/Newsfeed'; // Import NewsFeed component
 
 const Home = ({ aboutRef, contactRef }) => {
   const { user, setUser } = useContext(UserContext);
@@ -100,7 +100,7 @@ const Home = ({ aboutRef, contactRef }) => {
       <About ref={aboutRef} />
 
       {/* News Feed Section */}
-      <section className="mt-12 px-4 lg:px-20">
+      <section className="my-12 px-4 lg:px-20">
         <h2 className="text-3xl lg:text-4xl font-bold text-center text-purple-800 mb-8">Latest News and Updates</h2>
         <NewsFeed /> {/* NewsFeed component */}
       </section>
