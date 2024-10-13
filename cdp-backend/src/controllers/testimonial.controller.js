@@ -1,7 +1,6 @@
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
-import testimonial from "../models/testimonial.model.js";
 import Testimonial from "../models/testimonial.model.js";
 
 
@@ -27,7 +26,7 @@ const createTestimonial = asyncHandler(async(req, res) => {
 
 const updateTestimonial = asyncHandler(async( req, res)=>{
     const { testimonialId } = req.params;
-    const { name, message, title} = req.body;
+    const { name, message, title, isApproved} = req.body;
 
     if(!req.user || req.user.role !== 'admin'){
         throw new ApiError(403, 'Forbidden: Admins only');
@@ -42,7 +41,9 @@ const updateTestimonial = asyncHandler(async( req, res)=>{
     testimonial.name = name || testimonial.name;
     testimonial.message = message || testimonial.message;
     testimonial.title = title || testimonial.title;
+    testimonial.isApproved = isApproved !== undefined ? isApproved : testimonial.isApproved;
     testimonial.date = Date.now();
+
 
     await testimonial.save();
 
@@ -69,9 +70,9 @@ const deleteTestimonial = asyncHandler(async (req, res) => {
 const getTestimonialById = asyncHandler(async (req, res) => {
     const { testimonialId } = req.params;
   
-    const testimonial = await Testimonial.findOne({ nuId });
+    const testimonial = await Testimonial.findById(testimonialId);
   
-    if (!graduate) {
+    if (!testimonial) {
       throw new ApiError(404, 'Testimonial not found');
     }
   
@@ -83,10 +84,10 @@ const fetchTestimonials = asyncHandler(async (req, res) => {
     try {
       // Fetch all approved testimonials from the database
       const testimonials = await Testimonial.find({ isApproved: true }); // Fetch only approved testimonials
-  
+      const total = await Testimonial.countDocuments(); // Count total jobs
       return res.status(200).json({
         data: testimonials,
-        totalTestimonials: testimonials.length, // Return total number of testimonials
+        totatotalTestimonialsl: total,
       });
     } 
     catch (error) {

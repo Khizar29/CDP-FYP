@@ -12,7 +12,7 @@ const router = Router();
 
 // Public routes 
 router.route('/').get(fetchTestimonials);
-router.route('/:jobId').get(getTestimonialById);
+router.route('/:testimonialId').get(getTestimonialById);
 
 // Admin routes
 router.use(verifyJWT); // Ensure user is logged in

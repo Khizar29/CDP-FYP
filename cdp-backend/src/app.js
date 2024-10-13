@@ -27,7 +27,7 @@ app.use(express.static('./public'));
 import userRouter from './routes/user.routes.js';
 import jobRouter from './routes/job.routes.js';
 import graduateRouter from './routes/graduate.routes.js';
-import testimonialRouter from "./Routes/testimonial.routes.js";
+import testimonialRouter from "./routes/testimonial.routes.js";
 import newsfeedRouter from './routes/newsfeed.routes.js';
 
 // Routes declaration
