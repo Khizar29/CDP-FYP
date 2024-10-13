@@ -17,7 +17,8 @@ const importGraduates = asyncHandler(async (req, res) => {
   }
 
   try {
-    const workbook = XLSX.readFile(`./public/temp/${req.file.originalname}`);
+    // Use the saved path from multer
+    const workbook = XLSX.readFile(`./public/temp/${req.file.filename}`);
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
 
@@ -75,7 +76,8 @@ const importGraduates = asyncHandler(async (req, res) => {
       }
     }
 
-    fs.unlinkSync(`./public/temp/${req.file.originalname}`);
+    // Delete the uploaded file after processing
+    fs.unlinkSync(`./public/temp/${req.file.filename}`);
 
     // Return a more accurate response message
     return res.status(201).json(
@@ -90,7 +92,6 @@ const importGraduates = asyncHandler(async (req, res) => {
     return res.status(500).json(new ApiError(500, 'Failed to import graduates', error.message));
   }
 });
-
 
 
 // Update a graduate's information (Admin only)
