@@ -26,7 +26,7 @@ import ChangePassword from './components/ChangePassword';
 import ContactUs from './components/ContactUs';
 import UpdateGraduate from './components/admin/manage/Graduates/UpdateGraduate';
 import ViewGraduate from './components/admin/manage/Graduates/ViewGraduate';
-import NewsFeed from './components/Newsfeeds/NewsFeed';
+import NewsFeed from './components/Newsfeeds/Newsfeed';
 import NewsDetail from './components/Newsfeeds/NewsDetail';
 
 // User Layout Component
