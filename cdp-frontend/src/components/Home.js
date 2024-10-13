@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Link as ScrollLink } from 'react-scroll';
-import { Link as RouterLink, useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import backgroundImage1 from '../Images/FAST_PIC_1.jpg';
 import backgroundImage2 from '../Images/FAST_PIC_2.jpg';
 import backgroundImage3 from '../Images/FAST_PIC_3.jpg';
@@ -8,7 +8,8 @@ import About from './About';
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
 import ContactUs from './ContactUs';
-import SignIn from './SignIn'; // Import the SignIn component
+import SignIn from './SignIn';
+import NewsFeed from './Newsfeeds/Newsfeed'; // Import NewsFeed component
 
 const Home = ({ aboutRef, contactRef }) => {
   const { user, setUser } = useContext(UserContext);
@@ -17,7 +18,7 @@ const Home = ({ aboutRef, contactRef }) => {
   const backgroundImages = [backgroundImage1, backgroundImage2, backgroundImage3];
   const transitionInterval = 5000;
   
-  const navigate = useNavigate(); // Create navigate function to programmatically redirect
+  const navigate = useNavigate();
 
   // Background image slider logic
   useEffect(() => {
@@ -35,7 +36,7 @@ const Home = ({ aboutRef, contactRef }) => {
       if (response.status === 200) {
         setUser(null);
         alert('Log out Successful');
-        navigate('/'); // Redirect to Home page after logout
+        navigate('/');
       }
     } catch (error) {
       console.error("Error during logout", error);
@@ -97,6 +98,12 @@ const Home = ({ aboutRef, contactRef }) => {
 
       {/* About Section */}
       <About ref={aboutRef} />
+
+      {/* News Feed Section */}
+      <section className="my-12 px-4 lg:px-20">
+        <h2 className="text-3xl lg:text-4xl font-bold text-center text-purple-800 mb-8">Latest News and Updates</h2>
+        <NewsFeed /> {/* NewsFeed component */}
+      </section>
 
       {/* Contact Us Section */}
       <div ref={contactRef}>

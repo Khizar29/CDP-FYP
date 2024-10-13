@@ -7,37 +7,38 @@ const ContactUs = () => {
   const longitude = 67.2646838;
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-900 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-7xl bg-gray-800 rounded-lg shadow-lg flex flex-col lg:flex-row overflow-hidden">
         {/* Left Section - Contact Info */}
-        <div className="w-full lg:w-1/2 p-6 md:p-12 lg:p-16 bg-gradient-to-b from-blue-500 to-blue-200 text-white">
+        <div className="w-full lg:w-1/2 p-6 md:p-12 lg:p-16 bg-gradient-to-b from-blue-500 to-blue-300 bg-opacity-40 backdrop-filter backdrop-blur-lg text-white shadow-lg ">
+
           <h2 className="text-2xl md:text-3xl font-bold mb-6">Get in touch</h2>
           <div className="mb-8">
-            <h3 className="text-md md:text-lg font-semibold">Visit us</h3>
-            <p className="text-sm md:text-base">
+            <h3 className="text-md md:text-xl text-yellow-400 font-extrabold">Visit us</h3>
+            <p className="lg:text-lg md:text-base">
               Office of Industrial Liaison, Career Services and Digital Media, FAST National University of Computer and Emerging Sciences, Karachi
             </p>
-            <p className="text-sm md:text-base">St-4, Sector 17-D, NH 5, Karachi, Karachi City, Sindh</p>
+            <p className="lg:text-lg md:text-base">St-4, Sector 17-D, NH 5, Karachi, Karachi City, Sindh</p>
           </div>
           <div className="mb-8">
-            <h3 className="text-md md:text-lg font-semibold">Chat to us</h3>
-            <p className="text-sm md:text-base">Our friendly team is here to help.</p>
-            <p className="text-sm md:text-base">
+            <h3 className="text-md md:text-xl text-yellow-400 font-bold">Chat to us</h3>
+            <p className="lg:text-lg md:text-base">Our friendly team is here to help.</p>
+            <p className="lg:text-lg md:text-base">
               <a href="mailto:aysha.siddiqui@nu.edu.pk" className="text-white hover:underline">aysha.siddiqui@nu.edu.pk</a>
             </p>
-            <p className="text-sm md:text-base">
+            <p className="lg:text-lg md:text-base">
               <a href="mailto:cso.khi@nu.edu.pk" className="text-white hover:underline">cso.khi@nu.edu.pk</a>
             </p>
           </div>
           <div className="mb-8">
-            <h3 className="text-md md:text-lg font-semibold">Call us</h3>
-            <p className="text-sm md:text-base">Mon-Fri from 9am to 3:30pm</p>
-            <p className="text-sm md:text-base">
+            <h3 className="text-md md:text-xl text-yellow-300 font-bold">Call us</h3>
+            <p className="lg:text-lg md:text-base">Mon-Fri from 9am to 3:30pm</p>
+            <p className="lg:text-lg md:text-base">
               <a href="tel:+92-21-111-128-128" className="text-white hover:underline">+92-21-111-128-128</a>
             </p>
           </div>
           <div className="mb-8">
-            <h3 className="text-md md:text-lg font-semibold">Social media</h3>
+            <h3 className="text-md md:text-xl text-yellow-300 font-bold">Social media</h3>
             <div className="flex space-x-4">
               <a href="https://www.linkedin.com/in/aysha-siddiqui-9880451a2/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300">
                 <FaLinkedin size={24} />
@@ -46,7 +47,7 @@ const ContactUs = () => {
             </div>
           </div>
           <div className="mb-8">
-            <h3 className="text-md md:text-lg font-semibold">Location</h3>
+            <h3 className="text-md md:text-xl text-yellow-300 font-bold">Location</h3>
             <iframe
               title="Google Maps"
               width="100%"
