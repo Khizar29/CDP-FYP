@@ -1,6 +1,7 @@
 // src/components/NewsFeed/NewsDetail.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import DOMPurify from 'dompurify'; // Import DOMPurify
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Paper, Button, Grid } from '@mui/material';
 
@@ -44,6 +45,9 @@ const NewsDetail = () => {
     }
   };
 
+  // Sanitize the description content
+  const sanitizedDescription = DOMPurify.sanitize(newsItem.description);
+
   return (
     <Box sx={{ 
       padding: '2rem', 
@@ -76,7 +80,7 @@ const NewsDetail = () => {
         
         <Box sx={{ 
           width: '100%', 
-          maxHeight: '500px', // Increased maxHeight
+          maxHeight: '500px', 
           overflow: 'hidden', 
           borderRadius: '12px', 
           marginBottom: '1.5rem' 
@@ -86,8 +90,8 @@ const NewsDetail = () => {
             alt={newsItem.title} 
             style={{ 
               width: '100%', 
-              height: 'auto', // Ensure the image maintains aspect ratio
-              objectFit: 'contain' // Adjust to fit image fully without cropping
+              height: 'auto', 
+              objectFit: 'contain' 
             }} 
           />
         </Box>
@@ -101,9 +105,8 @@ const NewsDetail = () => {
             fontFamily: 'Arial, sans-serif', 
             textAlign: 'justify'
           }}
-        >
-          {newsItem.description}
-        </Typography>
+          dangerouslySetInnerHTML={{ __html: sanitizedDescription }} // Render sanitized HTML
+        />
         
         <Typography 
           variant="caption" 
