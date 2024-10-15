@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Modal from 'react-modal';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 Modal.setAppElement('#root'); // Set the root element for accessibility
 
@@ -20,20 +22,15 @@ const AddJob = () => {
     });
 
     const [jobAdText, setJobAdText] = useState('');
-    const [isLoading, setIsLoading] = useState(false); // New state for loading
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+    const handleQuillChange = (name, value) => {
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
     const handleExtractInfo = async () => {
-        setIsLoading(true); // Show loading modal
-        console.log("Loading started"); // Debugging log
-
+        setIsLoading(true);
         try {
             const response = await axios.post('http://localhost:5001/api/v1/jobs/extract', {
                 job_ad_text: jobAdText,
@@ -52,8 +49,7 @@ const AddJob = () => {
         } catch (error) {
             console.error('Error extracting job info:', error);
         } finally {
-            console.log("Loading finished"); // Debugging log
-            setIsLoading(false); // Hide loading modal
+            setIsLoading(false);
         }
     };
 
@@ -85,6 +81,16 @@ const AddJob = () => {
         }
     };
 
+    const toolbarOptions = [
+        [{ 'header': '1'}, { 'header': '2'}, { 'font': [] }],
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        ['bold', 'italic', 'underline', 'strike'],
+        ['link', 'image', 'video'],
+        [{ 'align': [] }],
+        [{ 'color': [] }, { 'background': [] }],
+        ['clean']
+    ];
+
     return (
         <div className="container mx-auto p-8">
             <form onSubmit={handleSubmit} className="bg-white p-10 rounded-lg shadow-lg max-w-2xl mx-auto">
@@ -111,7 +117,6 @@ const AddJob = () => {
                     </button>
                 </div>
 
-                {/* Form fields for job details */}
                 <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="company_name">
                         Company Name
@@ -121,102 +126,42 @@ const AddJob = () => {
                         id="company_name"
                         name="company_name"
                         value={formData.company_name}
-                        onChange={handleChange}
+                        onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
                         className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
                         required
                     />
                 </div>
 
                 <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
-                        Job Title
-                    </label>
-                    <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        value={formData.title}
-                        onChange={handleChange}
-                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
-                        required
-                    />
-                </div>
-
-                {/* Add other form fields as shown previously */}
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2">
-                        Job Type
-                    </label>
-                    <div className="flex flex-wrap gap-4">
-                        {["Onsite", "Remote", "Hybrid", "Internship"].map((type) => (
-                            <label key={type} className="inline-flex items-center">
-                                <input
-                                    type="radio"
-                                    name="job_type"
-                                    value={type}
-                                    checked={formData.job_type === type}
-                                    onChange={handleChange}
-                                    className="form-radio h-5 w-5 text-blue-900"
-                                />
-                                <span className="ml-2 text-gray-700">{type}</span>
-                            </label>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="no_of_openings">
-                        Number of Openings
-                    </label>
-                    <input
-                        type="number"
-                        id="no_of_openings"
-                        name="no_of_openings"
-                        value={formData.no_of_openings}
-                        onChange={handleChange}
-                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
-                    />
-                </div>
-
-                <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="qualification_req">
-                        Qualification Requirements
-                    </label>
-                    <textarea
-                        id="qualification_req"
-                        name="qualification_req"
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Qualification Requirements</label>
+                    <ReactQuill
                         value={formData.qualification_req}
-                        onChange={handleChange}
-                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
-                        rows="4"
+                        onChange={(value) => handleQuillChange('qualification_req', value)}
+                        modules={{ toolbar: toolbarOptions }}
+                        className="bg-white mb-4"
+                        theme="snow"
                     />
                 </div>
 
                 <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="job_description">
-                        Job Description
-                    </label>
-                    <textarea
-                        id="job_description"
-                        name="job_description"
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Job Description</label>
+                    <ReactQuill
                         value={formData.job_description}
-                        onChange={handleChange}
-                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
-                        rows="5"
+                        onChange={(value) => handleQuillChange('job_description', value)}
+                        modules={{ toolbar: toolbarOptions }}
+                        className="bg-white mb-4"
+                        theme="snow"
                     />
                 </div>
 
                 <div className="mb-6">
-                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="responsibilities">
-                        Responsibilities
-                    </label>
-                    <textarea
-                        id="responsibilities"
-                        name="responsibilities"
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Responsibilities</label>
+                    <ReactQuill
                         value={formData.responsibilities}
-                        onChange={handleChange}
-                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
-                        rows="4"
+                        onChange={(value) => handleQuillChange('responsibilities', value)}
+                        modules={{ toolbar: toolbarOptions }}
+                        className="bg-white mb-4"
+                        theme="snow"
                     />
                 </div>
 
@@ -237,7 +182,6 @@ const AddJob = () => {
                 </div>
             </form>
 
-            {/* Loading Modal */}
             <Modal
                 isOpen={isLoading}
                 contentLabel="Extracting Information"
