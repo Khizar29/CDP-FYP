@@ -9,6 +9,7 @@ import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
 import ContactUs from './ContactUs';
 import SignIn from './SignIn'; // Import the SignIn component
+import Slider from './Testimonial/Slider';
 
 const Home = ({ aboutRef, contactRef }) => {
   const { user, setUser } = useContext(UserContext);
@@ -94,7 +95,9 @@ const Home = ({ aboutRef, contactRef }) => {
           </div>
         </div>
       </section>
-
+      <div className="min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 flex items-center justify-center">
+      <Slider />
+      </div>
       {/* About Section */}
       <About ref={aboutRef} />
 
