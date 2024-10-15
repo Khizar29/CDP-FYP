@@ -8,10 +8,12 @@ import About from './About';
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
 import ContactUs from './ContactUs';
+
 import SignIn from './SignIn'; // Import the SignIn component
 import Slider from './Testimonial/Slider';
 import NewsFeed from './Newsfeeds/Newsfeed';
 const Home = ({ aboutRef, contactRef }) => {
+
   const { user, setUser } = useContext(UserContext);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [signInOpen, setSignInOpen] = useState(false);
@@ -101,10 +103,9 @@ const Home = ({ aboutRef, contactRef }) => {
       {/* About Section */}
       <About ref={aboutRef} />
 
-      {/* News Feed Section */}
-      <section className="my-12 px-4 lg:px-20">
-        <h2 className="text-3xl lg:text-4xl font-bold text-center text-purple-800 mb-8">Latest News and Updates</h2>
-        <NewsFeed /> {/* NewsFeed component */}
+       {/* News Feed Section */}
+       <section className="my-12 px-4 lg:px-20">
+        <NewsFeed ref={newsRef} limit={4} /> {/* Display only 4 news items on the homepage */}
       </section>
 
       {/* Contact Us Section */}
