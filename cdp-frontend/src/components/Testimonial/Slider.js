@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Slide from './Slide';
 import Arrows from './Arrows';
-
 const slides = [
   {
     url: '/images/image-tanya.jpg',

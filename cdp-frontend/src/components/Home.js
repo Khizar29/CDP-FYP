@@ -11,6 +11,7 @@ import ContactUs from './ContactUs';
 import SignIn from './SignIn'; // Import the SignIn component
 import Slider from './Testimonial/Slider';
 
+
 const Home = ({ aboutRef, contactRef }) => {
   const { user, setUser } = useContext(UserContext);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);

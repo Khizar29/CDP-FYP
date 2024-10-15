@@ -25,6 +25,7 @@ import ContactUs from './components/ContactUs';
 import UpdateGraduate from './components/admin/manage/Graduates/UpdateGraduate';
 import ViewGraduate from './components/admin/manage/Graduates/ViewGraduate';
 
+
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
   <div className="min-h-screen flex flex-col">

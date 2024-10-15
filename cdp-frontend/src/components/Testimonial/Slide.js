@@ -1,5 +1,4 @@
 import React from 'react';
-
 function Slide({ slide }) {
   return (
     <div className="flex items-center justify-between w-full space-x-6">
