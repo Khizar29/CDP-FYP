@@ -1,3 +1,5 @@
+// src/App.js
+
 import React, { useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { UserProvider } from './contexts/UserContext';
@@ -18,12 +20,18 @@ import ProtectedRoute from './components/ProtectedRoute';
 import DashboardHome from './components/admin/DashboardHome';
 import AdminJobs from './components/admin/manage/Jobs/AdminJobs';
 import AddJob from './components/admin/manage/Jobs/AddJob';
-import AdminGraduates from './components/admin/manage/Graduates/AdminGraduate'; // Main page for managing graduates
-import AddGraduate from './components/admin/manage/Graduates/AddGraduate'; // Component for importing graduates via Excel file
+import AdminGraduates from './components/admin/manage/Graduates/AdminGraduate';
+import AddGraduate from './components/admin/manage/Graduates/AddGraduate';
 import ChangePassword from './components/ChangePassword';
 import ContactUs from './components/ContactUs';
 import UpdateGraduate from './components/admin/manage/Graduates/UpdateGraduate';
 import ViewGraduate from './components/admin/manage/Graduates/ViewGraduate';
+import NewsFeed from './components/Newsfeeds/Newsfeed';
+import NewsDetail from './components/Newsfeeds/NewsDetail';
+import PaginatedNewsFeed from './components/Newsfeeds/PaginatedNewfeed';
+import AdminNewsfeed from './components/admin/manage/Newsfeeds/AdminNewsfeed';
+import AddNews from './components/admin/manage/Newsfeeds/AddNews';
+import ViewNews from './components/admin/manage/Newsfeeds/ViewNews';
 
 
 // User Layout Component
@@ -66,6 +74,9 @@ function App() {
           <Route path="/jobs/:jobId" element={<UserLayout scrollToSection={scrollToSection}><JobDetails /></UserLayout>} />
           <Route path="/reset-password/:id/:token" element={<UserLayout scrollToSection={scrollToSection}><ResetPassword /></UserLayout>} />
           <Route path="/change-password" element={<ChangePassword />} />
+          <Route path="/news" element={<UserLayout><PaginatedNewsFeed /></UserLayout>} />
+          {/* <Route path="/news" element={<UserLayout scrollToSection={scrollToSection}><NewsFeed /></UserLayout>} /> News Feed Route */}
+          <Route path="/news/:id" element={<UserLayout><NewsDetail /></UserLayout>} />
 
           {/* Admin Routes */}
           <Route path="/admin/*" element={
@@ -77,12 +88,17 @@ function App() {
             <Route path="jobs" element={<AdminJobs />} />
             <Route path="jobs/manage" element={<AddJob />} />
             <Route path="jobs/manage/:id" element={<AddJob />} />
-
+            
             {/* Graduate Routes */}
-            <Route path="graduates" element={<AdminGraduates />} /> {/* Displays all graduates and options */}
-            <Route path="graduates/import" element={<AddGraduate />} /> {/* Bulk import graduates via Excel */}
-            <Route path="graduates/view/:nuId" element={<ViewGraduate />} /> {/* Add view route */}
-            <Route path="graduates/edit/:nuId" element={<UpdateGraduate />} /> {/* Add edit route */}
+            <Route path="graduates" element={<AdminGraduates />} />
+            <Route path="graduates/import" element={<AddGraduate />} />
+            <Route path="graduates/view/:nuId" element={<ViewGraduate />} />
+            <Route path="graduates/edit/:nuId" element={<UpdateGraduate />} />
+
+            {/* Newsfeed Routes */}
+            <Route path="newsfeeds" element={<AdminNewsfeed />} />
+            <Route path="newsfeeds/add" element={<AddNews />} />
+            <Route path="newsfeeds/view/:id" element={<ViewNews />} />
 
           </Route>
         </Routes>
