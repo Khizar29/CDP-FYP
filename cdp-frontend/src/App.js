@@ -34,6 +34,7 @@ import AddNews from './components/admin/manage/Newsfeeds/AddNews';
 import ViewNews from './components/admin/manage/Newsfeeds/ViewNews';
 import EditNews from './components/admin/manage/Newsfeeds/EditNews';
 
+
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
   <div className="min-h-screen flex flex-col">
