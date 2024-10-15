@@ -27,8 +27,6 @@ const createNewsFeed = asyncHandler(async (req, res) => {
   res.status(201).json(new ApiResponse(201, newsFeed, 'NewsFeed created successfully'));
 });
 
-
-
 // Update a news or event
 const updateNewsFeed = asyncHandler(async (req, res) => {
   if (!req.user || req.user.role !== 'admin') {
@@ -49,15 +47,14 @@ const updateNewsFeed = asyncHandler(async (req, res) => {
   newsFeed.isPublic = isPublic !== undefined ? isPublic : newsFeed.isPublic;
   
   if (req.savedImagePath) {
-    newsFeed.image = req.savedImagePath; // Update image only if a new one is uploaded
+    // Update the image URL only if a new image is uploaded
+    newsFeed.image = `${req.protocol}://${req.get('host')}${req.savedImagePath}`;
   }
 
   await newsFeed.save();
   res.status(200).json(new ApiResponse(200, newsFeed, 'NewsFeed updated successfully'));
 });
 
-
-// Fetch all public news and events with pagination
 // Fetch all public news and events with pagination
 const fetchNewsFeeds = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;

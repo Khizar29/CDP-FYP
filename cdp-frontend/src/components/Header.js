@@ -80,7 +80,7 @@ const Header = ({ scrollToSection }) => {
           <Link to="/alumni" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faGraduationCap} /> <span>Alumni</span>
           </Link>
-          <Link to="/events" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
+          <Link to="/news" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
           </Link>
           <div onClick={() => scrollToSection('contact')} className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">

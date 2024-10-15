@@ -11,7 +11,7 @@ import ContactUs from './ContactUs';
 import SignIn from './SignIn';
 import NewsFeed from './Newsfeeds/Newsfeed'; // Import NewsFeed component
 
-const Home = ({ aboutRef, contactRef }) => {
+const Home = ({ aboutRef, contactRef, newsRef }) => {
   const { user, setUser } = useContext(UserContext);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [signInOpen, setSignInOpen] = useState(false);
@@ -99,10 +99,9 @@ const Home = ({ aboutRef, contactRef }) => {
       {/* About Section */}
       <About ref={aboutRef} />
 
-      {/* News Feed Section */}
-      <section className="my-12 px-4 lg:px-20">
-        <h2 className="text-3xl lg:text-4xl font-bold text-center text-purple-800 mb-8">Latest News and Updates</h2>
-        <NewsFeed /> {/* NewsFeed component */}
+       {/* News Feed Section */}
+       <section className="my-12 px-4 lg:px-20">
+        <NewsFeed ref={newsRef} limit={4} /> {/* Display only 4 news items on the homepage */}
       </section>
 
       {/* Contact Us Section */}

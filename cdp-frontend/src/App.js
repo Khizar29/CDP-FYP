@@ -32,6 +32,7 @@ import PaginatedNewsFeed from './components/Newsfeeds/PaginatedNewfeed';
 import AdminNewsfeed from './components/admin/manage/Newsfeeds/AdminNewsfeed';
 import AddNews from './components/admin/manage/Newsfeeds/AddNews';
 import ViewNews from './components/admin/manage/Newsfeeds/ViewNews';
+import EditNews from './components/admin/manage/Newsfeeds/EditNews';
 
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
@@ -98,7 +99,7 @@ function App() {
             <Route path="newsfeeds" element={<AdminNewsfeed />} />
             <Route path="newsfeeds/add" element={<AddNews />} />
             <Route path="newsfeeds/view/:id" element={<ViewNews />} />
-
+            <Route path="newsfeeds/edit/:id" element={<EditNews />} />
           </Route>
         </Routes>
       </Router>

@@ -1,14 +1,14 @@
 // src/components/admin/manage/Newsfeeds/AdminNewsfeed.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Pagination from '../Graduates/Pagination'; // Assuming custom pagination component for Admin
+import Pagination from '../Graduates/Pagination';
 import { useNavigate } from 'react-router-dom';
 
 const AdminNewsfeed = () => {
   const [newsItems, setNewsItems] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 10; // Limit for admin view
+  const itemsPerPage = 10;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,12 +35,7 @@ const AdminNewsfeed = () => {
         return;
       }
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       await axios.delete(`http://localhost:8000/api/v1/newsfeeds/${id}`, config);
       setNewsItems(newsItems.filter(news => news._id !== id));
       alert('News/Event Deleted Successfully');
@@ -53,12 +48,7 @@ const AdminNewsfeed = () => {
   return (
     <div className="p-4">
       <h2 className="text-2xl font-bold mb-4">Manage News and Events</h2>
-      <button 
-        onClick={() => navigate('/admin/newsfeeds/add')}
-        className="bg-blue-500 text-white py-2 px-4 rounded mb-4"
-      >
-        Add News/Event
-      </button>
+      <button onClick={() => navigate('/admin/newsfeeds/add')} className="bg-blue-500 text-white py-2 px-4 rounded mb-4">Add News/Event</button>
       <table className="min-w-full bg-white shadow rounded-lg">
         <thead>
           <tr>
