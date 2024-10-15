@@ -26,8 +26,12 @@ import ChangePassword from './components/ChangePassword';
 import ContactUs from './components/ContactUs';
 import UpdateGraduate from './components/admin/manage/Graduates/UpdateGraduate';
 import ViewGraduate from './components/admin/manage/Graduates/ViewGraduate';
-import NewsFeed from './components/Newsfeeds/NewsFeed';
+import NewsFeed from './components/Newsfeeds/Newsfeed';
 import NewsDetail from './components/Newsfeeds/NewsDetail';
+import PaginatedNewsFeed from './components/Newsfeeds/PaginatedNewfeed';
+import AdminNewsfeed from './components/admin/manage/Newsfeeds/AdminNewsfeed';
+import AddNews from './components/admin/manage/Newsfeeds/AddNews';
+import ViewNews from './components/admin/manage/Newsfeeds/ViewNews';
 
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
@@ -69,7 +73,8 @@ function App() {
           <Route path="/jobs/:jobId" element={<UserLayout scrollToSection={scrollToSection}><JobDetails /></UserLayout>} />
           <Route path="/reset-password/:id/:token" element={<UserLayout scrollToSection={scrollToSection}><ResetPassword /></UserLayout>} />
           <Route path="/change-password" element={<ChangePassword />} />
-          <Route path="/news" element={<UserLayout scrollToSection={scrollToSection}><NewsFeed /></UserLayout>} /> {/* News Feed Route */}
+          <Route path="/news" element={<UserLayout><PaginatedNewsFeed /></UserLayout>} />
+          {/* <Route path="/news" element={<UserLayout scrollToSection={scrollToSection}><NewsFeed /></UserLayout>} /> News Feed Route */}
           <Route path="/news/:id" element={<UserLayout><NewsDetail /></UserLayout>} />
 
           {/* Admin Routes */}
@@ -88,6 +93,12 @@ function App() {
             <Route path="graduates/import" element={<AddGraduate />} />
             <Route path="graduates/view/:nuId" element={<ViewGraduate />} />
             <Route path="graduates/edit/:nuId" element={<UpdateGraduate />} />
+
+            {/* Newsfeed Routes */}
+            <Route path="newsfeeds" element={<AdminNewsfeed />} />
+            <Route path="newsfeeds/add" element={<AddNews />} />
+            <Route path="newsfeeds/view/:id" element={<ViewNews />} />
+
           </Route>
         </Routes>
       </Router>

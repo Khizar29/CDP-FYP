@@ -23,45 +23,76 @@ const generateAccessAndRefereshTokens = async (userId) => {
   }
 };
 
-// Register User
+// Register User and Send Password via Email
 const registerUser = asyncHandler(async (req, res) => {
-  const { fullName, email, password } = req.body;
-  console.log("Received data:", { fullName, email, password });
+  const { email, fullName, nuId } = req.body;  // Receive email and fullName from frontend
 
-  if ([fullName, email, password].some((field) => field?.trim() === "")) {
-    throw new ApiError(400, "All fields are required");
+  if (!email || !fullName || !nuId) {
+    throw new ApiError(400, "Email and fullName are required");
   }
 
   const existedUser = await User.findOne({ email });
 
   if (existedUser) {
-    throw new ApiError(409, "User with email already exists");
+    throw new ApiError(409, "User with this email already exists");
   }
 
-  const adminExists = await User.findOne({ role: "admin" });
+  // Generate a random password
+  const generatedPassword = crypto.randomBytes(8).toString('hex'); // Generates 16-character password
 
+  // // Hash the password
+  // const hashedPassword = await bcrypt.hash(generatedPassword, 10);
+  // console.log(hashedPassword);
+  
+
+  // Create the user in the database
   const user = await User.create({
     fullName,
     email,
-    password,
-    role: adminExists ? "user" : "admin",
+    nuId,
+    password: generatedPassword, // Save the hashed password in the database
+    role: "user",  // Default role, you can change it based on your logic
   });
 
-  const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken"
-  );
+  const createdUser = await User.findById(user._id).select("-password -refreshToken");
 
   if (!createdUser) {
     throw new ApiError(500, "Something went wrong while registering the user");
   }
 
-  return res
-    .status(201)
-    .json(
-      new ApiResponse(200, createdUser, "User registered Successfully")
-    );
-});
+  // Send the generated password to the user's email
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL,  // Your Gmail address
+      pass: process.env.GMAIL_PASSWORD,  // Your Gmail app password
+    },
+  });
 
+  const mailOptions = {
+    from: process.env.GMAIL,  // Sender address
+    to: email,  // Receiver's email (the user who signed up)
+    subject: 'Your New Account Password',
+    html: `<p>Hello ${fullName},</p>
+           <p>Thank you for registering on our platform. Here is your login password:</p>
+           <p><strong>Password:</strong> ${generatedPassword}</p>
+           <p>We recommend changing your password after the first login.</p>
+           <p>Best regards,<br>Your Company</p>`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log('Error while sending email: ', error);
+      throw new ApiError(500, 'Error while sending the email.');
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
+
+  return res.status(201).json(
+    new ApiResponse(201, createdUser, "User registered successfully and password emailed.")
+  );
+});
 // Login User
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;

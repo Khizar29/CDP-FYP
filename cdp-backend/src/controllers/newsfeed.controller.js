@@ -11,7 +11,7 @@ const createNewsFeed = asyncHandler(async (req, res) => {
       throw new ApiError(403, 'Forbidden: Admins only');
   }
 
-  const { title, description, isPublic } = req.body;
+  const { title, description, category, isPublic  } = req.body;
   const imagePath = req.savedImagePath || '';
 
   const imageUrl = `${req.protocol}://${req.get('host')}/temp/${path.basename(imagePath)}`;
@@ -19,6 +19,7 @@ const createNewsFeed = asyncHandler(async (req, res) => {
       title, 
       description, 
       image: imageUrl, 
+      category: category || 'news',
       isPublic: isPublic !== undefined ? isPublic : true 
   });
 
@@ -35,7 +36,7 @@ const updateNewsFeed = asyncHandler(async (req, res) => {
   }
 
   const { id } = req.params;
-  const { title, description, isPublic } = req.body;
+  const { title, description, isPublic, category } = req.body;
 
   const newsFeed = await NewsFeed.findById(id);
   if (!newsFeed) {
@@ -44,6 +45,7 @@ const updateNewsFeed = asyncHandler(async (req, res) => {
 
   newsFeed.title = title || newsFeed.title;
   newsFeed.description = description || newsFeed.description;
+  newsFeed.category = category || newsFeed.category;
   newsFeed.isPublic = isPublic !== undefined ? isPublic : newsFeed.isPublic;
   
   if (req.savedImagePath) {
@@ -54,11 +56,37 @@ const updateNewsFeed = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, newsFeed, 'NewsFeed updated successfully'));
 });
 
-// Fetch all public news and events
+
+// Fetch all public news and events with pagination
+// Fetch all public news and events with pagination
 const fetchNewsFeeds = asyncHandler(async (req, res) => {
-  const newsFeeds = await NewsFeed.find({ isPublic: true });
-  res.status(200).json(new ApiResponse(200, newsFeeds, 'NewsFeeds fetched successfully'));
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  // Get the total count of public newsfeeds
+  const totalItems = await NewsFeed.countDocuments({ isPublic: true });
+
+  // Fetch news feeds with pagination
+  const newsFeeds = await NewsFeed.find({ isPublic: true })
+    .skip(skip)
+    .limit(limit);
+
+  const totalPages = Math.ceil(totalItems / limit);
+
+  res.status(200).json({
+    success: true,
+    message: "NewsFeeds fetched successfully",
+    data: newsFeeds,
+    meta: {
+      currentPage: page,
+      totalPages,
+      totalItems
+    }
+  });
 });
+
+
 
 // Fetch a single news feed by ID
 const fetchNewsFeedById = asyncHandler(async (req, res) => {

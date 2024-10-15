@@ -16,6 +16,12 @@ const newsFeedSchema = new Schema(
       type: String,
       required: false, // Optional field for the image path
     },
+    category: {
+      type: String,
+      enum: ['announcement', 'event', 'news', 'other'], // Define possible categories
+      default: 'news', // Set a default category if none is specified
+      required: true,
+    },
     date: {
       type: Date,
       default: Date.now,
