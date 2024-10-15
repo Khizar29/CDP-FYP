@@ -73,22 +73,40 @@ const deleteJob = asyncHandler(async (req, res) => {
 });
 
 
-// Fetch all jobs with pagination
+// Fetch all jobs with pagination and search
 const getAllJobs = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page) || 1; // Default to page 1
-  const limit = parseInt(req.query.limit) || 10; // Default to 10 jobs per page
+  const { page = 1, limit = 10, searchTerm = '', filterDate = '' } = req.query;
+
+  const query = {};
+  
+  // Build search query
+  if (searchTerm) {
+    query.$or = [
+      { company_name: { $regex: searchTerm, $options: 'i' } },
+      { title: { $regex: searchTerm, $options: 'i' } },
+    ];
+  }
+
+  // Add date filter
+  if (filterDate) {
+    const start = new Date(filterDate);
+    const end = new Date(filterDate);
+    end.setDate(end.getDate() + 1);
+    query.posted_on = { $gte: start, $lt: end };
+  }
 
   const startIndex = (page - 1) * limit;
-  const total = await Job.countDocuments(); // Count total jobs
-  const jobs = await Job.find().skip(startIndex).limit(limit);
+  const total = await Job.countDocuments(query);
+  const jobs = await Job.find(query).skip(startIndex).limit(parseInt(limit));
 
   return res.status(200).json({
     data: jobs,
-    totalPages: Math.ceil(total / limit), // Total number of pages
+    totalPages: Math.ceil(total / limit),
     currentPage: page,
     totalJobs: total,
   });
 });
+
 
 
 // Fetch a single job by ID
