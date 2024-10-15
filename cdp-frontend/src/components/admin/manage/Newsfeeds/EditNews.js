@@ -1,9 +1,8 @@
-// src/components/admin/manage/Newsfeeds/EditNews.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css'; // Import React Quill styles
+import 'react-quill/dist/quill.snow.css';
 
 const EditNews = () => {
   const { id } = useParams();
@@ -75,6 +74,16 @@ const EditNews = () => {
     }
   };
 
+  const toolbarOptions = [
+    [{ 'header': '1'}, { 'header': '2'}, { 'font': [] }],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    ['bold', 'italic', 'underline', 'strike'],
+    ['link', 'image', 'video'],
+    [{ 'align': [] }],
+    [{ 'color': [] }, { 'background': [] }],
+    ['clean']
+  ];
+
   return (
     <div className="container mx-auto p-8">
       <form onSubmit={handleSubmit} className="bg-white p-10 rounded-lg shadow-lg max-w-2xl mx-auto">
@@ -113,32 +122,18 @@ const EditNews = () => {
           </select>
         </div>
 
-        <div className="mb-6">
+        <div className="mb-12">
           <label htmlFor="description" className="block text-gray-700 text-sm font-bold mb-2">Description</label>
           <ReactQuill
             value={formData.description}
             onChange={handleDescriptionChange}
-            modules={{
-              toolbar: [
-                [{ 'header': '1'}, {'header': '2'}, { 'font': [] }],
-                [{size: []}],
-                ['bold', 'italic', 'underline', 'strike', 'blockquote'],
-                [{'list': 'ordered'}, {'list': 'bullet'}, {'indent': '-1'}, {'indent': '+1'}],
-                ['link', 'image', 'video'],
-                ['clean']
-              ],
-            }}
-            formats={[
-              'header', 'font', 'size',
-              'bold', 'italic', 'underline', 'strike', 'blockquote',
-              'list', 'bullet', 'indent',
-              'link', 'image', 'video'
-            ]}
-            style={{ height: '200px', marginBottom: '4rem' }}
+            className="bg-white"
+            modules={{ toolbar: toolbarOptions }}
+            style={{ height: '250px', marginBottom: '30px' }} // Adjust margin-bottom here
           />
         </div>
 
-        <div className="mb-6">
+        <div className="mb-6 pt-10"> {/* Increase top margin to prevent overlap */}
           <label htmlFor="date" className="block text-gray-700 text-sm font-bold mb-2">Date</label>
           <input
             type="date"
