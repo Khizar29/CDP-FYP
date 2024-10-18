@@ -53,7 +53,7 @@ const AddNews = () => {
       data.append('date', formData.date);
       if (formData.image) data.append('image', formData.image);
 
-      await axios.post('http://localhost:8000/api/v1/newsfeeds', data, config);
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds`, data, config);
       navigate('/admin/newsfeeds');
     } catch (err) {
       setError(`Error saving news: ${err.response?.data?.message || err.message}`);

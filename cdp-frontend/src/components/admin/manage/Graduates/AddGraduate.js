@@ -18,7 +18,7 @@ const AddGraduate = ({ show, onClose, onErrors, onRefresh }) => {
 
         try {
             const token = localStorage.getItem('accessToken'); // Get the token from localStorage
-            const response = await axios.post('http://localhost:8000/api/v1/graduates/import', formData, {
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/import`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                     Authorization: `Bearer ${token}` // Add the authorization header

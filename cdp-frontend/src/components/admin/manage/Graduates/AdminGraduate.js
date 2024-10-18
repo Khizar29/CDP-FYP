@@ -20,7 +20,7 @@ const AdminGraduates = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await axios.get('http://localhost:8000/api/v1/graduates', {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates`, {
                 headers: { Authorization: `Bearer ${token}` },
                 params: {
                     page,

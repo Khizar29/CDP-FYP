@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }) => {
 
     const cookies = getCookies();
     if (cookies.accessToken) {
-      axios.get('http://localhost:8000/api/v1/users/current-user', {
+      axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/current-user`, {
         withCredentials: true,
       })
       .then(response => {

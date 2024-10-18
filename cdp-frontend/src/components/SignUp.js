@@ -41,7 +41,7 @@ export default function SignUp() {
     event.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/users/register', {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/register`, {
         fullName,
         email,
         password,

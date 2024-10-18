@@ -28,7 +28,7 @@ const AdminJobs = () => {
 
     const fetchJobs = async (page = 1) => {
         try {
-            const response = await axios.get('http://localhost:8000/api/v1/jobs', {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, {
                 params: {
                     page: page,
                     limit: jobsPerPage,
@@ -54,7 +54,7 @@ const AdminJobs = () => {
             if (!token) return;
 
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            await axios.delete(`http://localhost:8000/api/v1/jobs/${id}`, config);
+            await axios.delete(`${process.env.REACT_APP_BACKEND_URL}api/v1/jobs/${id}`, config);
             setJobs(jobs.filter(job => job._id !== id));
             alert('Job Deleted Successfully');
         } catch (error) {

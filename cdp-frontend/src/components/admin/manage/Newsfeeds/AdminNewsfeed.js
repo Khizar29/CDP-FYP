@@ -16,7 +16,7 @@ const AdminNewsfeed = () => {
   }, [currentPage]);
 
   const fetchNews = () => {
-    axios.get(`http://localhost:8000/api/v1/newsfeeds?isPublic=true&page=${currentPage}&limit=${itemsPerPage}`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds?isPublic=true&page=${currentPage}&limit=${itemsPerPage}`)
       .then(response => {
         setNewsItems(response.data.data);
         setTotalPages(response.data.meta.totalPages);
@@ -36,7 +36,7 @@ const AdminNewsfeed = () => {
       }
 
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`http://localhost:8000/api/v1/newsfeeds/${id}`, config);
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/${id}`, config);
       setNewsItems(newsItems.filter(news => news._id !== id));
       alert('News/Event Deleted Successfully');
     } catch (error) {
@@ -46,7 +46,7 @@ const AdminNewsfeed = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 mx-auto">
       <h2 className="text-2xl font-bold mb-4">Manage News and Events</h2>
       <button onClick={() => navigate('/admin/newsfeeds/add')} className="bg-blue-500 text-white py-2 px-4 rounded mb-4">Add News/Event</button>
       <table className="min-w-full bg-white shadow rounded-lg">

@@ -13,7 +13,7 @@ const NewsFeed = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/v1/newsfeeds?isPublic=true&limit=4')
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds?isPublic=true&limit=4`)
       .then(response => {
         setNewsItems(response.data.data);
       })

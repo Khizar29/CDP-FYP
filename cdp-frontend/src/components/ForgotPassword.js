@@ -21,7 +21,7 @@ export default function ForgotPasswordModal({ open, handleClose }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/users/forgot-password', { email });
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/forgot-password`, { email });
       alert(response.data.message);
     } catch (error) {
       alert(error.response?.data?.message || 'Something went wrong');

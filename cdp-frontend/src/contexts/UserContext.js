@@ -37,7 +37,7 @@ export const UserProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('http://localhost:8000/api/v1/users/logout', {}, { withCredentials: true });
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`, {}, { withCredentials: true });
       setUser(null);
     } catch (error) {
       console.error("Error during logout:", error);

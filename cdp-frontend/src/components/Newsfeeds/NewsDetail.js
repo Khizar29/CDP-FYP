@@ -12,7 +12,7 @@ const NewsDetail = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/api/v1/newsfeeds/${id}`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/${id}`)
       .then(response => {
         setNewsItem(response.data.data);
       })
@@ -20,7 +20,7 @@ const NewsDetail = () => {
         console.error("There was an error fetching the news details!", error);
       });
 
-    axios.get(`http://localhost:8000/api/v1/newsfeeds?isPublic=true`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds?isPublic=true`)
       .then(response => {
         setNewsList(response.data.data);
       })

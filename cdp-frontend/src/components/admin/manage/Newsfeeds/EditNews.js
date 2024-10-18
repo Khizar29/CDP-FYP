@@ -66,7 +66,7 @@ const EditNews = () => {
       data.append('date', formData.date);
       if (formData.image) data.append('image', formData.image);
 
-      await axios.put(`http://localhost:8000/api/v1/newsfeeds/${id}`, data, config);
+      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/${id}`, data, config);
       navigate('/admin/newsfeeds');
     } catch (error) {
       console.error('Error updating news:', error);

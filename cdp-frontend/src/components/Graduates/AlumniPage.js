@@ -23,7 +23,7 @@ const AlumniPage = () => {
         setLoading(true);
 
         // Fetch data from the backend API
-        const response = await axios.get('http://localhost:8000/api/v1/graduates');
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates`);
 
         if (response.data && Array.isArray(response.data.data)) {
           setAlumniData(response.data.data); // Access the 'data' field in response

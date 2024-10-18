@@ -69,9 +69,9 @@ const AddJob = () => {
             };
 
             if (job) {
-                await axios.put(`http://localhost:8000/api/v1/jobs/${job._id}`, formData, config);
+                await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${job._id}`, formData, config);
             } else {
-                await axios.post('http://localhost:8000/api/v1/jobs', formData, config);
+                await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, formData, config);
             }
 
             navigate('/admin/jobs');
