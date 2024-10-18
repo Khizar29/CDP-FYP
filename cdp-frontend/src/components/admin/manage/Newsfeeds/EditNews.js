@@ -17,7 +17,7 @@ const EditNews = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/api/v1/newsfeeds/${id}`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/${id}`)
       .then(response => {
         const { title, category, description, date } = response.data.data;
         setFormData({ title, category, description, date, image: null });

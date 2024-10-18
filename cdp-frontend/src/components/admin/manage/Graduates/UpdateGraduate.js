@@ -43,7 +43,7 @@ const UpdateGraduate = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('accessToken');
-      await axios.put(`http://localhost:8000/api/v1/graduates/${nuId}`, formData, {
+      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

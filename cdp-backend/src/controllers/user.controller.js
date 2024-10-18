@@ -254,7 +254,7 @@ const forgetPassword = asyncHandler(async (req, res) => {
   const token = jwt.sign({ email: user.email, id: user._id }, secret, { expiresIn: '10m' });
   console.log("Token generated:", token);
   
-  const link = `http://localhost:8000/reset-password/${user._id}/${token}`;
+  const link = `${process.env.REACT_APP_BACKEND_URL}/reset-password/${user._id}/${token}`;
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',

@@ -53,7 +53,7 @@ export const AuthProvider = ({ children }) => {
     setIsLoggedIn(false);
     setIsAdmin(false);
     // Clear cookies or local storage if needed
-    axios.post("http://localhost:8000/api/v1/users/logout", {}, { withCredentials: true })
+    axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`, {}, { withCredentials: true })
       .then(() => {
         // Logout successful
         console.log("Logged out successfully");

@@ -12,7 +12,8 @@ const __dirname = dirname(__filename);
 const app = express();
 
 app.use(cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+     origin: "http://192.168.100.3:3000",  
+    // origin: process.env.CORS_ORIGIN || "http://localhost:3000",
     credentials: true
 }));
 
