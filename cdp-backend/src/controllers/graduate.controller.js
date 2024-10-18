@@ -167,15 +167,31 @@ const deleteGraduate = asyncHandler(async (req, res) => {
 });
 
 
-// Fetch paginated graduates information (Public route)
+// Fetch paginated graduates with filters (Public route)
 const fetchGraduates = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page) || 1; // Default to page 1
-  const limit = parseInt(req.query.limit) || 10; // Default to 10 graduates per page
-  const skip = (page - 1) * limit; // Calculate how many records to skip
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+
+  // Retrieve filters from query parameters
+  const { searchTerm, filterYear, filterDiscipline } = req.query;
+
+  // Build the search criteria
+  const criteria = {};
+  if (searchTerm) {
+    const regex = new RegExp(searchTerm, 'i'); // Case-insensitive regex
+    criteria.$or = [{ firstName: regex }, { lastName: regex }, { nuId: regex }];
+  }
+  if (filterYear) {
+    criteria.yearOfGraduation = filterYear;
+  }
+  if (filterDiscipline) {
+    criteria.discipline = filterDiscipline;
+  }
 
   try {
-    const totalGraduates = await Graduate.countDocuments(); // Get total count of graduates
-    const graduates = await Graduate.find().skip(skip).limit(limit); // Fetch paginated graduates
+    const totalGraduates = await Graduate.countDocuments(criteria);
+    const graduates = await Graduate.find(criteria).skip(skip).limit(limit);
 
     return res.status(200).json({
       data: graduates,
@@ -187,6 +203,7 @@ const fetchGraduates = asyncHandler(async (req, res) => {
     return res.status(500).json(new ApiError(500, 'Failed to fetch graduates', error.message));
   }
 });
+
 
 
 // Fetch a single Graduate by ID
