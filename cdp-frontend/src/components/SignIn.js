@@ -50,7 +50,7 @@ export default function SignIn({ onClose }) {
     event.preventDefault();
     try {
       setErrorMessage('');
-      const response = await axios.post('http://localhost:8000/api/v1/users/login', {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/login`, {
         email,
         password,
       }, {

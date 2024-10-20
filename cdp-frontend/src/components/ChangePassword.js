@@ -21,7 +21,7 @@ function ChangePassword() {
       const token = localStorage.getItem('accessToken');
 
       const response = await axios.post(
-        'http://localhost:8000/api/v1/users/change-password',
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/change-password`,
         { oldPassword, newPassword },
         {
           headers: {

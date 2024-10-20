@@ -6,7 +6,7 @@ const GraduateRow = ({ index, graduate, onDelete }) => { // Ensure onDelete is p
     const handleDelete = async () => {
         try {
             const token = localStorage.getItem('accessToken');
-            await axios.delete(`http://localhost:8000/api/v1/graduates/${graduate.nuId}`, {
+            await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${graduate.nuId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

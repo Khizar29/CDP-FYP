@@ -2,18 +2,11 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faBuilding, faBriefcase, faClipboardList, faClipboardUser, faCalendarAlt, faTasks } from '@fortawesome/free-solid-svg-icons';
 import { motion, AnimatePresence } from 'framer-motion';
+import DOMPurify from 'dompurify';
 
 const JobView = ({ job, handleBackToJobs }) => {
-  const formatText = (text) => {
-    return text.split('\n').map((line, index) => (
-      <p key={index} className="mb-2">
-        {line.trim().startsWith('•') ? (
-          <span>{line}</span>
-        ) : (
-          <span>{line}</span>
-        )}
-      </p>
-    ));
+  const sanitizeContent = (htmlContent) => {
+    return { __html: DOMPurify.sanitize(htmlContent) };
   };
 
   return (
@@ -58,7 +51,6 @@ const JobView = ({ job, handleBackToJobs }) => {
 
           <div className="relative z-10">
             <h2 className="text-3xl font-bold text-blue-900 mb-4 flex items-center">
-              
               {job.title}
             </h2>
             <p className="text-xl font-semibold mb-4 flex items-center text-amber-400">
@@ -73,23 +65,33 @@ const JobView = ({ job, handleBackToJobs }) => {
               <FontAwesomeIcon icon={faCalendarAlt} className="mr-2 text-blue-600" /> 
               Posted on {new Date(job.posted_on).toLocaleDateString()}
             </p>
+
             <h3 className="text-xl font-semibold text-blue-900 mt-6 mb-4 flex items-center">
               <FontAwesomeIcon icon={faClipboardList} className="mr-2 text-blue-600" /> 
               Requirements
             </h3>
-            {formatText(job.qualification_req)}
+            <div
+              dangerouslySetInnerHTML={sanitizeContent(job.qualification_req)}
+              className="mb-4 text-gray-700"
+            />
 
             <h3 className="text-xl font-semibold text-blue-900 mt-6 mb-4 flex items-center">
               <FontAwesomeIcon icon={faClipboardUser} className="mr-2 text-blue-600" /> 
               Description
             </h3>
-            {formatText(job.job_description)}
+            <div
+              dangerouslySetInnerHTML={sanitizeContent(job.job_description)}
+              className="mb-4 text-gray-700"
+            />
 
             <h3 className="text-xl font-semibold text-blue-900 mt-6 mb-4 flex items-center">
               <FontAwesomeIcon icon={faTasks} className="mr-2 text-blue-600" /> 
               Responsibilities
             </h3>
-            {formatText(job.responsibilities)}
+            <div
+              dangerouslySetInnerHTML={sanitizeContent(job.responsibilities)}
+              className="mb-4 text-gray-700"
+            />
 
             <button className="mt-8 w-[120px] bg-blue-900 text-white py-2 rounded-full hover:bg-blue-600 transition duration-300">
               Apply Now

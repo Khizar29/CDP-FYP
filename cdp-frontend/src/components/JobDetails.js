@@ -65,7 +65,7 @@ const JobList = () => {
 
   const fetchJobs = async () => {
     try {
-      const response = await axios.get('http://localhost:8000/api/v1/jobs');
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`);
       setJobs(response.data.data);
       setFilteredJobs(response.data.data);
     } catch (error) {

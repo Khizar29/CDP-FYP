@@ -30,7 +30,7 @@ const Home = ({ aboutRef, contactRef }) => {
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post('http://localhost:8000/api/v1/users/logout', {}, { withCredentials: true });
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`, {}, { withCredentials: true });
       if (response.status === 200) {
         setUser(null);
         alert('Log out Successful');

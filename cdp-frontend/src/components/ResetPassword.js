@@ -17,7 +17,7 @@ export default function ResetPassword() {
        return;
     }
     try {
-       const response = await axios.post(`http://localhost:8000/api/v1/users/reset-password/${id}/${token}`, { password });
+       const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/reset-password/${id}/${token}`, { password });
        alert(response.data.message);
        navigate('/signin'); // Use navigate instead of history.push
     } catch (error) {

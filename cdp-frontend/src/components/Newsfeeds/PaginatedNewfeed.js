@@ -12,7 +12,7 @@ const PaginatedNewsFeed = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/api/v1/newsfeeds?isPublic=true&page=${page}&limit=${itemsPerPage}`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds?isPublic=true&page=${page}&limit=${itemsPerPage}`)
       .then(response => {
         setNewsItems(response.data.data);
         setTotalPages(response.data.meta.totalPages);

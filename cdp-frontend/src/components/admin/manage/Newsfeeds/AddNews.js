@@ -1,7 +1,8 @@
-// src/components/admin/manage/Newsfeeds/AddNews.js
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const AddNews = () => {
   const [formData, setFormData] = useState({
@@ -23,9 +24,13 @@ const AddNews = () => {
     setFormData((prev) => ({ ...prev, image: e.target.files[0] }));
   };
 
+  const handleDescriptionChange = (value) => {
+    setFormData((prev) => ({ ...prev, description: value }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Reset error message before submission
+    setError('');
 
     const token = localStorage.getItem('accessToken');
     if (!token) {
@@ -48,12 +53,22 @@ const AddNews = () => {
       data.append('date', formData.date);
       if (formData.image) data.append('image', formData.image);
 
-      await axios.post('http://localhost:8000/api/v1/newsfeeds', data, config);
+      await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds`, data, config);
       navigate('/admin/newsfeeds');
     } catch (err) {
       setError(`Error saving news: ${err.response?.data?.message || err.message}`);
     }
   };
+
+  const toolbarOptions = [
+    [{ 'header': '1'}, { 'header': '2'}, { 'font': [] }],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    ['bold', 'italic', 'underline', 'strike'],
+    ['link', 'image', 'video'],
+    [{ 'align': [] }],
+    [{ 'color': [] }, { 'background': [] }],
+    ['clean']
+  ];
 
   return (
     <div className="container mx-auto p-8">
@@ -93,17 +108,17 @@ const AddNews = () => {
 
         <div className="mb-6">
           <label className="block text-gray-700 text-sm font-bold mb-2">Description</label>
-          <textarea
-            name="description"
+          <ReactQuill
             value={formData.description}
-            onChange={handleChange}
-            className="w-full border rounded p-2"
-            rows="4"
+            onChange={handleDescriptionChange}
+            theme="snow"
+            modules={{ toolbar: toolbarOptions }}
+            className="bg-white mb-[30px]"
             required
           />
         </div>
 
-        <div className="mb-6">
+        <div className="mb-6 mt-8"> {/* Added margin-top for spacing */}
           <label className="block text-gray-700 text-sm font-bold mb-2">Date</label>
           <input
             type="date"

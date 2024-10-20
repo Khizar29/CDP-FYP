@@ -3,15 +3,18 @@ import axios from 'axios';
 import { FaPlus } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import ViewJob from './ViewJob';
-import Pagination from '../Graduates/Pagination'; // Reuse the Pagination component
+import Pagination from '../Graduates/Pagination';
 
 const AdminJobs = () => {
     const [jobs, setJobs] = useState([]);
+    const [filteredJobs, setFilteredJobs] = useState([]);
     const [selectedJob, setSelectedJob] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1); // Track the current page
-    const [totalPages, setTotalPages] = useState(1); // Track the total number of pages
-    const jobsPerPage = 10; // Jobs per page
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterDate, setFilterDate] = useState('');
+    const jobsPerPage = 10;
 
     const openModal = (job) => {
         setSelectedJob(job);
@@ -23,70 +26,82 @@ const AdminJobs = () => {
         setIsModalOpen(false);
     };
 
-    // Fetch jobs with pagination
     const fetchJobs = async (page = 1) => {
         try {
-            const response = await axios.get('http://localhost:8000/api/v1/jobs', {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, {
                 params: {
                     page: page,
-                    limit: jobsPerPage, // Limit number of jobs per page
+                    limit: jobsPerPage,
+                    searchTerm: searchTerm,
+                    filterDate: filterDate,
                 },
             });
-            setJobs(response.data.data); // Set the jobs data
-            setTotalPages(response.data.totalPages); // Set the total pages
+            setJobs(response.data.data);
+            setFilteredJobs(response.data.data); // The backend handles filtering
+            setTotalPages(response.data.totalPages);
         } catch (err) {
             console.log(err);
         }
     };
 
     useEffect(() => {
-        fetchJobs(currentPage); // Fetch jobs when the current page changes
-    }, [currentPage]);
+        fetchJobs(currentPage);
+    }, [currentPage, searchTerm, filterDate]); // Trigger search whenever these values change
 
     const handleDelete = async (id) => {
         try {
             const token = localStorage.getItem('accessToken');
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
+            if (!token) return;
 
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            };
-
-            const response = await axios.delete(`http://localhost:8000/api/v1/jobs/${id}`, config);
-            console.log('Job deleted:', response.data);
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            await axios.delete(`${process.env.REACT_APP_BACKEND_URL}api/v1/jobs/${id}`, config);
             setJobs(jobs.filter(job => job._id !== id));
             alert('Job Deleted Successfully');
         } catch (error) {
-            if (error.response && error.response.data) {
-                console.error('Error:', error.response.data);
-            } else {
-                console.error('Error:', error.message);
-            }
+            console.error('Error:', error.message);
         }
     };
 
     const handlePageChange = (pageNumber) => {
-        setCurrentPage(pageNumber); // Update current page when pagination changes
+        setCurrentPage(pageNumber);
     };
 
     const handleBackToJobs = () => {
         setSelectedJob(null);
     };
 
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const handleDateChange = (e) => {
+        setFilterDate(e.target.value);
+    };
+
     return (
         <>
             <div className="container mx-auto p-4">
-                <div className="w-full max-w-5xl mx-auto"> {/* Center the content */}
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-2xl font-bold text-blue-900">Jobs List</h2>
-                        <Link to="/admin/jobs/manage" className="inline-flex items-center bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-600">
-                            <FaPlus className="mr-2" /> New
-                        </Link>
+                <div className="w-full max-w-5xl mx-auto">
+                    <div className="flex flex-col md:flex-row md:justify-between items-center mb-4">
+                        <h2 className="text-2xl font-bold text-blue-900 mb-4 md:mb-0">Jobs List</h2>
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <input
+                                type="text"
+                                placeholder="Search by Company or Title"
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                                className="py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                            />
+                            <input
+                                type="date"
+                                value={filterDate}
+                                onChange={handleDateChange}
+                                className="py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                            />
+                            <Link to="/admin/jobs/manage" className="inline-flex items-center bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-600">
+                                <FaPlus className="mr-2" /> New
+                            </Link>
+                        </div>
                     </div>
 
                     <div className="overflow-x-auto bg-white rounded-lg shadow-md mb-6">
@@ -101,35 +116,19 @@ const AdminJobs = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {jobs.length > 0 ? (
-                                    jobs.map((job, index) => (
+                                {filteredJobs.length > 0 ? (
+                                    filteredJobs.map((job, index) => (
                                         <tr key={index} className="border-b hover:bg-gray-100 transition duration-300">
                                             <td className="py-2 px-3 text-center">{index + 1}</td>
                                             <td className="py-2 px-3">{job.company_name}</td>
                                             <td className="py-2 px-3">{job.title}</td>
                                             <td className="py-2 px-3">{new Date(job.posted_on).toLocaleDateString()}</td>
                                             <td className="py-2 px-3 text-center">
-                                                <button 
-                                                    className="btn btn-sm bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-600 mr-2" 
-                                                    onClick={() => openModal(job)}>
-                                                    View
-                                                </button>
-                                                <Link 
-                                                    to="/admin/jobs/manage" 
-                                                    state={{ action: 'edit', data: job }} 
-                                                    className="inline-block"
-                                                >
-                                                    <button 
-                                                        className="btn btn-sm bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600 mr-2"
-                                                    >
-                                                        Edit
-                                                    </button>
+                                                <button className="bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-600 mr-2" onClick={() => openModal(job)}>View</button>
+                                                <Link to="/admin/jobs/manage" state={{ action: 'edit', data: job }}>
+                                                    <button className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600 mr-2">Edit</button>
                                                 </Link>
-                                                <button 
-                                                    className="btn btn-sm bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600" 
-                                                    onClick={() => handleDelete(job._id)}>
-                                                    Delete
-                                                </button>
+                                                <button className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600" onClick={() => handleDelete(job._id)}>Delete</button>
                                             </td>
                                         </tr>
                                     ))
@@ -142,21 +141,13 @@ const AdminJobs = () => {
                         </table>
                     </div>
 
-                    {/* Pagination Section */}
                     <div className="flex justify-center mt-6">
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={totalPages}
-                            onPageChange={handlePageChange} // Handle page change
-                        />
+                        <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
                     </div>
                 </div>
             </div>
 
-            {/* Render the JobView component when a job is selected */}
-            {selectedJob && (
-                <ViewJob job={selectedJob} handleBackToJobs={handleBackToJobs} />
-            )}
+            {selectedJob && <ViewJob job={selectedJob} handleBackToJobs={handleBackToJobs} />}
         </>
     );
 };
