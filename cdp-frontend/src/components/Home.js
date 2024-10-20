@@ -10,7 +10,7 @@ import axios from 'axios';
 import ContactUs from './ContactUs';
 import SignIn from './SignIn';
 import Slider from './Testimonial/Slider';
-import NewsFeed from './Newsfeeds/Newsfeed';
+import NewsFeed from './Newsfeeds/NewsFeed';
 
 const Home = ({ aboutRef, contactRef }) => {
   const { user, setUser } = useContext(UserContext);
