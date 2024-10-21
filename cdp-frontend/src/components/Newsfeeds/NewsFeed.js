@@ -45,10 +45,10 @@ const NewsFeed = () => {
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   return (
-    <Box sx={{ width: '100%', padding: '2rem', backgroundColor: '#0b5394', borderRadius: '10px' }}>
-      <Typography variant="h3" align="center" color="#fff" gutterBottom>
+    <Box sx={{ width: '100%', padding: '2rem', borderRadius: '10px' }}>
+      <Typography variant="h3" align="center" color="#000" gutterBottom>
         Latest <span className='text-yellow-500 font-bold'>News </span>
-        and <span className='text-green-600 font-bold'>Events</span>
+        and <span className='text-blue-400 font-bold'>Events</span>
       </Typography>
       <Grid container spacing={4}>
         {newsItems && Array.isArray(newsItems) && newsItems.length > 0 ? (
@@ -63,7 +63,7 @@ const NewsFeed = () => {
                   justifyContent: 'space-between',
                   boxShadow: 3,
                   borderRadius: 3,
-                  border: '3px solid #fa8306',
+                  border: '3px solid #41d4e5',
                   transition: 'transform 0.3s, box-shadow 0.3s',
                   '&:hover': { transform: 'scale(1.03)', boxShadow: 6 },
                   overflow: 'hidden',

@@ -1,13 +1,12 @@
-// src/components/About.js
 import React from 'react';
-import buildingImage from '../Images/career.png'; // Replace with your image path
 import { Link } from "react-router-dom";
 
 const About = React.forwardRef((props, ref) => (
-  <div ref={ref} id="about" className="bg-white py-12"> {/* Add id="about" */}
+  <div ref={ref} id="about" className="bg-white py-12">
     <div className="container mx-auto px-4 lg:px-8">
-      <div className="flex flex-col md:flex-row items-start md:space-x-8">
-        <div className="md:w-1/2">
+      <div className="flex flex-col items-center">
+        {/* Narrow the width */}
+        <div className="max-w-2xl w-full text-center">
           <h6 className="text-gray-600 uppercase tracking-widest text-sm">All About Our Campus</h6>
           <h2 className="text-3xl font-bold text-gray-800 mt-2">
             About Career Development Portal
@@ -34,9 +33,6 @@ const About = React.forwardRef((props, ref) => (
               <Link to="/signup" className="text-blue-500">Sign Up</Link> / <Link to="/signin" className="text-blue-500">Log In</Link> today!
             </p>
           </div>
-        </div>
-        <div className="md:w-1/2 mt-8 md:mt-0">
-          <img src={buildingImage} alt="FAST National University" className="w-full h-auto rounded-lg shadow-md" />
         </div>
       </div>
     </div>

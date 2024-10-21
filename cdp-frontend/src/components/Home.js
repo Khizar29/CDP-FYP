@@ -4,6 +4,11 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import backgroundImage1 from '../Images/FAST_PIC_1.jpg';
 import backgroundImage2 from '../Images/FAST_PIC_2.jpg';
 import backgroundImage3 from '../Images/FAST_PIC_3.jpg';
+import bgimg4 from '../Images/bg-4.jpg';
+import bgimg5 from '../Images/bg-5.jpg';
+import bgimg6 from '../Images/bg-6.jpg';
+import bgimg7 from '../Images/bg-7.jpg';
+
 import About from './About';
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
@@ -11,6 +16,7 @@ import ContactUs from './ContactUs';
 import SignIn from './SignIn';
 import Slider from './Testimonial/Slider';
 import NewsFeed from './Newsfeeds/NewsFeed';
+
 
 const Home = ({ aboutRef, contactRef }) => {
   const { user, setUser } = useContext(UserContext);
@@ -91,15 +97,39 @@ const Home = ({ aboutRef, contactRef }) => {
         </div>
       </section>
 
-      <div className="min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 flex items-center justify-center">
-        <Slider />
-      </div>
-
+      
+      <section
+        className="min-h-screen py-10 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10"
+        style={{
+          backgroundImage: `url(${bgimg5})`,
+        }}
+      >
       <About ref={aboutRef} />
+      </section>
 
-      <section className="my-12 px-4 lg:px-20">
+      <section className="min-h-screen py-10 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10"
+      // style={{
+      //   backgroundImage: `url(${bgimg7})`,
+      // }}
+      >
         <NewsFeed limit={4} /> {/* Display only 4 news items on the homepage */}
       </section>
+
+      <section
+        className="min-h-screen py-10 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10"
+        style={{
+          backgroundImage: `url(${bgimg6})`,
+        }}
+      >
+        <div className="text-center">
+          <h2 className="text-4xl sm:text-6xl font-bold text-gray-100 mb-2">
+            Testimonials
+          </h2>
+          
+        </div>
+        <Slider />
+      </section>
+
 
       <div ref={contactRef}>
         <ContactUs />

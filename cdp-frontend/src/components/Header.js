@@ -148,7 +148,7 @@ const Header = ({ scrollToSection }) => {
               <Link to="/alumni" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faGraduationCap} /> <span>Alumni</span>
               </Link>
-              <Link to="/events" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+              <Link to="/news" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
               </Link>
               <div onClick={() => { toggleMenu(); scrollToSection('contact'); }} className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer">

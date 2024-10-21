@@ -1,20 +1,23 @@
 import React from 'react';
+import Quoteicon from "../../Images/quote-icon.svg";
+import dummyimg from "../../Images/IMG_8487.jpg"
+
 function Slide({ slide }) {
   return (
-    <div className="flex items-center justify-between w-full space-x-6">
-      <div className="flex-1 p-4">
-        <p className="text-gray-700 text-lg italic mb-6">{slide.text}</p>
-        <h3 className="text-xl font-bold text-blue-900">{slide.name}</h3>
-        <p className="text-gray-500">{slide.title}</p>
+    <div className="flex flex-col sm:flex-row items-center sm:justify-between w-full sm:space-x-6 space-y-4 sm:space-y-0">
+      <div className="flex-1 p-4 text-center sm:text-left">
+        <p className="text-gray-800 text-sm text-center sm:text-lg italic mb-4 sm:text-left">{slide.text}</p>
+        <h3 className="text-lg sm:text-xl font-bold text-orange-400">{slide.name}</h3>
+        <p className="text-black-500 text-sm">{slide.title}</p>
       </div>
-      <div className="w-48 h-48 relative">
+      <div className="w-28 h-28 sm:w-48 sm:h-48 relative"> {/* Reduced size for mobile */}
         <img
-          src={slide.url}
+          src={dummyimg}
           alt={slide.name}
           className="w-full h-full object-cover rounded-lg shadow-lg"
         />
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 bg-white shadow-md p-2 rounded-full">
-          <img src="/icons/icon-quotes.svg" alt="Quotes Icon" className="w-8 h-8" />
+        <div className="absolute  bg-indigo-200 bottom-0 left-1/2 transform  -translate-x-1/2 translate-y-1/2 shadow-md p-1 sm:p-2 rounded-full border-2 border-black">
+          <img src={Quoteicon} alt="Quotes Icon" className="w-4 h-4 sm:w-6 sm:h-6" />
         </div>
       </div>
     </div>

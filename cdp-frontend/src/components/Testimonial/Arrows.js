@@ -1,21 +1,25 @@
 import React from 'react';
+import arrowleft from "../../Images/arrow-left.svg";
+import arrowright from "../../Images/arrow-right.svg";
+
 function Arrows({ nextSlide, prevSlide }) {
   return (
-    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4">
+    <div className="flex justify-center space-x-4 pt-6 sm:absolute sm:bottom-4 sm:left-1/2 sm:transform sm:-translate-x-1/2">
       <button
         onClick={prevSlide}
-        className="w-10 h-10 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-full shadow-md"
+        className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-orange-200 rounded-full shadow-md"
       >
-        <img src="/icons/icon-prev.svg" alt="Previous" className="w-4 h-4" />
+        <img src={arrowleft} alt="Previous" className="w-8 h-8 sm:w-10 sm:h-10" />
       </button>
       <button
         onClick={nextSlide}
-        className="w-10 h-10 flex items-center justify-center bg-gray-200 hover:bg-gray-300 rounded-full shadow-md"
+        className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center  hover:bg-orange-200 rounded-full shadow-md"
       >
-        <img src="/icons/icon-next.svg" alt="Next" className="w-4 h-4" />
+        <img src={arrowright} alt="Next" className="w-8 h-8 sm:w-10 sm:h-10" />
       </button>
     </div>
   );
 }
+
 
 export default Arrows;
