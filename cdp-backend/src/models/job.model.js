@@ -19,7 +19,7 @@ const jobSchema = new Schema(
     },
     no_of_openings: {
       type: Number,
-      required: true,
+      required: false,
     },
     qualification_req: {
       type: String,

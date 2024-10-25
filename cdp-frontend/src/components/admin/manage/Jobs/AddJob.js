@@ -132,6 +132,44 @@ const AddJob = () => {
                     />
                 </div>
 
+                 {/* Job Title Input */}
+                 <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
+                        Job Title
+                    </label>
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
+                        required
+                    />
+                </div>
+
+                {/* Job Type Select */}
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="job_type">
+                        Job Type
+                    </label>
+                    <select
+                        id="job_type"
+                        name="job_type"
+                        value={formData.job_type}
+                        onChange={(e) => setFormData({ ...formData, job_type: e.target.value })}
+                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
+                        required
+                    >
+                        <option value="">Select Job Type</option>
+                        <option value="Onsite">Onsite</option>
+                        <option value="Remote">Remote</option>
+                        <option value="Hybrid">Hybrid</option>
+                        <option value="Internship">Internship</option>
+                    </select>
+                </div>
+
+
                 <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Qualification Requirements</label>
                     <ReactQuill

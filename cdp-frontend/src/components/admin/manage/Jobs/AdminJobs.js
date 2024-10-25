@@ -54,7 +54,7 @@ const AdminJobs = () => {
             if (!token) return;
 
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            await axios.delete(`${process.env.REACT_APP_BACKEND_URL}api/v1/jobs/${id}`, config);
+            await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`, config);
             setJobs(jobs.filter(job => job._id !== id));
             alert('Job Deleted Successfully');
         } catch (error) {
@@ -82,30 +82,35 @@ const AdminJobs = () => {
         <>
             <div className="container mx-auto p-4">
                 <div className="w-full max-w-5xl mx-auto">
+                    {/* Flexbox for Search, Date Filter, and Add Job button */}
                     <div className="flex flex-col md:flex-row md:justify-between items-center mb-4">
                         <h2 className="text-2xl font-bold text-blue-900 mb-4 md:mb-0">Jobs List</h2>
-                        <div className="flex flex-col md:flex-row gap-4">
+                        <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
                             <input
                                 type="text"
                                 placeholder="Search by Company or Title"
                                 value={searchTerm}
                                 onChange={handleSearchChange}
-                                className="py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                                className="w-full md:w-auto py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-900"
                             />
                             <input
                                 type="date"
                                 value={filterDate}
                                 onChange={handleDateChange}
-                                className="py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                                className="w-full md:w-auto py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-900"
                             />
-                            <Link to="/admin/jobs/manage" className="inline-flex items-center bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-600">
+                            <Link
+                                to="/admin/jobs/manage"
+                                className="w-full md:w-auto inline-flex items-center justify-center bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
+                            >
                                 <FaPlus className="mr-2" /> New
                             </Link>
                         </div>
                     </div>
 
-                    <div className="overflow-x-auto bg-white rounded-lg shadow-md mb-6">
-                        <table className="min-w-full bg-white">
+                    {/* Table for Jobs */}
+                    <div className="overflow-x-auto"> {/* Ensure table can scroll on small screens */}
+                        <table className="min-w-full table-auto bg-white rounded-lg shadow-md mb-6"> {/* Use table-auto to fit content */}
                             <thead>
                                 <tr>
                                     <th className="py-2 px-3 text-center bg-blue-100 border-b">#</th>
@@ -124,11 +129,23 @@ const AdminJobs = () => {
                                             <td className="py-2 px-3">{job.title}</td>
                                             <td className="py-2 px-3">{new Date(job.posted_on).toLocaleDateString()}</td>
                                             <td className="py-2 px-3 text-center">
-                                                <button className="bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-600 mr-2" onClick={() => openModal(job)}>View</button>
+                                                <button
+                                                    className="bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-600 transition duration-300 mr-2"
+                                                    onClick={() => openModal(job)}
+                                                >
+                                                    View
+                                                </button>
                                                 <Link to="/admin/jobs/manage" state={{ action: 'edit', data: job }}>
-                                                    <button className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600 mr-2">Edit</button>
+                                                    <button className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600 transition duration-300 mr-2">
+                                                        Edit
+                                                    </button>
                                                 </Link>
-                                                <button className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600" onClick={() => handleDelete(job._id)}>Delete</button>
+                                                <button
+                                                    className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 transition duration-300"
+                                                    onClick={() => handleDelete(job._id)}
+                                                >
+                                                    Delete
+                                                </button>
                                             </td>
                                         </tr>
                                     ))
@@ -141,12 +158,14 @@ const AdminJobs = () => {
                         </table>
                     </div>
 
+                    {/* Pagination */}
                     <div className="flex justify-center mt-6">
                         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
                     </div>
                 </div>
             </div>
 
+            {/* Modal to show selected job */}
             {selectedJob && <ViewJob job={selectedJob} handleBackToJobs={handleBackToJobs} />}
         </>
     );
