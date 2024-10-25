@@ -5,24 +5,27 @@ import Testimonial from "../models/testimonial.model.js";
 
 
 //Admin only function
-const createTestimonial = asyncHandler(async(req, res) => {
-    const{ name, message, title} = req.body;
+const createTestimonial = asyncHandler(async (req, res) => {
+  const { name, message, title, isApproved } = req.body;
 
-    if(!req.user || req.user.role !== 'admin'){
-        throw new ApiError(403, 'Forbidden: Admins only');
-    }
+  console.log('Request Body isApproved:', isApproved); // Log incoming data
 
-    const testimonial = new Testimonial ({
-        name, 
-        message, 
-        title,
-    })
+  if (!req.user || req.user.role !== 'admin') {
+      throw new ApiError(403, 'Forbidden: Admins only');
+  }
 
-    await testimonial.save();
+  const testimonial = new Testimonial({
+      name,
+      message,
+      title,
+      isApproved
+  });
 
-    return res.status(201).json(new ApiResponse(201, testimonial, 'Testimonial created successfully'));
+  await testimonial.save();
 
+  return res.status(201).json(new ApiResponse(201, testimonial, 'Testimonial created successfully'));
 });
+
 
 const updateTestimonial = asyncHandler(async( req, res)=>{
     const { testimonialId } = req.params;
@@ -79,22 +82,19 @@ const getTestimonialById = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, testimonial, 'Testimonial fetched successfully'));
 });
   
-// Fetch all Testimonials (without pagination)
 const fetchTestimonials = asyncHandler(async (req, res) => {
-    try {
-      // Fetch all approved testimonials from the database
-      const testimonials = await Testimonial.find({ isApproved: true }); // Fetch only approved testimonials
-      const total = await Testimonial.countDocuments(); // Count total jobs
-      return res.status(200).json({
-        data: testimonials,
-        totatotalTestimonialsl: total,
-      });
-    } 
-    catch (error) {
-      //console.error('Error fetching testimonials:', error);
+  try {
+      // Fetch only approved testimonials from the database
+      const testimonials = await Testimonial.find({ isApproved: true });
+      if (!testimonials || testimonials.length === 0) {
+          return res.status(404).json(new ApiError(404, 'No approved testimonials found'));
+      }
+      return res.status(200).json(new ApiResponse(200, testimonials, 'Testimonials fetched successfully'));
+  } catch (error) {
       return res.status(500).json(new ApiError(500, 'Failed to fetch testimonials', error.message));
-    }
+  }
 });
+
 
 export {
     createTestimonial,
