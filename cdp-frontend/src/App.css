@@ -1,2 +1,16 @@
 /* App.css */
 /* This file can contain any additional custom styles you need */
+.formatted-content {
+    line-height: 1.6;
+  }
+  
+  .formatted-content ul,
+  .formatted-content ol {
+    margin-left: 1.5rem;
+  }
+  
+  .formatted-content li {
+    list-style-type: disc;
+    margin-bottom: 0.5rem;
+  }
+  

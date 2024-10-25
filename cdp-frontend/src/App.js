@@ -33,7 +33,8 @@ import AdminNewsfeed from './components/admin/manage/Newsfeeds/AdminNewsfeed';
 import AddNews from './components/admin/manage/Newsfeeds/AddNews';
 import ViewNews from './components/admin/manage/Newsfeeds/ViewNews';
 import EditNews from './components/admin/manage/Newsfeeds/EditNews';
-
+import AdminTestimonials from './components/admin/manage/Testimonials/AdminTestimonials';
+import AddEditTestimonial from './components/admin/manage/Testimonials/Add-EditTestimonials';
 
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
@@ -101,6 +102,11 @@ function App() {
             <Route path="newsfeeds/add" element={<AddNews />} />
             <Route path="newsfeeds/view/:id" element={<ViewNews />} />
             <Route path="newsfeeds/edit/:id" element={<EditNews />} />
+
+            <Route path="testimonials" element={<AdminTestimonials />} />
+            <Route path="testimonials/add" element={<AddEditTestimonial />} />
+            <Route path="testimonials/edit/:id" element={<AddEditTestimonial />} />
+            
           </Route>
         </Routes>
       </Router>

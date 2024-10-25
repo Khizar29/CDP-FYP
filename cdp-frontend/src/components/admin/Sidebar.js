@@ -26,7 +26,7 @@ const Sidebar = ({ isOpen }) => {
                     <FaCalendarAlt className="mr-3" />
                     Events
                 </Link>
-                <Link to="/admin/forum" className="flex items-center mt-4 py-2 px-6 text-xl text-gray-100 hover:bg-blue-700 rounded">
+                <Link to="/admin/testimonials" className="flex items-center mt-4 py-2 px-6 text-xl text-gray-100 hover:bg-blue-700 rounded">
                     <FaComments className="mr-3" />
                     Testimonials
                 </Link>
