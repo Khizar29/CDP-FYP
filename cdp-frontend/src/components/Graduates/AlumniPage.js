@@ -1,50 +1,56 @@
-// src/components/Graduates/AlumniPage.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Typography, Grid, Box, CircularProgress } from '@mui/material';
 import AlumniCard from './AlumniCard';
 import Pagination from './Pagination';
-import SearchBar from '../SearchBar';
+import SearchBar from './SearchBar';
+import placeholder from '../../Images/placeholder.png';
 
 const AlumniPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [alumniData, setAlumniData] = useState([]); // Initialize as an empty array
+  const [alumniData, setAlumniData] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
-  const [alumniPerPage] = useState(10); // Number of cards per page
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [searchFilters, setSearchFilters] = useState({
+    searchTerm: '',
+    filterYear: '',
+    filterDiscipline: '',
+  });
+  const alumniPerPage = 12; // Set to 12 for user view
   const navigate = useNavigate();
 
+  // Fetch graduates from the server based on filters and pagination
+  const fetchAlumniData = async () => {
+    try {
+      setError(null);
+      setLoading(true);
+
+      // Make API call to fetch graduates with search, discipline, and year filters
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates`, {
+        params: {
+          page: currentPage,
+          limit: alumniPerPage,
+          searchTerm: searchFilters.searchTerm,
+          filterYear: searchFilters.filterYear,
+          filterDiscipline: searchFilters.filterDiscipline,
+        },
+      });
+
+      setAlumniData(response.data.data); // Populate alumni data
+      setTotalPages(response.data.totalPages); // Set total pages
+    } catch (error) {
+      setError(error.message || 'Error fetching alumni data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Trigger data fetch when filters or pagination change
   useEffect(() => {
-    const fetchAlumniData = async () => {
-      try {
-        setError(null);
-        setLoading(true);
-
-        // Fetch data from the backend API
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates`);
-
-        if (response.data && Array.isArray(response.data.data)) {
-          setAlumniData(response.data.data); // Access the 'data' field in response
-          setTotalPages(Math.ceil(response.data.data.length / alumniPerPage)); // Calculate total pages
-        } else {
-          throw new Error('Unexpected response format from server');
-        }
-      } catch (error) {
-        setError(error.message || 'Error fetching alumni data');
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchAlumniData();
-  }, []);
-
-  // Pagination logic
-  const indexOfLastAlumni = currentPage * alumniPerPage;
-  const indexOfFirstAlumni = indexOfLastAlumni - alumniPerPage;
-  const currentAlumni = alumniData.slice(indexOfFirstAlumni, indexOfLastAlumni);
+  }, [currentPage, searchFilters]);
 
   // Handle page change
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
@@ -52,6 +58,12 @@ const AlumniPage = () => {
   // Handle card click
   const handleCardClick = (nuId) => {
     navigate(`/profile/${nuId}`); // Navigate to profile page
+  };
+
+  // Handle search input and filter changes from SearchBar
+  const handleSearch = (filters) => {
+    setSearchFilters(filters);
+    setCurrentPage(1); // Reset to page 1 when searching or filtering
   };
 
   if (loading) {
@@ -106,21 +118,14 @@ const AlumniPage = () => {
         </Typography>
       </Box>
 
-      {/* Search Bar Section */}
+      {/* Search Bar and Filters */}
       <Box sx={{ maxWidth: '100%', px: { xs: 2, sm: 3, md: 4 }, mb: 4 }}>
-        <SearchBar onSearch={() => {}} /> {/* Implement search as needed */}
-      </Box>
-
-      {/* Alumni Showcase Title */}
-      <Box sx={{ mt: 4, mb: 2, px: { xs: 2, sm: 3, md: 4 } }}>
-        <Typography variant="h6" component="div" sx={{ textAlign: 'center', color: 'gray', fontSize: { xs: '1rem', sm: '1.2rem' } }}>
-          Alumni Showcase
-        </Typography>
+        <SearchBar onSearch={handleSearch} />
       </Box>
 
       {/* Alumni Cards Grid */}
       <Grid container spacing={4} mt={2} sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
-        {currentAlumni.map((alumni) => (
+        {alumniData.map((alumni) => (
           <Grid item key={alumni.nuId} xs={12} sm={6} md={4} lg={3}>
             <AlumniCard
               name={`${alumni.firstName} ${alumni.lastName}`}
@@ -128,7 +133,7 @@ const AlumniPage = () => {
               image={
                 alumni.profilePic
                   ? `https://drive.google.com/thumbnail?id=${alumni.profilePic.split('/d/')[1]?.split('/')[0]}&sz=s4000`
-                  : 'https://via.placeholder.com/150'
+                  : `${placeholder}`
               }
               classOf={alumni.yearOfGraduation}
               onClick={() => handleCardClick(alumni.nuId)}
