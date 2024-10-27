@@ -10,7 +10,8 @@ const AddEditTestimonial = () => {
         name: testimonial?.name || '',
         message: testimonial?.message || '',
         title: testimonial?.title || '',
-        isApproved: testimonial?.isApproved || false
+        isApproved: testimonial?.isApproved || false,
+        image: null // File input state
     });
 
     const navigate = useNavigate();
@@ -20,36 +21,49 @@ const AddEditTestimonial = () => {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
+    const handleFileChange = (e) => {
+        setFormData((prev) => ({ ...prev, image: e.target.files[0] }));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('FormData before submission: ', formData); // Check if formData contains correct isApproved value
-    
+        console.log('FormData before submission: ', formData);
+
         try {
             const token = localStorage.getItem("accessToken");
-    
+
             if (!token) {
                 throw new Error('No token found');
             }
-    
+
             const config = {
                 headers: {
-                    Authorization: `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data' // Required for file upload
                 }
             };
-    
-            if (testimonial) {
-                await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials/${testimonial._id}`, formData, config);
-            } else {
-                await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials`, formData, config);
+
+            const submitData = new FormData();
+            submitData.append("name", formData.name);
+            submitData.append("message", formData.message);
+            submitData.append("title", formData.title);
+            submitData.append("isApproved", formData.isApproved);
+            if (formData.image) {
+                submitData.append("image", formData.image); // Append file to form data
             }
-    
+
+            if (testimonial) {
+                await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials/${testimonial._id}`, submitData, config);
+            } else {
+                await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials`, submitData, config);
+            }
+
             navigate('/admin/testimonials');
         } catch (error) {
             console.error('Error saving testimonial:', error);
             alert('Error saving testimonial: ' + error.message);
         }
     };
-    
 
     return (
         <div className="container mx-auto p-8">
@@ -105,15 +119,29 @@ const AddEditTestimonial = () => {
                         Approved
                     </label>
                     <select
-                    id="isApproved"
-                    name="isApproved"
-                    value={formData.isApproved}
-                    onChange={(e) => setFormData({ ...formData, isApproved: e.target.value === 'true' })}
-                    className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
+                        id="isApproved"
+                        name="isApproved"
+                        value={formData.isApproved}
+                        onChange={(e) => setFormData({ ...formData, isApproved: e.target.value === 'true' })}
+                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
                     >
                         <option value="true">Yes</option>
                         <option value="false">No</option>
                     </select>
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="image">
+                        Upload Image
+                    </label>
+                    <input
+                        type="file"
+                        id="image"
+                        name="image"
+                        onChange={handleFileChange}
+                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
+                        accept="image/*"
+                    />
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -132,8 +160,6 @@ const AddEditTestimonial = () => {
                     </button>
                 </div>
             </form>
-
-        
         </div>
     );
 };
