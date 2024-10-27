@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import placeholder from '../../Images/placeholder.png'
 import axios from 'axios';
 import Header from '../Header'; // Adjust the import path as needed
 import Footer from '../Footer'; // Adjust the import path as needed
-
-// Import Material UI icons
 import EmailIcon from '@mui/icons-material/Email';
 import WhatsAppIcon from '@mui/icons-material/WhatsApp';
 import ShareIcon from '@mui/icons-material/Share';
@@ -41,19 +40,19 @@ const ProfilePage = () => {
     {
       icon: <EmailIcon />, // Material UI Email Icon
       label: 'Email',
-      url: `mailto:?subject=Check out this profile&body=Check out the profile of ${alumni.firstName} ${alumni.lastName}: http://localhost:3000/profile/${id}`,
+      url: `mailto:?subject=Check out this profile&body=Check out the profile of ${alumni.firstName} ${alumni.lastName}: http://111.68.108.227:3000/profile/${id}`,
     },
     {
       icon: <WhatsAppIcon />, // Material UI WhatsApp Icon
       label: 'WhatsApp',
-      url: `https://api.whatsapp.com/send?text=Check out the profile of ${alumni.firstName} ${alumni.lastName}: http://localhost:3000/profile/${id}`,
+      url: `https://api.whatsapp.com/send?text=Check out the profile of ${alumni.firstName} ${alumni.lastName}: http://111.68.108.227:3000/profile/${id}`,
     },
   ];
 
   // Generate the correct Google Drive thumbnail link format
   const profileImageUrl = alumni.profilePic
     ? `https://drive.google.com/thumbnail?id=${alumni.profilePic.split('/d/')[1]?.split('/')[0]}&sz=s4000`
-    : 'https://placehold.co/300x300';
+    : `${placeholder}`;
 
   return (
     <div className="min-h-screen bg-[#C1E4FB] flex flex-col">
@@ -100,7 +99,7 @@ const ProfilePage = () => {
         {/* Left Section - Profile Image and Basic Info in a shadow box */}
         <div className="w-full flex flex-col items-center bg-[#C1E4FB] p-6 rounded-lg shadow-md mb-8 max-w-sm mx-auto">
           <img
-            src={profileImageUrl || 'https://placehold.co/300x300'}
+            src={profileImageUrl || `${placeholder}`}
             alt={`Profile of ${alumni.firstName} ${alumni.lastName}`}
             className="rounded-lg w-64 h-64 object-cover mb-6 shadow-md"
           />
