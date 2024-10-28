@@ -51,7 +51,7 @@ const AdminGraduates = () => {
         <div className="p-6 mx-auto">
             <div className="flex flex-col md:flex-row md:justify-between items-center mb-4">
                 <h1 className="text-2xl font-bold text-blue-900">Manage Graduates</h1>
-                <button onClick={handleShowModal} className="bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700">
+                <button onClick={handleShowModal} className="bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300">
                     Import Graduates
                 </button>
             </div>

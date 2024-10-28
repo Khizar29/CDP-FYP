@@ -72,13 +72,11 @@ const deleteJob = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, 'Job deleted successfully'));
 });
 
-
-// Fetch all jobs with pagination and search
 const getAllJobs = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, searchTerm = '', filterDate = '' } = req.query;
 
   const query = {};
-  
+
   // Build search query
   if (searchTerm) {
     query.$or = [
@@ -95,13 +93,17 @@ const getAllJobs = asyncHandler(async (req, res) => {
     query.posted_on = { $gte: start, $lt: end };
   }
 
-  const startIndex = (page - 1) * limit;
   const total = await Job.countDocuments(query);
-  const jobs = await Job.find(query).skip(startIndex).limit(parseInt(limit));
+  
+  const startIndex = (page - 1) * limit;
+  const jobs = await Job.find(query)
+    .sort({ posted_on: -1 }) // Sort by posted_on in descending order
+    .skip(startIndex)
+    .limit(parseInt(limit));
 
   return res.status(200).json({
     data: jobs,
-    totalPages: Math.ceil(total / limit),
+    totalPages: limit > 0 ? Math.ceil(total / limit) : 1,
     currentPage: page,
     totalJobs: total,
   });
