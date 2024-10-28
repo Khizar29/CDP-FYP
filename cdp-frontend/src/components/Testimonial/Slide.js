@@ -17,6 +17,7 @@ function Slide({ slide }) {
         <img
           src={image}
           alt={name}
+          loading="lazy" // This enables lazy loading
           className="w-full h-full object-cover rounded-lg shadow-lg"
         />
         <div className="absolute bg-indigo-200 bottom-0 left-1/2 transform  -translate-x-1/2 translate-y-1/2 shadow-md p-1 sm:p-2 rounded-full border-2 border-black">
