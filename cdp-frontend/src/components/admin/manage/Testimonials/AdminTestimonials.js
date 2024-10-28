@@ -103,11 +103,15 @@ const AdminTestimonials = () => {
                                         <td className="py-2 px-3">{testimonial.message}</td>
                                         <td className="py-2 px-3">{testimonial.title}</td>
                                         <td className="py-2 px-3 text-center">
-                                            <Link to={`/admin/testimonials/edit/${testimonial._id}`}>
-                                                <button className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600 transition duration-300 mr-2">
-                                                    Edit
-                                                </button>
-                                            </Link>
+                                        <Link 
+                                            to={`/admin/testimonials/edit/${testimonial._id}`} 
+                                            state={{ data: testimonial }}
+                                        >
+                                            <button className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600 transition duration-300 mr-2">
+                                                Edit
+                                            </button>
+                                        </Link>
+
                                             <button
                                                 className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 transition duration-300"
                                                 onClick={() => handleDelete(testimonial._id)}

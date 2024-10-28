@@ -4,14 +4,15 @@ import axios from 'axios';
 
 const AddEditTestimonial = () => {
     const location = useLocation();
-    const testimonial = location.state?.data;
+    const testimonial = location.state?.data; // Get testimonial data from location state
 
+    // Initialize formData directly based on `testimonial` data if available
     const [formData, setFormData] = useState({
         name: testimonial?.name || '',
         message: testimonial?.message || '',
         title: testimonial?.title || '',
         isApproved: testimonial?.isApproved || false,
-        image: null // File input state
+        image: null // File input state, initially null
     });
 
     const navigate = useNavigate();
@@ -27,11 +28,9 @@ const AddEditTestimonial = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log('FormData before submission: ', formData);
 
         try {
             const token = localStorage.getItem("accessToken");
-
             if (!token) {
                 throw new Error('No token found');
             }
@@ -39,7 +38,7 @@ const AddEditTestimonial = () => {
             const config = {
                 headers: {
                     Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data' // Required for file upload
+                    'Content-Type': 'multipart/form-data'
                 }
             };
 
@@ -49,7 +48,7 @@ const AddEditTestimonial = () => {
             submitData.append("title", formData.title);
             submitData.append("isApproved", formData.isApproved);
             if (formData.image) {
-                submitData.append("image", formData.image); // Append file to form data
+                submitData.append("image", formData.image);
             }
 
             if (testimonial) {
