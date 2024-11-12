@@ -2,10 +2,12 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import Graduate from '../models/graduate.model.js';
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import path from "path";
+import crypto from "crypto";
 
 // Generate Access and Refresh Tokens
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -93,6 +95,117 @@ const registerUser = asyncHandler(async (req, res) => {
     new ApiResponse(201, createdUser, "User registered successfully and password emailed.")
   );
 });
+
+// Step 1: Check Graduate Existence and Display Email
+const checkGraduate = asyncHandler(async (req, res) => {
+  const { nuId } = req.body;
+
+  if (!nuId) {
+    throw new ApiError(400, "nuID is required");
+  }
+
+  // Check if the user already exists in the User collection
+  const existingUser = await User.findOne({ nuId });
+
+  if (existingUser) {
+    throw new ApiError(409, "User with this nuID already exists");
+  }
+
+  // If not found in User, proceed to check the Graduate collection
+  const graduate = await Graduate.findOne({ nuId });
+
+  if (!graduate) {
+    throw new ApiError(404, "Graduate not found with this nuID");
+  }
+
+  const personalEmail = graduate.personalEmail;
+  const existedUser = await User.findOne({ email: personalEmail });
+
+  if (existedUser) {
+    throw new ApiError(409, "User with this email already exists");
+  }
+
+  // Mask the email for frontend display
+  const maskedEmail = maskEmail(personalEmail);
+
+  return res.status(200).json(new ApiResponse(200, { maskedEmail }, "Graduate found. Confirm email to send password."));
+});
+
+// Step 2: Register Graduate as User and Send Password via Email
+const registerGraduateAsUser = asyncHandler(async (req, res) => {
+  const { nuId } = req.body;
+
+  if (!nuId) {
+    throw new ApiError(400, "nuID is required");
+  }
+
+  const graduate = await Graduate.findOne({ nuId });
+
+  if (!graduate) {
+    throw new ApiError(404, "Graduate not found with this nuID");
+  }
+
+  const personalEmail = graduate.personalEmail;
+  const existedUser = await User.findOne({ email: personalEmail });
+
+  if (existedUser) {
+    throw new ApiError(409, "User with this email already exists");
+  }
+
+  // Generate a random password
+  const generatedPassword = crypto.randomBytes(8).toString('hex');
+
+  // Create the user in the database
+  const user = await User.create({
+    fullName: `${graduate.firstName} ${graduate.lastName}`,
+    email: personalEmail,
+    nuId: graduate.nuId,
+    password: generatedPassword,
+    role: "user",
+  });
+
+  // Set up the email transporter
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL,
+      pass: process.env.GMAIL_PASSWORD,
+    },
+  });
+
+  const mailOptions = {
+    from: process.env.GMAIL,
+    to: personalEmail,
+    subject: 'Your New Account Password',
+    html: `<p>Hello ${graduate.fullName},</p>
+           <p>Thank you for registering on our platform. Here is your login password:</p>
+           <p><strong>Password:</strong> ${generatedPassword}</p>
+           <p>We recommend changing your password after the first login.</p>
+           <p>Best regards,<br>Your Company</p>`,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log('Error while sending email: ', error);
+      throw new ApiError(500, 'Error while sending the email.');
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
+
+  return res.status(201).json(
+    new ApiResponse(201, { user }, "Graduate registered successfully, and password emailed.")
+  );
+});
+
+// Helper function to mask email for display
+const maskEmail = (email) => {
+  const [user, domain] = email.split('@');
+  const maskedUser = user.slice(0, 4) + '****';
+  return `${maskedUser}@${domain}`;
+};
+
+
 // Login User
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
@@ -401,6 +514,8 @@ const serveResetPasswordPage = (req, res) => {
 
 export {
   registerUser,
+  checkGraduate,
+  registerGraduateAsUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
