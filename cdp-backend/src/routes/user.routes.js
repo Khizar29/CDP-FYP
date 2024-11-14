@@ -1,6 +1,8 @@
 import { Router } from "express";
 import {
   registerUser,
+  checkGraduate,
+  registerGraduateAsUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
@@ -12,10 +14,15 @@ import {
 } from "../controllers/user.controller.js";
 
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+
 const router = Router();
 
 router.route("/register").post(registerUser);
 router.route("/login").post(loginUser);
+
+// Graduate registration routes
+router.route("/check-graduate").post(checkGraduate);
+router.route("/register-graduate").post(registerGraduateAsUser);
 
 // Secured routes
 router.route("/logout").post(verifyJWT, logoutUser);
