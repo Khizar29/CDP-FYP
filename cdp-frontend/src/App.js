@@ -26,6 +26,7 @@ import ChangePassword from './components/ChangePassword';
 import ContactUs from './components/ContactUs';
 import UpdateGraduate from './components/admin/manage/Graduates/UpdateGraduate';
 import ViewGraduate from './components/admin/manage/Graduates/ViewGraduate';
+import EditGraduateProfile from './components/Graduates/EditProfile';
 import NewsFeed from './components/Newsfeeds/NewsFeed';
 import NewsDetail from './components/Newsfeeds/NewsDetail';
 import PaginatedNewsFeed from './components/Newsfeeds/PaginatedNewfeed';
@@ -69,6 +70,7 @@ function App() {
           <Route path="/benefits" element={<UserLayout scrollToSection={scrollToSection}><Benefits /></UserLayout>} />
           <Route path="/alumni" element={<UserLayout scrollToSection={scrollToSection}><Alumni /></UserLayout>} />
           <Route path="/profile/:id" element={<ProfilePage />} />
+          <Route path="/edit-profile/:nuId" element={<EditGraduateProfile />} />
           <Route path="/signin" element={<UserLayout scrollToSection={scrollToSection}><SignIn /></UserLayout>} />
           <Route path="/signup" element={<UserLayout scrollToSection={scrollToSection}><SignUp /></UserLayout>} />
           <Route path="/contactUs" element={<UserLayout scrollToSection={scrollToSection}><ContactUs /></UserLayout>} />

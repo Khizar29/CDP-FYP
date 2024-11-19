@@ -104,6 +104,11 @@ const Header = ({ scrollToSection }) => {
                       Admin Panel
                     </Link>
                   )}
+                  
+                    <Link to={`/edit-profile/${user.nuId}`} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                      Update Profile
+                    </Link>
+                  
                   <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
                     Logout
                   </div>
