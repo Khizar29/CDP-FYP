@@ -20,6 +20,7 @@ const Header = ({ scrollToSection }) => {
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
   const handleLogout = async () => {
     try {
       const token = localStorage.getItem('accessToken'); // Get the token from localStorage
@@ -45,8 +46,6 @@ const Header = ({ scrollToSection }) => {
       console.error("Error during logout", error);
     }
   };
-  
-
 
   const handleDropdownToggle = () => {
     setIsDropdownOpen(!isDropdownOpen);
