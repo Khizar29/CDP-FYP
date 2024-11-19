@@ -50,36 +50,42 @@ export default function SignIn({ onClose }) {
     event.preventDefault();
     try {
       setErrorMessage('');
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/login`, {
-        email,
-        password,
-      }, {
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        withCredentials: true,
-      });
-
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/login`,
+        { email, password },
+        {
+          headers: { 'Content-Type': 'application/json' },
+          withCredentials: true,
+        }
+      );
+  
       console.log('User logged in:', response.data);
-      setUser(response.data.data.user);
-      localStorage.setItem('accessToken', response.data.data.accessToken);
-
-      // Close the modal if onClose is provided
+  
+      // Save user info in localStorage
+      const { accessToken, refreshToken, user } = response.data.data;
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('user_id', user.nuId); // Use nuId to match your backend logic
+      localStorage.setItem('user_role', user.role); // Save role for role-based UI
+  
+      setUser(user);
+  
+      // Close modal if `onClose` is provided
       if (onClose) {
         onClose();
       }
-
-      // Redirect to home page
+  
+      // Redirect to home or dashboard
       navigate('/');
     } catch (error) {
       if (error.response && error.response.status === 401) {
         setErrorMessage('The password you entered is incorrect.');
       } else {
-        setErrorMessage(error.response ? error.response.data.message : 'An error occurred. Please try again.');
+        setErrorMessage(error.response?.data?.message || 'An error occurred. Please try again.');
       }
     }
   };
-
+  
   const handleOpenForgotPassword = () => setOpenForgotPassword(true);
   const handleCloseForgotPassword = () => setOpenForgotPassword(false);
   const handleClickShowPassword = () => setShowPassword(!showPassword);
