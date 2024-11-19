@@ -442,20 +442,20 @@ const forgetPassword = asyncHandler(async (req, res) => {
       <body>
           <div class="container">
               <div class="header">
-                  <a href="#">YourCompanyName</a>
+                  <a href="#">Career Service Office</a>
               </div>
               <div class="content">
                   <p style="font-size: 1.1em;">Hi,</p>
                   <p>We received a request to reset your password. Click the link below to choose a new password. The link will expire in 30 minutes.</p>
                   <a href="${link}" style="display: inline-block; padding: 10px 20px; margin: 20px 0; font-size: 1.1em; color: #fff; background-color: #00466a; text-decoration: none; border-radius: 4px;">Reset Password</a>
                   <p style="font-size: 0.9em;">If you did not request this password reset, please ignore this email.</p>
-                  <p style="font-size: 0.9em;">Regards,<br>YourCompanyName</p>
+                  <p style="font-size: 0.9em;">Regards,<br>Career Service Office</p>
                   <hr style="border:none;border-top:1px solid #eee" />
               </div>
               <div class="footer">
-                  <p>YourCompanyName Inc</p>
-                  <p>1234 Your Street</p>
-                  <p>Your City, Your Country</p>
+                  <p>Career Service Office</p>
+                  <p>FAST</p>
+                  <p>Karachi</p>
               </div>
           </div>
       </body>

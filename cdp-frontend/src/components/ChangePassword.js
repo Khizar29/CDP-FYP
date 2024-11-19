@@ -38,7 +38,7 @@ function ChangePassword() {
 
       // Redirect to sign-in page after 2 seconds
       setTimeout(() => {
-        navigate('/signin');
+        navigate('/');
       }, 2000);
     } catch (error) {
       setMessage(error.response?.data?.message || 'Something went wrong');
