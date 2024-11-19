@@ -26,6 +26,10 @@ router.post('/import', verifyAdmin, upload.single('file'), importGraduates); // 
 router.delete('/:nuId', verifyAdmin, deleteGraduate); // Delete a graduate's profile
 
 // Graduate and Admin routes for updating profile
-router.put('/:nuId', authorizeGraduate, updateGraduate); // Update a graduate's information (with role-based control)
-
+router.put(
+    '/:nuId', 
+    upload.single('profilePic'), // Handle file uploads for profile pictures
+    authorizeGraduate,           // Check if the user is authorized to update the profile
+    updateGraduate               // Update graduate information
+);
 export default router;

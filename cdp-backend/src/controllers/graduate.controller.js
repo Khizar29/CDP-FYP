@@ -3,6 +3,7 @@ import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 import XLSX from 'xlsx'; // Library to parse Excel files
+import { uploadFileToGoogleDrive, deleteLocalFile, getFilePublicUrl } from '../utils/GoogleDrive.js';
 import fs from 'fs'; // To work with the filesystem
 
 const BATCH_SIZE = 100; // Adjust batch size according to your needs
@@ -93,61 +94,54 @@ const importGraduates = asyncHandler(async (req, res) => {
   }
 });
 
-
-// Update a graduate's information (Admin only)
 const updateGraduate = asyncHandler(async (req, res) => {
   const { nuId } = req.params;
-  const { firstName, lastName, nuEmail, personalEmail, discipline, yearOfGraduation, cgpa, profilePic, contact, tagline, personalExperience, certificate, fyp } = req.body;
 
-  // Ensure the user is authenticated
   if (!req.user) {
     throw new ApiError(403, 'Unauthorized: User not authenticated');
   }
 
-  // Find the graduate by nuId
   const graduate = await Graduate.findOne({ nuId });
-
   if (!graduate) {
     throw new ApiError(404, 'Graduate not found');
   }
 
-  // Ensure the graduate can only update their own profile (if the user is a graduate)
   if (req.user.role === 'user' && req.user.nuId !== graduate.nuId) {
     throw new ApiError(403, 'Forbidden: You can only update your own profile');
   }
 
-  // Fields that can be updated by a graduate (non-admin user)
-  const allowedFieldsForGraduate = {
-    personalEmail: personalEmail || graduate.personalEmail,
-    contact: contact || graduate.contact,
-    tagline: tagline || graduate.tagline,
-    profilePic: profilePic || graduate.profilePic,
-    personalExperience: personalExperience || graduate.personalExperience,
-    certificate: certificate || graduate.certificate,
-    fyp: fyp || graduate.fyp,
-  };
+  const allowedFields = [
+    "personalEmail",
+    "contact",
+    "tagline",
+    "personalExperience",
+    "certificate",
+    "fyp",
+  ];
 
-  // Check the role of the user
-  if (req.user.role === 'admin') {
-    // Admins can update all fields
-    graduate.firstName = firstName || graduate.firstName;
-    graduate.lastName = lastName || graduate.lastName;
-    graduate.nuEmail = nuEmail || graduate.nuEmail;
-    graduate.discipline = discipline || graduate.discipline;
-    graduate.yearOfGraduation = yearOfGraduation || graduate.yearOfGraduation;
-    graduate.cgpa = cgpa || graduate.cgpa;
+  Object.keys(req.body).forEach((key) => {
+    if (allowedFields.includes(key)) {
+      graduate[key] = req.body[key];
+    }
+  });
 
-    // Admins can also update the fields that graduates can update
-    Object.assign(graduate, allowedFieldsForGraduate);
-  } else if (req.user.role === 'user') {
-    // Non-admin (graduate) users can only update certain fields
-    Object.assign(graduate, allowedFieldsForGraduate);
+  if (req.file) {
+    try {
+      const fileId = await uploadFileToGoogleDrive(req.file);
+      const profilePicUrl = getFilePublicUrl(fileId);
+
+      graduate.profilePic = profilePicUrl;
+      deleteLocalFile(req.file.path);
+    } catch (error) {
+      console.error("Error uploading profile picture:", error);
+      throw new ApiError(500, "Failed to upload profile picture");
+    }
   }
 
   await graduate.save();
-
-  return res.status(200).json(new ApiResponse(200, graduate, 'Graduate updated successfully'));
+  res.status(200).json(new ApiResponse(200, graduate, "Graduate updated successfully"));
 });
+
 
 // Delete a graduate profile (Admin only)
 const deleteGraduate = asyncHandler(async (req, res) => {
