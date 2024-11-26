@@ -5,7 +5,7 @@ import { ApiResponse } from '../utils/ApiResponse.js';
 
 // Create a new job (Admin only)
 const createJob = asyncHandler(async (req, res) => {
-  const { title, company_name, job_type, no_of_openings, qualification_req, job_description, responsibilities } = req.body;
+  const { title, company_name, job_type, no_of_openings, qualification_req, job_description, responsibilities, job_link } = req.body;
 
   if (!req.user || req.user.role !== 'admin') {
     throw new ApiError(403, 'Forbidden: Admins only');
@@ -19,6 +19,7 @@ const createJob = asyncHandler(async (req, res) => {
     qualification_req,
     job_description,
     responsibilities,
+    job_link,
   });
 
   await job.save();
@@ -29,7 +30,7 @@ const createJob = asyncHandler(async (req, res) => {
 // Update a job (Admin only)
 const updateJob = asyncHandler(async (req, res) => {
   const { jobId } = req.params;
-  const { title, company_name, job_type, no_of_openings, qualification_req, job_description, responsibilities } = req.body;
+  const { title, company_name, job_type, no_of_openings, qualification_req, job_description, responsibilities, job_link } = req.body;
 
   if (!req.user || req.user.role !== 'admin') {
     throw new ApiError(403, 'Forbidden: Admins only');
@@ -48,6 +49,7 @@ const updateJob = asyncHandler(async (req, res) => {
   job.qualification_req = qualification_req || job.qualification_req;
   job.job_description = job_description || job.job_description;
   job.responsibilities = responsibilities || job.responsibilities;
+  job.job_link = job_link || job.job_link;
   job.updated_on = Date.now();
 
   await job.save();

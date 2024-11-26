@@ -19,6 +19,7 @@ const AddJob = () => {
         qualification_req: job?.qualification_req || '',
         job_description: job?.job_description || '',
         responsibilities: job?.responsibilities || '',
+        job_link: job?.job_link || '',
     });
 
     const [jobAdText, setJobAdText] = useState('');
@@ -42,6 +43,7 @@ const AddJob = () => {
                 company_name: extractedInfo.company_name || prevFormData.company_name,
                 title: extractedInfo.title || prevFormData.title,
                 job_type: extractedInfo.job_type || prevFormData.job_type,
+                job_link: extractedInfo.job_link || prevFormData.job_link,
                 qualification_req: extractedInfo.qualification_req || prevFormData.qualification_req,
                 job_description: extractedInfo.job_description || prevFormData.job_description,
                 responsibilities: extractedInfo.responsibilities || prevFormData.responsibilities,
@@ -200,6 +202,22 @@ const AddJob = () => {
                         modules={{ toolbar: toolbarOptions }}
                         className="bg-white mb-4"
                         theme="snow"
+                    />
+                </div>
+
+                {/* Job Link Input */}
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="joblink">
+                        Job Link
+                    </label>
+                    <input
+                        type="text"
+                        id="link"
+                        name="link"
+                        value={formData.job_link}
+                        onChange={(e) => setFormData({ ...formData, job_link: e.target.value })}
+                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
+                        
                     />
                 </div>
 

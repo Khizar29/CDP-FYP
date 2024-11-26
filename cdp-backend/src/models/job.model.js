@@ -36,6 +36,21 @@ const jobSchema = new Schema(
       required: true,
       trim: true,
     },
+    job_link: { // New field for external application links
+      type: String,
+      required: false, // Optional
+      trim: true,
+      validate: {
+        validator: function (value) {
+          // Allow valid URLs or email addresses
+          return (
+            /^((https?:\/\/)?[a-zA-Z0-9-_.]+\.[a-zA-Z]+(\/.*)?)$/.test(value) || 
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+          );
+        },
+        message: "Invalid job link or email address",
+      },
+    },
     posted_on: {
       type: Date,
       default: Date.now,
