@@ -101,6 +101,7 @@ const AdminJobs = () => {
                             />
                             <Link
                                 to="/admin/jobs/manage"
+                                id="NewJob"
                                 className="w-full md:w-auto inline-flex items-center justify-center bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
                             >
                                 <FaPlus className="mr-2" /> New
@@ -132,17 +133,22 @@ const AdminJobs = () => {
                                                 <button
                                                     className="bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-600 transition duration-300 mr-2"
                                                     onClick={() => openModal(job)}
+                                                    id="ViewJob"
                                                 >
                                                     View
                                                 </button>
                                                 <Link to="/admin/jobs/manage" state={{ action: 'edit', data: job }}>
-                                                    <button className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600 transition duration-300 mr-2">
+                                                    <button className="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600 transition duration-300 mr-2"
+                                                    id="EditJob"
+                                                    >
+                                    
                                                         Edit
                                                     </button>
                                                 </Link>
                                                 <button
                                                     className="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600 transition duration-300"
                                                     onClick={() => handleDelete(job._id)}
+                                                    id="DeleteJob"
                                                 >
                                                     Delete
                                                 </button>

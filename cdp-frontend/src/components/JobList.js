@@ -217,7 +217,10 @@ const JobList = () => {
                 >
                   <h2 className="text-2xl font-bold text-blue-900 mb-2">{job.title}</h2>
                   <p className="text-xl font-semibold mb-2 text-amber-400">{job.company_name}</p>
-                  <p className="text-gray-700 mb-2">
+                  <p 
+                  className="text-gray-700 mb-2"
+                  id="jobtype"
+                  >
                     <FontAwesomeIcon icon={faBriefcase} /> {job.job_type}
                   </p>
                   <p className="text-gray-700 mb-2">

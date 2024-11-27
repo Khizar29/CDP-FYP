@@ -76,7 +76,7 @@ const Home = ({ aboutRef, contactRef }) => {
           </p>
           <div className="mt-8 space-y-4 lg:space-y-0 lg:space-x-4 flex flex-col lg:flex-row">
             {user && user.role === 'admin' ? (
-              <RouterLink to="/admin" className="bg-blue-900 text-white py-2 px-6 rounded-full hover:bg-blue-600 transition duration-300 cursor-pointer">
+              <RouterLink to="/admin"  className="bg-blue-900 text-white py-2 px-6 rounded-full hover:bg-blue-600 transition duration-300 cursor-pointer">
                 Admin Dashboard
               </RouterLink>
             ) : (
