@@ -22,7 +22,20 @@ const Header = ({ scrollToSection }) => {
   };
   const handleLogout = async () => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`, {}, { withCredentials: true });
+      const token = localStorage.getItem('accessToken'); // Get the token from localStorage
+      
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`, 
+        {}, // Empty data object for POST request body
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}` // Add the authorization header
+          },
+          withCredentials: true
+        }
+      );
+      
       if (response.status === 200) {
         setUser(null); // Clear the user context
         navigate('/'); // Redirect to Home page after logout
@@ -32,7 +45,6 @@ const Header = ({ scrollToSection }) => {
       console.error("Error during logout", error);
     }
   };
-
 
   const handleDropdownToggle = () => {
     setIsDropdownOpen(!isDropdownOpen);

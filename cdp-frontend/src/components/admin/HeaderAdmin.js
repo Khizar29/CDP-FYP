@@ -16,17 +16,29 @@ const HeaderAdmin = ({ onToggleSidebar }) => {
 
     const handleLogout = async () => {
         try {
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`, {}, { withCredentials: true });
-            if (response.status === 200) {
-                logout();
-                setUser(null);
-                alert('Log out Successful');
-                navigate("/", { state: { action: "homelogout" } });
+          const token = localStorage.getItem('accessToken'); // Get the token from localStorage
+          
+          const response = await axios.post(
+            `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`, 
+            {}, // Empty data object for POST request body
+            {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+                Authorization: `Bearer ${token}` // Add the authorization header
+              },
+              withCredentials: true
             }
+          );
+          
+          if (response.status === 200) {
+            setUser(null); // Clear the user context
+            navigate('/'); // Redirect to Home page after logout
+            alert('Log out Successful');
+          }
         } catch (error) {
-            console.error("Error during logout", error);
+          console.error("Error during logout", error);
         }
-    };
+      };
 
     useEffect(() => {
         if (user && user.role === 'admin') {
