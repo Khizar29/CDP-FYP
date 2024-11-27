@@ -74,7 +74,7 @@ const Header = ({ scrollToSection }) => {
           <Link to="/benefits" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faGift} /> <span>Benefits</span>
           </Link>
-          <Link to="/jobs" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
+          <Link to="/jobs" id="jobs" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faBriefcase} /> <span>Jobs</span>
           </Link>
           <Link to="/alumni" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
@@ -100,15 +100,15 @@ const Header = ({ scrollToSection }) => {
                     Change Password
                   </Link>
                   {user.role === 'admin' && (
-                    <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                    <Link to="/admin" id="adminpanel" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                       Admin Panel
                     </Link>
                   )}
-                  
+                  {(user.role === 'user' &&
                     <Link to={`/edit-profile/${user.nuId}`} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                       Update Profile
                     </Link>
-                  
+                  )}
                   <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
                     Logout
                   </div>
