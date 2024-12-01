@@ -2,10 +2,20 @@ import Job from '../models/job.model.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
+import nodemailer from 'nodemailer';
 
-// Create a new job (Admin only)
+
 const createJob = asyncHandler(async (req, res) => {
-  const { title, company_name, job_type, no_of_openings, qualification_req, job_description, responsibilities, job_link } = req.body;
+  const { 
+    title, 
+    company_name, 
+    job_type, 
+    no_of_openings, 
+    qualification_req, 
+    job_description, 
+    responsibilities, 
+    job_link 
+  } = req.body;
 
   if (!req.user || req.user.role !== 'admin') {
     throw new ApiError(403, 'Forbidden: Admins only');
@@ -24,8 +34,80 @@ const createJob = asyncHandler(async (req, res) => {
 
   await job.save();
 
-  return res.status(201).json(new ApiResponse(201, job, 'Job created successfully'));
+  // // Fetch all students' emails
+  // const students = await Student.find({}, 'email'); // Assuming 'email' is a field in Student
+  // const studentEmails = students.map(student => student.email);
+
+  // Set up nodemailer transporter
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail', // Use your email service provider
+    auth: {
+      user: process.env.GMAIL, // Your email
+      pass: process.env.GMAIL_PASSWORD, // Your email password
+    },
+  });
+
+  // Email content
+  // Email content as plain text
+  // Email content as HTML
+const subject = `Job Opportunity: ${title}`;
+const html = `
+<p>Dear Students,</p>
+
+<p>Job Opportunity at <b>${company_name}</b>.</p>
+
+<p><b>Title:</b> ${title}</p>
+<p><b>Job Type:</b> ${job_type}</p>
+
+<h3>Qualifications:</h3>
+<p>${qualification_req}</p>
+
+<h3>Job Description:</h3>
+<p>${job_description}</p>
+
+<h3>Responsibilities:</h3>
+<p>${responsibilities}</p>
+<br><br>
+<p><b>You can apply here:</b> <a href="${job_link}">${job_link}</a></p>
+
+<p>Best regards,</p>
+<p>Your Career Development Team</p>
+`;
+
+  // Send email to all students
+  await transporter.sendMail({
+    from: process.env.GMAIL, // Sender address
+    to: "k213335@nu.edu.pk", // List of recipients
+    subject: subject, // Subject line
+    html: html, // Plain text body
+  });
+
+  return res.status(201).json(new ApiResponse(201, job, 'Job created successfully and emails sent'));
 });
+
+// Create a new job (Admin only)
+// const createJob = asyncHandler(async (req, res) => {
+//   const { title, company_name, job_type, no_of_openings, qualification_req, job_description, responsibilities, job_link } = req.body;
+
+//   if (!req.user || req.user.role !== 'admin') {
+//     throw new ApiError(403, 'Forbidden: Admins only');
+//   }
+
+//   const job = new Job({
+//     title,
+//     company_name, 
+//     job_type,
+//     no_of_openings,
+//     qualification_req,
+//     job_description,
+//     responsibilities,
+//     job_link,
+//   });
+
+//   await job.save();
+
+//   return res.status(201).json(new ApiResponse(201, job, 'Job created successfully'));
+// });
 
 // Update a job (Admin only)
 const updateJob = asyncHandler(async (req, res) => {
