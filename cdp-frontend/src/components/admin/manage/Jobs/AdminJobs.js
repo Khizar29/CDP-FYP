@@ -55,6 +55,7 @@ const AdminJobs = () => {
 
             const config = { headers: { Authorization: `Bearer ${token}` } };
             await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`, config);
+            fetchJobs(currentPage);
             setJobs(jobs.filter(job => job._id !== id));
             alert('Job Deleted Successfully');
         } catch (error) {

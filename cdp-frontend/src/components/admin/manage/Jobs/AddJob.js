@@ -75,7 +75,7 @@ const AddJob = () => {
             } else {
                 await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, formData, config);
             }
-
+            alert('Job Posted Successfully')
             navigate('/admin/jobs');
         } catch (error) {
             console.error('Error saving job:', error);
@@ -164,10 +164,10 @@ const AddJob = () => {
                         required
                     >
                         <option value="">Select Job Type</option>
-                        <option value="Onsite">Onsite</option>
-                        <option value="Remote">Remote</option>
-                        <option value="Hybrid">Hybrid</option>
-                        <option value="Internship">Internship</option>
+                        <option id="Onsite" value="Onsite">Onsite</option>
+                        <option id="Remote" value="Remote">Remote</option>
+                        <option id="Hybrid" value="Hybrid">Hybrid</option>
+                        <option id="Internship" value="Internship">Internship</option>
                     </select>
                 </div>
 
@@ -179,6 +179,7 @@ const AddJob = () => {
                         onChange={(value) => handleQuillChange('qualification_req', value)}
                         modules={{ toolbar: toolbarOptions }}
                         className="bg-white mb-4"
+                        id="qualification_req"
                         theme="snow"
                     />
                 </div>
@@ -190,6 +191,7 @@ const AddJob = () => {
                         onChange={(value) => handleQuillChange('job_description', value)}
                         modules={{ toolbar: toolbarOptions }}
                         className="bg-white mb-4"
+                        id="job_description"
                         theme="snow"
                     />
                 </div>
@@ -201,6 +203,7 @@ const AddJob = () => {
                         onChange={(value) => handleQuillChange('responsibilities', value)}
                         modules={{ toolbar: toolbarOptions }}
                         className="bg-white mb-4"
+                         id="responsibilities"
                         theme="snow"
                     />
                 </div>
@@ -224,6 +227,7 @@ const AddJob = () => {
                 <div className="flex items-center justify-between">
                     <button
                         type="submit"
+                        id="submit_job"
                         className="bg-blue-900 text-white py-2 px-6 rounded-lg font-bold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-opacity-50 transition duration-200"
                     >
                         Submit

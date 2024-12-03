@@ -89,7 +89,7 @@ const Header = ({ scrollToSection }) => {
           <Link to="/jobs" id="jobs" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faBriefcase} /> <span>Jobs</span>
           </Link>
-          <Link to="/alumni" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
+          <Link to="/alumni" id="alumni" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faGraduationCap} /> <span>Alumni</span>
           </Link>
           <Link to="/news" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">

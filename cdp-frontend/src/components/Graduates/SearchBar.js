@@ -30,6 +30,7 @@ const SearchBar = ({ onSearch }) => {
             <label className="block text-center text-lg font-semibold text-gray-700">Search Graduate Directory</label>
             <input
               type="text"
+              id="search_alumni"
               placeholder="By Name, Skills"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -74,6 +75,7 @@ const SearchBar = ({ onSearch }) => {
           <div className="ml-4 flex justify-center items-center">
             <button
               type="button"
+              id="search_btn"
               onClick={handleSearch}
               className="p-4 mx-5 mt-2 bg-blue-600 rounded-full text-white focus:outline-none hover:bg-blue-900 transition duration-200 ease-in-out"
             >
