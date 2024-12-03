@@ -50,34 +50,43 @@ const createJob = asyncHandler(async (req, res) => {
   // Email content
   // Email content as plain text
   // Email content as HTML
-const subject = `Job Opportunity: ${title}`;
-const html = `
-<p>Dear Students,</p>
-
-<p>Job Opportunity at <b>${company_name}</b>.</p>
-
-<p><b>Title:</b> ${title}</p>
-<p><b>Job Type:</b> ${job_type}</p>
-
-<h3>Qualifications:</h3>
-<p>${qualification_req}</p>
-
-<h3>Job Description:</h3>
-<p>${job_description}</p>
-
-<h3>Responsibilities:</h3>
-<p>${responsibilities}</p>
-<br><br>
-<p><b>You can apply here:</b> <a href="${job_link}">${job_link}</a></p>
-
-<p>Best regards,</p>
-<p>Your Career Development Team</p>
-`;
+  const subject = `Exciting Career Opportunity: ${title}`;
+  const html = `
+  <p>Dear Students,</p>
+  
+  <p>We are excited to share an excellent career opportunity with you. Below are the details:</p>
+  
+  <h3>Company Information</h3>
+  <ul>
+    <li><b>Company:</b> ${company_name}</li>
+    <li><b>Job Title:</b> ${title}</li>
+    <li><b>Job Type:</b> ${job_type}</li>
+  </ul>
+  
+  <h3>Job Description</h3>
+  <p>${job_description}</p>
+  
+  <h3>Qualifications</h3>
+  <p>${qualification_req}</p>
+  
+  <h3>Key Responsibilities</h3>
+  <p>${responsibilities}</p>
+  
+  <h3>Apply Now</h3>
+  <p>Don't miss this opportunity! You can apply by:</p>
+  <p><b>${job_link.includes('@') ? 'Sending an email to' : 'Visiting this link'}:</b> <a href="${job_link}">${job_link}</a></p>
+  
+  <p>We wish you the best of luck in your career journey!</p>
+  
+  <p>Best regards,</p>
+  <p><b>Career Development Team</b></p>
+  `;
+  
 
   // Send email to all students
   await transporter.sendMail({
     from: process.env.GMAIL, // Sender address
-    to: "k213335@nu.edu.pk", // List of recipients
+    to: "", // List of recipients
     subject: subject, // Subject line
     html: html, // Plain text body
   });
