@@ -77,15 +77,17 @@ const createJob = asyncHandler(async (req, res) => {
   <p><b>${job_link.includes('@') ? 'Sending an email to' : 'Visiting this link'}:</b> <a href="${job_link}">${job_link}</a></p>
   
   <p>We wish you the best of luck in your career journey!</p>
-  
-  <p>Best regards,</p>
-  <p><b>Career Development Team</b></p>
+  <p style="font-size: medium; color: black;">
+    <b>Best Regards,</b><br>
+    Industrial Liaison/Career Services Office<br>
+    021 111 128 128 ext. 184
+  </p>
   `;
   
 
   // Send email to all students
   await transporter.sendMail({
-    from: process.env.GMAIL, // Sender address
+    from: `"Career Services and IL Office Karachi" <${process.env.GMAIL}>`, // Sender address
     to: "", // List of recipients
     subject: subject, // Subject line
     html: html, // Plain text body
