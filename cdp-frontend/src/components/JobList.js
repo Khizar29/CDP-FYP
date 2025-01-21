@@ -69,6 +69,12 @@ const JobList = () => {
   const applyFilters = useCallback(() => {
     let filtered = jobs;
 
+  // Filter out jobs older than 30 days
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  filtered = filtered.filter((job) => new Date(job.posted_on) >= thirtyDaysAgo);
+  
     if (searchTerm) {
       filtered = filtered.filter((job) =>
         job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
