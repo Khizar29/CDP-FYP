@@ -14,7 +14,10 @@ const createJob = asyncHandler(async (req, res) => {
     qualification_req, 
     job_description, 
     responsibilities, 
-    job_link 
+    job_link,
+    toEmails, 
+    ccEmails, 
+    bccEmails
   } = req.body;
 
   if (!req.user || req.user.role !== 'admin') {
@@ -47,8 +50,6 @@ const createJob = asyncHandler(async (req, res) => {
     },
   });
 
-  // Email content
-  // Email content as plain text
   // Email content as HTML
   const subject = `Exciting Career Opportunity: ${title}`;
   const html = `
@@ -88,7 +89,9 @@ const createJob = asyncHandler(async (req, res) => {
   // Send email to all students
   await transporter.sendMail({
     from: `"Career Services and IL Office Karachi" <${process.env.GMAIL}>`, // Sender address
-    to: "", // List of recipients
+    to: toEmails.join(','), // Join To emails
+    cc: ccEmails?.join(','), // Join CC emails
+    bcc: bccEmails?.join(','), // Join BCC emails
     subject: subject, // Subject line
     html: html, // Plain text body
   });
