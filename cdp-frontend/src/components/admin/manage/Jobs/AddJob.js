@@ -4,8 +4,9 @@ import axios from 'axios';
 import Modal from 'react-modal';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import EmailInput from './EmailInput';
 
-Modal.setAppElement('#root'); // Set the root element for accessibility
+Modal.setAppElement('#root');
 
 const AddJob = () => {
     const location = useLocation();
@@ -20,7 +21,18 @@ const AddJob = () => {
         job_description: job?.job_description || '',
         responsibilities: job?.responsibilities || '',
         job_link: job?.job_link || '',
+        toEmails: [],
+        ccEmails: [],
+        bccEmails: [],
     });
+
+    const emailSuggestions = [
+        'k213329@nu.edu.pk',
+        'k213249@nu.edu.pk',
+        'allstudents.khi@nu.edu.pk',
+        'hr@company.com',
+        'careers@company.com'
+    ];
 
     const [jobAdText, setJobAdText] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +40,10 @@ const AddJob = () => {
 
     const handleQuillChange = (name, value) => {
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleEmailChange = (field, emails) => {
+        setFormData(prev => ({ ...prev, [field]: emails }));
     };
 
     const handleExtractInfo = async () => {
@@ -70,10 +86,17 @@ const AddJob = () => {
                 }
             };
 
+            // The formData already contains the correct email arrays
+            // No need to transform them since EmailInput component handles that
+            const payload = {
+                ...formData
+            };
+            console.log('Payload being sent:', payload);
+
             if (job) {
-                await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${job._id}`, formData, config);
+                await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${job._id}`, payload, config);
             } else {
-                await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, formData, config);
+                await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, payload, config);
             }
             alert('Job Posted Successfully')
             navigate('/admin/jobs');
@@ -134,8 +157,7 @@ const AddJob = () => {
                     />
                 </div>
 
-                 {/* Job Title Input */}
-                 <div className="mb-6">
+                <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="title">
                         Job Title
                     </label>
@@ -150,7 +172,6 @@ const AddJob = () => {
                     />
                 </div>
 
-                {/* Job Type Select */}
                 <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="job_type">
                         Job Type
@@ -170,7 +191,6 @@ const AddJob = () => {
                         <option id="Internship" value="Internship">Internship</option>
                     </select>
                 </div>
-
 
                 <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Qualification Requirements</label>
@@ -203,12 +223,11 @@ const AddJob = () => {
                         onChange={(value) => handleQuillChange('responsibilities', value)}
                         modules={{ toolbar: toolbarOptions }}
                         className="bg-white mb-4"
-                         id="responsibilities"
+                        id="responsibilities"
                         theme="snow"
                     />
                 </div>
 
-                {/* Job Link Input */}
                 <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="joblink">
                         Job Link
@@ -220,7 +239,42 @@ const AddJob = () => {
                         value={formData.job_link}
                         onChange={(e) => setFormData({ ...formData, job_link: e.target.value })}
                         className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
-                        
+                    />
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">
+                        To
+                    </label>
+                    <EmailInput
+                        value={formData.toEmails}
+                        onChange={(emails) => handleEmailChange('toEmails', emails)}
+                        placeholder="Enter email addresses"
+                        suggestions={emailSuggestions}
+                    />
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">
+                        CC
+                    </label>
+                    <EmailInput
+                        value={formData.ccEmails}
+                        onChange={(emails) => handleEmailChange('ccEmails', emails)}
+                        placeholder="Enter CC email addresses"
+                        suggestions={emailSuggestions}
+                    />
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">
+                        BCC
+                    </label>
+                    <EmailInput
+                        value={formData.bccEmails}
+                        onChange={(emails) => handleEmailChange('bccEmails', emails)}
+                        placeholder="Enter BCC email addresses"
+                        suggestions={emailSuggestions}
                     />
                 </div>
 
