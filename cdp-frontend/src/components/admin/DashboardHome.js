@@ -9,20 +9,26 @@ const DashboardHome = () => {
   const [eventsCount, setEventsCount] = useState(0);
   const [forumCount, setForumCount] = useState(0);
 
-  useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/count`)
-      .then(response => {
-        setJobCount(response.data.data.count);
-      })
-      .catch(error => {
-        console.error("There was an error fetching the job count!", error);
-      });
+  const token = localStorage.getItem('accessToken'); // Fetch token from localStorage or a state
 
-    // Placeholder counts for other entities
-    setAlumniCount(0);
-    setEventsCount(0);
-    setForumCount(0);
-  }, []);
+  useEffect(() => {
+  axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/count`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+    .then(response => {
+      setJobCount(response.data.data.count);
+    })
+    .catch(error => {
+      console.error("There was an error fetching the job count!", error);
+    });
+
+  // Placeholder counts for other entities
+  setAlumniCount(0);
+  setEventsCount(0);
+  setForumCount(0);
+}, []);
 
   const cardVariants = {
     hover: {
