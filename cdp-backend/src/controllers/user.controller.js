@@ -25,12 +25,12 @@ const generateAccessAndRefereshTokens = async (userId) => {
   }
 };
 
-// Register User and Send Password via Email
+// Register User (student) and Send Password via Email
 const registerUser = asyncHandler(async (req, res) => {
   const { email, fullName, nuId } = req.body;  // Receive email and fullName from frontend
 
   if (!email || !fullName || !nuId) {
-    throw new ApiError(400, "Email and fullName are required");
+    throw new ApiError(400, "Nu Id, Email and fullName are required");
   }
 
   const existedUser = await User.findOne({ email });
@@ -41,11 +41,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // Generate a random password
   const generatedPassword = crypto.randomBytes(8).toString('hex'); // Generates 16-character password
-
-  // // Hash the password
-  // const hashedPassword = await bcrypt.hash(generatedPassword, 10);
-  // console.log(hashedPassword);
-  
 
   // Create the user in the database
   const user = await User.create({
@@ -177,7 +172,7 @@ const registerGraduateAsUser = asyncHandler(async (req, res) => {
     from: process.env.GMAIL,
     to: personalEmail,
     subject: 'Your New Account Password',
-    html: `<p>Hello ${graduate.fullName},</p>
+    html: `<p>Hello ${graduate.firstName},</p>
            <p>Thank you for registering on our platform. Here is your login password:</p>
            <p><strong>Password:</strong> ${generatedPassword}</p>
            <p>We recommend changing your password after the first login.</p>
