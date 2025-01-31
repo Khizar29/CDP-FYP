@@ -31,13 +31,14 @@ import jobRouter from './routes/job.routes.js';
 import graduateRouter from './routes/graduate.routes.js';
 import testimonialRouter from "./routes/testimonial.routes.js";
 import newsfeedRouter from './routes/newsfeed.routes.js';
-
+import recruiterRouter from './routes/recruiter.routes.js';
 // Routes declaration
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/jobs", jobRouter);
 app.use("/api/v1/graduates", graduateRouter);
 app.use("/api/v1/testimonials",testimonialRouter);
 app.use("/api/v1/newsfeeds", newsfeedRouter);
+app.use("/api/v1/recruiters", recruiterRouter);
 
 // Serve static files from the React frontend app's build folder
 app.use(express.static(path.join(__dirname, '../../cdp-frontend/build')));
