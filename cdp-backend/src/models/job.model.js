@@ -7,7 +7,7 @@ const jobSchema = new Schema(
       required: true,
       trim: true,
     },
-    company_name: { // Added company_name field
+    company_name: { 
       type: String,
       required: true,
       trim: true,
@@ -16,10 +16,6 @@ const jobSchema = new Schema(
       type: String,
       enum: ["Onsite", "Remote", "Hybrid", "Internship"],
       required: true,
-    },
-    no_of_openings: {
-      type: Number,
-      required: false,
     },
     qualification_req: {
       type: String,
@@ -36,9 +32,9 @@ const jobSchema = new Schema(
       required: true,
       trim: true,
     },
-    job_link: { // New field for external application links
+    job_link: { 
       type: String,
-      required: false, // Optional
+      required: false, 
       trim: true,
       validate: {
         validator: function (value) {
@@ -57,6 +53,11 @@ const jobSchema = new Schema(
     },
     updated_on: {
       type: Date,
+    },
+    postedBy: { 
+      type: String, 
+      required: true,
+      trim: true 
     },
   },
   {
