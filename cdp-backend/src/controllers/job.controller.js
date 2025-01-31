@@ -9,8 +9,7 @@ const createJob = asyncHandler(async (req, res) => {
   const { 
     title, 
     company_name, 
-    job_type, 
-    no_of_openings, 
+    job_type,  
     qualification_req, 
     job_description, 
     responsibilities, 
@@ -20,30 +19,26 @@ const createJob = asyncHandler(async (req, res) => {
     bccEmails
   } = req.body;
 
-  if (!req.user || req.user.role !== 'admin') {
-    throw new ApiError(403, 'Forbidden: Admins only');
+  if (!req.user || !['admin', 'recruiter'].includes(req.user.role)) {
+    throw new ApiError(403, 'Forbidden: Admins and Recruiters only');
   }
 
   const job = new Job({
     title,
     company_name, 
     job_type,
-    no_of_openings,
     qualification_req,
     job_description,
     responsibilities,
     job_link,
+    postedBy: req.user.fullName,
   });
 
   await job.save();
 
-  // // Fetch all students' emails
-  // const students = await Student.find({}, 'email'); // Assuming 'email' is a field in Student
-  // const studentEmails = students.map(student => student.email);
-
   // Set up nodemailer transporter
   const transporter = nodemailer.createTransport({
-    service: 'Gmail', // Use your email service provider
+    service: 'Gmail', 
     auth: {
       user: process.env.GMAIL, // Your email
       pass: process.env.GMAIL_PASSWORD, // Your email password
@@ -99,29 +94,6 @@ const createJob = asyncHandler(async (req, res) => {
   return res.status(201).json(new ApiResponse(201, job, 'Job created successfully and emails sent'));
 });
 
-// Create a new job (Admin only)
-// const createJob = asyncHandler(async (req, res) => {
-//   const { title, company_name, job_type, no_of_openings, qualification_req, job_description, responsibilities, job_link } = req.body;
-
-//   if (!req.user || req.user.role !== 'admin') {
-//     throw new ApiError(403, 'Forbidden: Admins only');
-//   }
-
-//   const job = new Job({
-//     title,
-//     company_name, 
-//     job_type,
-//     no_of_openings,
-//     qualification_req,
-//     job_description,
-//     responsibilities,
-//     job_link,
-//   });
-
-//   await job.save();
-
-//   return res.status(201).json(new ApiResponse(201, job, 'Job created successfully'));
-// });
 
 // Update a job (Admin only)
 const updateJob = asyncHandler(async (req, res) => {
@@ -171,6 +143,11 @@ const deleteJob = asyncHandler(async (req, res) => {
 });
 
 const getAllJobs = asyncHandler(async (req, res) => {
+
+  if (!req.user) {
+    throw new ApiError(401, 'Unauthorized request');
+  }
+
   const { page = 1, limit = 10, searchTerm = '', filterDate = '' } = req.query;
 
   const query = {};
