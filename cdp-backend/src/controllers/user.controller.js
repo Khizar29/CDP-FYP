@@ -204,10 +204,9 @@ const maskEmail = (email) => {
 // Login User
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  console.log(email);
 
-  if (!email) {
-    throw new ApiError(400, "Email is required");
+  if (!email || !password) {
+    throw new ApiError(400, "Email and password are required");
   }
 
   const user = await User.findOne({ email });
@@ -219,16 +218,16 @@ const loginUser = asyncHandler(async (req, res) => {
   const isPasswordValid = await user.isPasswordCorrect(password);
 
   if (!isPasswordValid) {
-    throw new ApiError(401, "Invalid user credentials");
+    throw new ApiError(401, "Invalid credentials");
   }
 
   const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
 
-  const loggedInUser = await User.findById(user._id).select("-password -refreshToken");
-
+  // Secure cookie options
   const options = {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production", // Secure only in production
+    sameSite: "Strict",
   };
 
   return res
@@ -238,11 +237,12 @@ const loginUser = asyncHandler(async (req, res) => {
     .json(
       new ApiResponse(
         200,
-        { user: loggedInUser, accessToken, refreshToken },
-        "User logged In Successfully"
+        { user: user.toObject(), accessToken, refreshToken },
+        "User logged in successfully"
       )
     );
 });
+
 
 // Logout User
 const logoutUser = asyncHandler(async (req, res) => {
@@ -275,47 +275,51 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
   const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
 
   if (!incomingRefreshToken) {
-    throw new ApiError(401, "Unauthorized request");
+    throw new ApiError(401, "Unauthorized request - No refresh token");
   }
 
   try {
-    const decodedToken = jwt.verify(
-      incomingRefreshToken,
-      process.env.REFRESH_TOKEN_SECRET
-    );
+    // Verify refresh token
+    const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
 
+    // Find user
     const user = await User.findById(decodedToken?._id);
 
     if (!user) {
-      throw new ApiError(401, "Invalid refresh token");
+      throw new ApiError(401, "Invalid refresh token - User not found");
     }
 
-    if (incomingRefreshToken !== user?.refreshToken) {
+    // Ensure refresh token matches
+    if (incomingRefreshToken !== user.refreshToken) {
       throw new ApiError(401, "Refresh token is expired or used");
     }
 
+    // Generate new tokens
+    const newAccessToken = user.generateAccessToken();
+    const newRefreshToken = user.generateRefreshToken();
+
+    // Save new refresh token in database
+    user.refreshToken = newRefreshToken;
+    await user.save({ validateBeforeSave: false });
+
+    // Secure cookie options
     const options = {
       httpOnly: true,
-      secure: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
     };
-
-    const { accessToken, newRefreshToken } = await generateAccessAndRefereshTokens(user._id);
 
     return res
       .status(200)
-      .cookie("accessToken", accessToken, options)
+      .cookie("accessToken", newAccessToken, options)
       .cookie("refreshToken", newRefreshToken, options)
-      .json(
-        new ApiResponse(
-          200,
-          { accessToken, refreshToken: newRefreshToken },
-          "Access token refreshed"
-        )
-      );
+      .json(new ApiResponse(200, { accessToken: newAccessToken, refreshToken: newRefreshToken }, "Access token refreshed"));
   } catch (error) {
-    throw new ApiError(401, error?.message || "Invalid refresh token");
+    console.error("Error refreshing token:", error.message);
+    throw new ApiError(401, "Invalid or expired refresh token");
   }
 });
+
 
 // Change Current Password
 const changeCurrentPassword = asyncHandler(async (req, res) => {
@@ -348,6 +352,29 @@ const getCurrentUser = asyncHandler(async (req, res) => {
       )
     );
 });
+
+
+export const checkSession = asyncHandler(async (req, res) => {
+  try {
+    const token = req.cookies?.accessToken || req.header("Authorization")?.split(" ")[1];
+
+    if (!token) {
+      return res.status(200).json({ success: true, sessionActive: false, user: null });
+    }
+
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const user = await User.findById(decodedToken?._id).select("-password -refreshToken");
+
+    if (!user) {
+      return res.status(200).json({ success: true, sessionActive: false, user: null });
+    }
+
+    res.status(200).json({ success: true, sessionActive: true, user });
+  } catch (error) {
+    return res.status(200).json({ success: true, sessionActive: false, user: null });
+  }
+});
+
 
 // Forget Password
 const forgetPassword = asyncHandler(async (req, res) => {
