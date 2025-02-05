@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import GraduateTable from './GraduateTable';
 import AddGraduate from './AddGraduate';
 import axios from 'axios';
 import Pagination from './Pagination';
+import { UserContext } from '../../../../contexts/UserContext';
 
 const AdminGraduates = () => {
     const [showModal, setShowModal] = useState(false);
@@ -16,12 +17,13 @@ const AdminGraduates = () => {
     const [filterDiscipline, setFilterDiscipline] = useState('');
     const graduatesPerPage = 10;
 
+    const { user } = useContext(UserContext);
+
     const fetchGraduates = async (page = 1) => {
         setLoading(true);
         try {
-            const token = localStorage.getItem('accessToken');
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates`, {
-                headers: { Authorization: `Bearer ${token}` },
+              withCredentials: true,
                 params: {
                     page,
                     limit: graduatesPerPage,

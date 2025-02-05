@@ -20,6 +20,7 @@ const AdminTestimonials = () => {
                     limit: testimonialsPerPage,
                     searchTerm: searchTerm,
                 },
+                withCredentials: true, // Include credentials with request
             });
             setTestimonials(response.data.data);
             setFilteredTestimonials(response.data.data); // Backend handles the filtering
@@ -38,11 +39,9 @@ const AdminTestimonials = () => {
         if (!confirmDelete) return;
 
         try {
-            const token = localStorage.getItem('accessToken');
-            if (!token) return;
-
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials/${id}`, config);
+            await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials/${id}`, {
+                withCredentials: true,
+            });
 
             // After deletion, refetch the testimonials from the server
             fetchTestimonials(currentPage);

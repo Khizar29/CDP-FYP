@@ -16,27 +16,11 @@ const HeaderAdmin = ({ onToggleSidebar }) => {
 
     const handleLogout = async () => {
         try {
-          const token = localStorage.getItem('accessToken'); // Get the token from localStorage
-          
-          const response = await axios.post(
-            `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`, 
-            {}, // Empty data object for POST request body
-            {
-              headers: {
-                'Content-Type': 'multipart/form-data',
-                Authorization: `Bearer ${token}` // Add the authorization header
-              },
-              withCredentials: true
-            }
-          );
-          
-          if (response.status === 200) {
-            setUser(null); // Clear the user context
+            await logout();
             navigate('/'); // Redirect to Home page after logout
             alert('Log out Successful');
-          }
-        } catch (error) {
-          console.error("Error during logout", error);
+        }   catch (error) {
+            console.error("Error during logout", error);
         }
       };
 

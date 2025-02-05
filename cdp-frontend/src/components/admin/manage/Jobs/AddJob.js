@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Modal from 'react-modal';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import EmailInput from './EmailInput';
+import { UserContext } from '../../../../contexts/UserContext';
 
 Modal.setAppElement('#root');
 
 const AddJob = () => {
+    const { user, loading } = useContext(UserContext); // Get user and loading from context
     const location = useLocation();
     const job = location.state?.data;
 
@@ -74,23 +76,11 @@ const AddJob = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = localStorage.getItem("accessToken");
-
-            if (!token) {
-                throw new Error('No token found');
-            }
-
+           
             const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
+                withCredentials: true,
             };
-
-            // The formData already contains the correct email arrays
-            // No need to transform them since EmailInput component handles that
-            const payload = {
-                ...formData
-            };
+            const payload = { ...formData };
             console.log('Payload being sent:', payload);
 
             if (job) {
@@ -98,7 +88,7 @@ const AddJob = () => {
             } else {
                 await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, payload, config);
             }
-            alert('Job Posted Successfully')
+            alert('Job Posted Successfully');
             navigate('/admin/jobs');
         } catch (error) {
             console.error('Error saving job:', error);
