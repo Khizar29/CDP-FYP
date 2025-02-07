@@ -32,18 +32,12 @@ const AddNews = () => {
     e.preventDefault();
     setError('');
 
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      setError('Authorization token is missing. Please log in again.');
-      return;
-    }
-
     try {
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`,
         },
+        withCredentials: true, // Enable secure cookie-based authentication
       };
 
       const data = new FormData();

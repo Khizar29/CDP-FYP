@@ -1,34 +1,49 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { FaBriefcase, FaUser, FaCalendarAlt, FaComments } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { UserContext } from '../../contexts/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 const DashboardHome = () => {
   const [jobCount, setJobCount] = useState(0);
   const [alumniCount, setAlumniCount] = useState(0);
   const [eventsCount, setEventsCount] = useState(0);
   const [forumCount, setForumCount] = useState(0);
-
-  const token = localStorage.getItem('accessToken'); // Fetch token from localStorage or a state
+  const { user, loading } = useContext(UserContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
-  axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/count`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-    .then(response => {
-      setJobCount(response.data.data.count);
-    })
-    .catch(error => {
-      console.error("There was an error fetching the job count!", error);
-    });
+    if (loading) return;
+    if (!user) {
+        navigate('/');
+        return;
+    }
+}, [user, loading, navigate]);
 
-  // Placeholder counts for other entities
-  setAlumniCount(0);
-  setEventsCount(0);
-  setForumCount(0);
-}, []);
+useEffect(() => {
+    if (!user || user.role !== 'admin') return;
+
+    const fetchDashboardData = async () => {
+        try {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/count`, {
+                withCredentials: true
+            });
+            setJobCount(response.data.data.count);
+        } catch (error) {
+            console.error("Error fetching job count", error);
+            if (error.response?.status === 401) {
+                navigate('/');
+            }
+        }
+    };
+    fetchDashboardData();
+    
+    // Placeholder counts for other entities
+    setAlumniCount(0);
+    setEventsCount(0);
+    setForumCount(0);
+  }, [user, navigate]);
 
   const cardVariants = {
     hover: {
@@ -41,6 +56,11 @@ const DashboardHome = () => {
       scale: 0.95,
     },
   };
+
+  // If user is not authenticated or not admin, don't render the dashboard
+  if (!user || user.role !== 'admin') {
+    return null;
+  }
 
   return (
     <div className="flex justify-center items-start w-full pt-5 md:mt-20">

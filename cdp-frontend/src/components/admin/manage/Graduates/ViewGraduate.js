@@ -14,12 +14,10 @@ const ViewGraduate = () => {
       try {
         setError(null);
         setLoading(true);
-        const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`,
+          { withCredentials: true }
+          );
         setGraduate(response.data.data);
       } catch (error) {
         setError(error.message || 'Error fetching graduate details');

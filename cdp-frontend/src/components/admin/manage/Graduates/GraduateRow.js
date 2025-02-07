@@ -2,20 +2,20 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const GraduateRow = ({ index, graduate, onDelete }) => { // Ensure onDelete is passed as a prop
+const GraduateRow = ({ index, graduate, onDelete }) => { 
     const handleDelete = async () => {
         try {
-            const token = localStorage.getItem('accessToken');
-            await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${graduate.nuId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            await axios.delete(
+                `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${graduate.nuId}`, 
+                {
+                    withCredentials: true, // Use cookie-based authentication
+                }
+            );
             alert('Graduate deleted successfully');
             onDelete(graduate.nuId); // Ensure the onDelete function is called correctly
         } catch (error) {
             console.error('Error deleting graduate', error);
-            alert(`Failed to delete graduate: ${error.response ? error.response.data.message : error.message}`);
+            alert(`Failed to delete graduate: ${error.response?.data?.message || error.message}`);
         }
     };
 

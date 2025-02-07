@@ -17,9 +17,8 @@ import SignIn from './SignIn';
 import Slider from './Testimonial/Slider';
 import NewsFeed from './Newsfeeds/NewsFeed';
 
-
 const Home = ({ aboutRef, contactRef }) => {
-  const { user, setUser } = useContext(UserContext);
+  const { user, logout } = useContext(UserContext); // Get logout from context
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [signInOpen, setSignInOpen] = useState(false);
   const backgroundImages = [backgroundImage1, backgroundImage2, backgroundImage3];
@@ -36,25 +35,9 @@ const Home = ({ aboutRef, contactRef }) => {
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem('accessToken'); // Get the token from localStorage
-      
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`, 
-        {}, // Empty data object for POST request body
-        {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${token}` // Add the authorization header
-          },
-          withCredentials: true
-        }
-      );
-      
-      if (response.status === 200) {
-        setUser(null); // Clear the user context
-        navigate('/'); // Redirect to Home page after logout
-        alert('Log out Successful');
-      }
+      await logout(); // Use the logout function from context
+      navigate('/');
+      alert('Log out Successful');
     } catch (error) {
       console.error("Error during logout", error);
     }
@@ -89,7 +72,7 @@ const Home = ({ aboutRef, contactRef }) => {
           </p>
           <div className="mt-8 space-y-4 lg:space-y-0 lg:space-x-4 flex flex-col lg:flex-row">
             {user && user.role === 'admin' ? (
-              <RouterLink to="/admin"  className="bg-blue-900 text-white py-2 px-6 rounded-full hover:bg-blue-600 transition duration-300 cursor-pointer">
+              <RouterLink to="/admin" className="bg-blue-900 text-white py-2 px-6 rounded-full hover:bg-blue-600 transition duration-300 cursor-pointer">
                 Admin Dashboard
               </RouterLink>
             ) : (
@@ -110,22 +93,17 @@ const Home = ({ aboutRef, contactRef }) => {
         </div>
       </section>
 
-      
       <section
         className="min-h-screen py-10 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10"
         style={{
           backgroundImage: `url(${bgimg5})`,
         }}
       >
-      <About ref={aboutRef} />
+        <About ref={aboutRef} />
       </section>
 
-      <section className="min-h-screen py-10 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10"
-      // style={{
-      //   backgroundImage: `url(${bgimg7})`,
-      // }}
-      >
-        <NewsFeed limit={4} /> {/* Display only 4 news items on the homepage */}
+      <section className="min-h-screen py-10 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10">
+        <NewsFeed limit={4} />
       </section>
 
       <section
@@ -138,11 +116,9 @@ const Home = ({ aboutRef, contactRef }) => {
           <h2 className="text-4xl sm:text-6xl font-bold text-gray-100 mb-2">
             Testimonials
           </h2>
-          
         </div>
         <Slider />
       </section>
-
 
       <div ref={contactRef}>
         <ContactUs />

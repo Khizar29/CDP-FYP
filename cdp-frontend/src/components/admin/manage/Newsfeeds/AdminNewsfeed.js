@@ -1,4 +1,3 @@
-// src/components/admin/manage/Newsfeeds/AdminNewsfeed.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Pagination from '../Graduates/Pagination';
@@ -16,7 +15,9 @@ const AdminNewsfeed = () => {
   }, [currentPage]);
 
   const fetchNews = () => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds?isPublic=true&page=${currentPage}&limit=${itemsPerPage}`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds?isPublic=true&page=${currentPage}&limit=${itemsPerPage}`, {
+      withCredentials: true, // Send cookies with the request
+    })
       .then(response => {
         setNewsItems(response.data.data);
         setTotalPages(response.data.meta.totalPages);
@@ -29,14 +30,10 @@ const AdminNewsfeed = () => {
     if (!isConfirmed) return;
 
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        console.error('No token found');
-        return;
-      }
-
-      const config = { headers: { Authorization: `Bearer ${token}` } };
-      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/${id}`, config);
+      // No need for token retrieval from localStorage, it's handled by cookies automatically
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/${id}`, {
+        withCredentials: true, // Send cookies with the request
+      });
       setNewsItems(newsItems.filter(news => news._id !== id));
       alert('News/Event Deleted Successfully');
     } catch (error) {
@@ -44,6 +41,7 @@ const AdminNewsfeed = () => {
       alert(`Error deleting news/event: ${error.response?.data?.message || error.message}`);
     }
   };
+
 
   return (
     <div className="p-4 mx-auto">
