@@ -4,8 +4,6 @@ import {
   Button,
   CssBaseline,
   TextField,
-  FormControlLabel,
-  Checkbox,
   Link,
   Grid,
   Box,
@@ -14,13 +12,11 @@ import {
   IconButton,
   InputAdornment,
   Alert,
-  Paper
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 import ForgotPasswordModal from './ForgotPassword';
@@ -44,39 +40,27 @@ export default function SignIn({ onClose }) {
   const [errorMessage, setErrorMessage] = useState('');
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const { setUser } = useContext(UserContext);
+  const { login } = useContext(UserContext); // Use login from context instead of setUser
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
       setErrorMessage('');
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/login`,
-        { email, password },
-        {
-          headers: { 'Content-Type': 'application/json' },
-          withCredentials: true,
+      
+      // Use the login function from UserContext
+      const success = await login({ email, password });
+      
+      if (success) {
+        // Close modal if `onClose` is provided
+        if (onClose) {
+          onClose();
         }
-      );
-  
-      console.log('User logged in:', response.data);
-  
-      // Save user info in localStorage
-      const { accessToken, refreshToken, user } = response.data.data;
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-      localStorage.setItem('user_id', user.nuId); // Use nuId to match your backend logic
-      localStorage.setItem('user_role', user.role); // Save role for role-based UI
-  
-      setUser(user);
-  
-      // Close modal if `onClose` is provided
-      if (onClose) {
-        onClose();
+        
+        // Redirect to home or dashboard
+        navigate('/');
+      } else {
+        setErrorMessage('Login failed. Please try again.');
       }
-  
-      // Redirect to home or dashboard
-      navigate('/');
     } catch (error) {
       if (error.response && error.response.status === 401) {
         setErrorMessage('The password you entered is incorrect.');
@@ -141,10 +125,6 @@ export default function SignIn({ onClose }) {
                 )
               }}
             />
-            {/* <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            /> */}
             <Button
               type="submit"
               fullWidth
