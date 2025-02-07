@@ -1,4 +1,3 @@
-// src/components/AlumniBenefits.js
 import React from 'react';
 import { FaClipboardList, FaBook, FaUserFriends } from 'react-icons/fa';
 import backgroundImage from '../Images/FAST_PIC_3.jpg';
@@ -11,33 +10,32 @@ const AlumniBenefits = () => {
   ];
 
   return (
-    <div
-      className="py-8"  // Adjust padding to reduce white space
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }}
+    <section
+      className="min-h-screen py-16 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10"
+      style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      <div className="text-center mb-8">
-        <h2 className="text-4xl font-bold text-white">ALUMNI BENEFITS</h2>
-        <p className="text-gray-200 mt-2">As a member of the global FAST alumni network, you have access to a variety of exclusive services and benefits.</p>
+      <div className="absolute inset-0 bg-black bg-opacity-70"></div>
+      <div className="relative text-center text-white max-w-3xl">
+        <h2 className="text-5xl font-extrabold text-gray-100">ALUMNI BENEFITS</h2>
+        <p className="text-lg mt-4 text-gray-300">
+          As a member of the global FAST alumni network, you have access to a variety of exclusive services and benefits.
+        </p>
       </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="relative max-w-7xl mx-auto px-6 sm:px-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {benefits.map((benefit, index) => (
           <div
             key={index}
-            className="bg-black bg-opacity-70 text-white p-4 rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300"
+            className="bg-gray-900 bg-opacity-80 text-white p-8 rounded-xl shadow-lg transform hover:scale-105 transition-transform duration-300 hover:shadow-xl border border-gray-700"
           >
-            <div className="bg-white bg-opacity-20 p-4 rounded-full inline-block mb-4">
-              <div className="text-white text-3xl">{benefit.icon}</div>
+            <div className="bg-gray-800 p-6 rounded-full inline-block mb-6 text-4xl text-blue-400 shadow-md">
+              {benefit.icon}
             </div>
-            <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
-            <p className="text-gray-300">{benefit.description}</p>
+            <h3 className="text-2xl font-semibold mb-3 text-gray-100">{benefit.title}</h3>
+            <p className="text-gray-400 text-lg leading-relaxed">{benefit.description}</p>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 };
 
