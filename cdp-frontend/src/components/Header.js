@@ -80,9 +80,9 @@ const Header = ({ scrollToSection }) => {
           <Link to="/" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faHome} /> <span>Home</span>
           </Link>
-          <div onClick={() => scrollToSection('about')} className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
+          <Link to="/about" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faInfoCircle} /> <span>About Us</span>
-          </div>
+          </Link>
           <Link to="/benefits" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faGift} /> <span>Benefits</span>
           </Link>
@@ -95,9 +95,9 @@ const Header = ({ scrollToSection }) => {
           <Link to="/news" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
           </Link>
-          <div onClick={() => scrollToSection('contact')} className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
+          <Link to="/contactUs" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
-          </div>
+          </Link>
           {user ? (
             <div className="relative">
               <div
@@ -126,6 +126,7 @@ const Header = ({ scrollToSection }) => {
                   </div>
                 </div>
               )}
+              
             </div>
           ) : (
             <div onClick={handleOpenSignIn} className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
@@ -153,9 +154,9 @@ const Header = ({ scrollToSection }) => {
               <Link to="/" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faHome} /> <span>Home</span>
               </Link>
-              <div onClick={() => { toggleMenu(); scrollToSection('about'); }} className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer">
+              <Link to="/about" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faInfoCircle} /> <span>About Us</span>
-              </div>
+              </Link>
               <Link to="/benefits" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faGift} /> <span>Benefits</span>
               </Link>
@@ -168,9 +169,9 @@ const Header = ({ scrollToSection }) => {
               <Link to="/news" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
               </Link>
-              <div onClick={() => { toggleMenu(); scrollToSection('contact'); }} className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer">
+              <Link to="/contactUs" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick = {toggleMenu}>
                 <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
-              </div>
+              </Link>
               {user ? (
                 <div className="relative">
                   <div className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={handleDropdownToggle}>
