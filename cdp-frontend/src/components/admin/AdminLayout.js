@@ -30,9 +30,13 @@ const AdminLayout = () => {
 
     return (
         <div className="flex min-h-screen">
-            <Sidebar isOpen={sidebarOpen} />
+            {/* ✅ Pass toggleSidebar to Sidebar */}
+            <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+            
             <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'ml-4' : 'ml-0'}`}>
+                {/* ✅ Ensure HeaderAdmin receives onToggleSidebar */}
                 <HeaderAdmin onToggleSidebar={toggleSidebar} />
+                
                 <main className="flex justify-start items-start mt-20 mx-auto"> {/* Adjusted the main content position */}
                     <Outlet />
                 </main>
