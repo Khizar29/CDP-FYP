@@ -27,7 +27,7 @@ const userSchema = new Schema(
     },
     role: {
       type: String,
-      enum: ['user', 'admin', 'recruiter'], // Added 'recruiter'
+      enum: ['user', 'admin', 'recruiter', 'faculty'], // Added 'recruiter', Added 'faculty'
       default: 'user',
     },
     nuId: {
