@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { FaPlus } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ViewJob from './ViewJob';
 import Pagination from '../Graduates/Pagination';
+import { UserContext } from '../../../../contexts/UserContext';
 
 const AdminJobs = () => {
     const [jobs, setJobs] = useState([]);
@@ -15,6 +16,9 @@ const AdminJobs = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [filterDate, setFilterDate] = useState('');
     const jobsPerPage = 10;
+    
+    const { user } = useContext(UserContext);
+    const navigate = useNavigate();
 
     const openModal = (job) => {
         setSelectedJob(job);
@@ -28,9 +32,9 @@ const AdminJobs = () => {
 
     const fetchJobs = async (page = 1) => {
         try {
-            const token = localStorage.getItem('accessToken');
+            // Use withCredentials to send cookies
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, {
-                headers: { Authorization: `Bearer ${token}` },
+                withCredentials: true,
                 params: {
                     page: page,
                     limit: jobsPerPage,
@@ -39,31 +43,44 @@ const AdminJobs = () => {
                 },
             });
             setJobs(response.data.data);
-            setFilteredJobs(response.data.data); // The backend handles filtering
+            setFilteredJobs(response.data.data);
             setTotalPages(response.data.totalPages);
         } catch (err) {
-            console.log(err);
+            console.error('Error fetching jobs:', err);
+            if (err.response?.status === 401) {
+                navigate('/signin');
+            }
         }
     };
 
     useEffect(() => {
+        // Check if user is authenticated and is admin
+        if (!user || user.role !== 'admin') {
+            navigate('/');
+            return;
+        }
+        
         fetchJobs(currentPage);
-    }, [currentPage, searchTerm, filterDate]); // Trigger search whenever these values change
+    }, [currentPage, searchTerm, filterDate, user, navigate]);
 
     const handleDelete = async (id) => {
         try {
-            const token = localStorage.getItem('accessToken');
-            if (!token) return;
-
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`, config);
+            // Use withCredentials to send cookies
+            await axios.delete(
+                `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`,
+                { withCredentials: true }
+            );
             fetchJobs(currentPage);
             setJobs(jobs.filter(job => job._id !== id));
             alert('Job Deleted Successfully');
         } catch (error) {
-            console.error('Error:', error.message);
+            console.error('Error:', error);
+            if (error.response?.status === 401) {
+                navigate('/signin');
+            }
         }
     };
+
 
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);

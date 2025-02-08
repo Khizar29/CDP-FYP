@@ -17,7 +17,7 @@ const EditNews = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/${id}`)
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/${id}`, { withCredentials: true })
       .then(response => {
         const { title, category, description, date } = response.data.data;
         setFormData({ title, category, description, date, image: null });
@@ -45,18 +45,12 @@ const EditNews = () => {
     e.preventDefault();
     setError('');
 
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      setError('Authorization token is missing. Please log in again.');
-      return;
-    }
-
     try {
       const config = {
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data',
         },
+        withCredentials: true, // Ensure cookies are sent
       };
 
       const data = new FormData();

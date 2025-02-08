@@ -61,42 +61,38 @@ const AddEditTestimonial = () => {
     // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+    
         try {
-            const token = localStorage.getItem("accessToken");
-            if (!token) {
-                throw new Error('No token found');
-            }
-
-            const config = {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'multipart/form-data'
-                }
-            };
-
             const submitData = new FormData();
             submitData.append("name", formData.name);
             submitData.append("message", formData.message);
             submitData.append("title", formData.title);
             submitData.append("isApproved", formData.isApproved);
+            
             if (formData.image) {
                 submitData.append("image", formData.image);
             }
-
-            if (testimonial) {
-                await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials/${testimonial._id}`, submitData, config);
-            } else {
-                await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials`, submitData, config);
-            }
-
+    
+            const apiUrl = testimonial
+                ? `${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials/${testimonial._id}`
+                : `${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials`;
+    
+            const method = testimonial ? 'put' : 'post';
+    
+            await axios({
+                method: method,
+                url: apiUrl,
+                data: submitData,
+                headers: { 'Content-Type': 'multipart/form-data' },
+                withCredentials: true, // Include credentials for cookies
+            });
+    
             navigate('/admin/testimonials');
         } catch (error) {
             console.error('Error saving testimonial:', error);
             alert('Error saving testimonial: ' + error.message);
         }
     };
-
     // Handle field changes
     const handleChange = (e) => {
         const { name, value } = e.target;

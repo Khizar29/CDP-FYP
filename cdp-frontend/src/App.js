@@ -4,6 +4,7 @@ import React, { useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { UserProvider } from './contexts/UserContext';
 import Header from './components/Header';
+import About from './components/About'; 
 import Footer from './components/Footer';
 import SignIn from './components/SignIn';
 import Home from './components/Home';
@@ -65,21 +66,19 @@ function App() {
       <Router>
         <Routes>
           {/* User Routes */}
-          <Route path="/" element={<UserLayout scrollToSection={scrollToSection}><Home aboutRef={aboutRef} contactRef={contactRef} /></UserLayout>} />
-          <Route path="/about" element={<UserLayout scrollToSection={scrollToSection}><Home aboutRef={aboutRef} contactRef={contactRef} /></UserLayout>} />
-          <Route path="/benefits" element={<UserLayout scrollToSection={scrollToSection}><Benefits /></UserLayout>} />
-          <Route path="/alumni" element={<UserLayout scrollToSection={scrollToSection}><Alumni /></UserLayout>} />
+          <Route path="/" element={<UserLayout><Home /></UserLayout>} />
+          <Route path="/about" element={<UserLayout><section className="min-h-screen py-10 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10" style={{ backgroundImage: `url(${require('./Images/bg-5.jpg')})` }}><About /></section></UserLayout>} />          <Route path="/benefits" element={<UserLayout><Benefits /></UserLayout>} />
+          <Route path="/alumni" element={<UserLayout><Alumni /></UserLayout>} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/edit-profile/:nuId" element={<EditGraduateProfile />} />
-          <Route path="/signin" element={<UserLayout scrollToSection={scrollToSection}><SignIn /></UserLayout>} />
-          <Route path="/signup" element={<UserLayout scrollToSection={scrollToSection}><SignUp /></UserLayout>} />
-          <Route path="/contactUs" element={<UserLayout scrollToSection={scrollToSection}><ContactUs /></UserLayout>} />
-          <Route path="/jobs" element={<UserLayout scrollToSection={scrollToSection}><JobList /></UserLayout>} />
-          <Route path="/jobs/:jobId" element={<UserLayout scrollToSection={scrollToSection}><JobDetails /></UserLayout>} />
-          <Route path="/reset-password/:id/:token" element={<UserLayout scrollToSection={scrollToSection}><ResetPassword /></UserLayout>} />
+          <Route path="/signin" element={<UserLayout><SignIn /></UserLayout>} />
+          <Route path="/signup" element={<UserLayout><SignUp /></UserLayout>} />
+          <Route path="/contactUs" element={<UserLayout><section className="min-h-screen py-10 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10" style={{ backgroundImage: `url(${require('./Images/bg-6.jpg')})` }}><ContactUs /></section></UserLayout>} />
+          <Route path="/jobs" element={<UserLayout><JobList /></UserLayout>} />
+          <Route path="/jobs/:jobId" element={<UserLayout><JobDetails /></UserLayout>} />
+          <Route path="/reset-password/:id/:token" element={<UserLayout><ResetPassword /></UserLayout>} />
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/news" element={<UserLayout><PaginatedNewsFeed /></UserLayout>} />
-          {/* <Route path="/news" element={<UserLayout scrollToSection={scrollToSection}><NewsFeed /></UserLayout>} /> News Feed Route */}
           <Route path="/news/:id" element={<UserLayout><NewsDetail /></UserLayout>} />
 
           {/* Admin Routes */}

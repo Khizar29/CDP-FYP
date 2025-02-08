@@ -1,4 +1,3 @@
-// src/components/admin/manage/Graduates/GraduateEdit.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -16,16 +15,14 @@ const UpdateGraduate = () => {
       try {
         setError(null);
         setLoading(true);
-        const token = localStorage.getItem('accessToken');
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`,
+          { withCredentials: true } // Use credentials for secure cookie-based authentication
+        );
         setGraduate(response.data.data);
         setFormData(response.data.data); // Populate the form data with fetched graduate
       } catch (error) {
-        setError(error.message || 'Error fetching graduate details');
+        setError(error.response?.data?.message || 'Error fetching graduate details');
       } finally {
         setLoading(false);
       }
@@ -42,17 +39,16 @@ const UpdateGraduate = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const token = localStorage.getItem('accessToken');
-      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`,
+        formData,
+        { withCredentials: true }
+      );
       alert('Graduate details updated successfully');
       navigate('/admin/graduates');
     } catch (error) {
       console.error('Error updating graduate details:', error);
-      setError(error.message || 'Error updating graduate details');
+      setError(error.response?.data?.message || 'Error updating graduate details');
     } finally {
       setLoading(false);
     }
@@ -60,7 +56,6 @@ const UpdateGraduate = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
-
   return (
     <div className="container mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4">Edit Graduate</h2>

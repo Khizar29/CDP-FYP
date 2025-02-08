@@ -51,9 +51,9 @@ const JobList = () => {
   // Fetch jobs from the server
   const fetchJobs = useCallback(async () => {
     try {
-      const token = localStorage.getItem('accessToken');
+      
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, {
-        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
         params: {
           page,
           limit: 10,
