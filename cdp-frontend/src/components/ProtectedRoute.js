@@ -2,20 +2,26 @@ import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { UserContext } from '../contexts/UserContext';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useContext(UserContext);
 
-  // If still loading, you can show a loading indicator or nothing
   if (loading) {
-    return <div>Loading...</div>; // Or just return null to prevent rendering anything while loading
+    return <div>Loading...</div>;
   }
 
-  // If user is not logged in or not an admin, redirect to signin
-  if (!user || user.role !== 'admin') {
+  // If user is not logged in, redirect to signin
+  if (!user) {
     return <Navigate to="/signin" replace />;
   }
 
-  // Otherwise, render the children (protected component)
+  // If user exists but role is not allowed, show an Unauthorized message
+  if (!allowedRoles.includes(user.role)) {
+    return <div style={{ textAlign: 'center', marginTop: '50px', color: 'red' }}>
+      <h2>Unauthorized Access</h2>
+      <p>You do not have permission to view this page.</p>
+    </div>;
+  }
+
   return children;
 };
 
