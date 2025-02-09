@@ -55,10 +55,13 @@ const jobSchema = new Schema(
       type: Date,
     },
     postedBy: { 
-      type: String, 
-      required: true,
-      trim: true 
+      type: mongoose.Schema.Types.ObjectId, ref: 'User' 
     },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"], 
+      default: "pending" 
+    }
   },
   {
     timestamps: true, // Automatically manage createdAt and updatedAt fields
