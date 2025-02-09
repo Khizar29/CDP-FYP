@@ -37,6 +37,11 @@ import ViewNews from './components/admin/manage/Newsfeeds/ViewNews';
 import EditNews from './components/admin/manage/Newsfeeds/EditNews';
 import AdminTestimonials from './components/admin/manage/Testimonials/AdminTestimonials';
 import AddEditTestimonial from './components/admin/manage/Testimonials/Add-EditTestimonials';
+import RecruiterManageJobs from './components/Recruiter/PostedJobs';
+import RecruiterLayout from './components/Recruiter/RecruiterLayout';
+import AddJobRecruiter from './components/Recruiter/AddJobRecruiter';
+import AdminRecruiters from './components/admin/manage/Recruiters/AdminRecruiters';
+
 
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
@@ -81,34 +86,54 @@ function App() {
           <Route path="/news" element={<UserLayout><PaginatedNewsFeed /></UserLayout>} />
           <Route path="/news/:id" element={<UserLayout><NewsDetail /></UserLayout>} />
 
-          {/* Admin Routes */}
+          {/* Admin Dashboard */}
           <Route path="/admin/*" element={
-            <ProtectedRoute>
+             <ProtectedRoute allowedRoles={['admin']}>
               <AdminLayout />
             </ProtectedRoute>
           }>
+          
+          {/* Managing Jobs, Graduates, Newsfeed, Testimonialsm Recruiters for Admins */}
+
+             {/* Jobs */}
             <Route path="" element={<DashboardHome />} />
             <Route path="jobs" element={<AdminJobs />} />
             <Route path="jobs/manage" element={<AddJob />} />
             <Route path="jobs/manage/:id" element={<AddJob />} />
             
-            {/* Graduate Routes */}
+            {/* Graduate */}
             <Route path="graduates" element={<AdminGraduates />} />
             <Route path="graduates/import" element={<AddGraduate />} />
             <Route path="graduates/view/:nuId" element={<ViewGraduate />} />
             <Route path="graduates/edit/:nuId" element={<UpdateGraduate />} />
 
-            {/* Newsfeed Routes */}
+            {/* Newsfeed */}
             <Route path="newsfeeds" element={<AdminNewsfeed />} />
             <Route path="newsfeeds/add" element={<AddNews />} />
             <Route path="newsfeeds/view/:id" element={<ViewNews />} />
             <Route path="newsfeeds/edit/:id" element={<EditNews />} />
 
+            {/* Testimonials */}
             <Route path="testimonials" element={<AdminTestimonials />} />
             <Route path="testimonials/add" element={<AddEditTestimonial />} />
             <Route path="testimonials/edit/:id" element={<AddEditTestimonial />} />
+
+            {/* Recruiter */}
+            <Route path="recruiters" element={<AdminRecruiters />} />
+            
             
           </Route>
+
+             {/* Recruiter Dashboard */}
+          <Route path="/recruiter/*" element={
+             <ProtectedRoute allowedRoles={['recruiter']}>
+              <RecruiterLayout/>
+            </ProtectedRoute>
+          }>
+            <Route path="" element= {<RecruiterManageJobs/>}/>
+            <Route path="addjob" element= {<AddJobRecruiter/>}/>
+          </Route>
+
         </Routes>
       </Router>
     </UserProvider>
