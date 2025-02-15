@@ -8,6 +8,7 @@ import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import path from "path";
 import crypto from "crypto";
+import { log } from "console";
 
 // Generate Access and Refresh Tokens
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -27,64 +28,85 @@ const generateAccessAndRefereshTokens = async (userId) => {
 
 // Register User (student) and Send Password via Email
 const registerUser = asyncHandler(async (req, res) => {
-  const { email, fullName, nuId } = req.body;  // Receive email and fullName from frontend
+  let { email, fullName, nuId } = req.body;  // Receive input from frontend
 
   if (!email || !fullName || !nuId) {
-    throw new ApiError(400, "Nu Id, Email and fullName are required");
+    throw new ApiError(400, "NU ID, Email, and Full Name are required");
   }
 
-  const existedUser = await User.findOne({ email });
+  nuId = nuId.toLowerCase();
 
+  // Check if email OR nuId already exists in DB
+  const existedUser = await User.findOne({ $or: [{ email }, { nuId }] });
   if (existedUser) {
-    throw new ApiError(409, "User with this email already exists");
+    throw new ApiError(409, "User with this Email or NU ID already exists");
   }
 
-  // Generate a random password
-  const generatedPassword = crypto.randomBytes(8).toString('hex'); // Generates 16-character password
+  // Validate Email Format (Should be like K21xxxx@nu.edu.pk or I21xxxx@nu.edu.pk)
+  const emailRegex = /^([A-Z])(\d{2})(\d{4})@nu\.edu\.pk$/; 
+  const match = email.match(emailRegex);
 
-  // Create the user in the database
+  if (!match) {
+    throw new ApiError(400, "Invalid email format. Use format: X21xxxx@nu.edu.pk where X is your campus code.");
+  }
+
+  // Extract campus code, batch year & student ID from email
+  const campusCode = match[1]; // A-Z (e.g., K, I, L)
+  const batchYear = match[2]; // 21 (for batch 2021)
+  const studentNumber = match[3]; // 3329
+  const expectedNuId = `${campusCode}${batchYear}-${studentNumber}`; 
+
+  if (nuId !== expectedNuId) {
+    throw new ApiError(400, `NU ID must match email pattern. Expected: ${expectedNuId}`);
+  }
+
+  //  Generate a secure random password
+  const generatedPassword = crypto.randomBytes(8).toString("hex");
+
+  //  Create the user in the database
   const user = await User.create({
     fullName,
     email,
     nuId,
-    password: generatedPassword, // Save the hashed password in the database
-    role: "user",  // Default role, you can change it based on your logic
+    password: generatedPassword, // Store the generated password
+    role: "user",  // Default role for students
   });
 
+  //  Remove sensitive data before sending response
   const createdUser = await User.findById(user._id).select("-password -refreshToken");
 
   if (!createdUser) {
-    throw new ApiError(500, "Something went wrong while registering the user");
+    throw new ApiError(500, "Error while registering the user");
   }
 
-  // Send the generated password to the user's email
+
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
-      user: process.env.GMAIL,  // Your Gmail address
-      pass: process.env.GMAIL_PASSWORD,  // Your Gmail app password
+      user: process.env.GMAIL,  
+      pass: process.env.GMAIL_PASSWORD,  
     },
   });
 
   const mailOptions = {
-    from: process.env.GMAIL,  // Sender address
-    to: email,  // Receiver's email (the user who signed up)
-    subject: 'Your New Account Password',
+    from: process.env.GMAIL,
+    to: email,
+    subject: "Your NU Student Account Password",
     html: `<p>Hello ${fullName},</p>
-           <p>Thank you for registering on our platform. Here is your login password:</p>
+           <p>Your NU Student account has been successfully created.</p>
+           <p><strong>Email:</strong> ${email}</p>
+           <p><strong>NU ID:</strong> ${nuId}</p>
            <p><strong>Password:</strong> ${generatedPassword}</p>
-           <p>We recommend changing your password after the first login.</p>
-           <p>Best regards,<br>Your Company</p>`,
+           <p>We recommend changing your password after logging in.</p>
+           <p>Best Regards,<br>NU Administration</p>`,
   };
 
-  transporter.sendMail(mailOptions, (error, info) => {
-    if (error) {
-      console.log('Error while sending email: ', error);
-      throw new ApiError(500, 'Error while sending the email.');
-    } else {
-      console.log('Email sent: ' + info.response);
-    }
-  });
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.log("Error sending email:", error);
+    throw new ApiError(500, "Failed to send password email.");
+  }
 
   return res.status(201).json(
     new ApiResponse(201, createdUser, "User registered successfully and password emailed.")
@@ -98,16 +120,18 @@ const checkGraduate = asyncHandler(async (req, res) => {
   if (!nuId) {
     throw new ApiError(400, "nuID is required");
   }
-
+  
   // Check if the user already exists in the User collection
-  const existingUser = await User.findOne({ nuId });
+  const existingUser = await User.findOne({  nuId: nuId.toLowerCase() });
 
   if (existingUser) {
+    
+    
     throw new ApiError(409, "User with this nuID already exists");
   }
 
   // If not found in User, proceed to check the Graduate collection
-  const graduate = await Graduate.findOne({ nuId });
+  const graduate = await Graduate.findOne({ nuId: nuId.toLowerCase() });
 
   if (!graduate) {
     throw new ApiError(404, "Graduate not found with this nuID");
@@ -128,12 +152,12 @@ const checkGraduate = asyncHandler(async (req, res) => {
 
 // Step 2: Register Graduate as User and Send Password via Email
 const registerGraduateAsUser = asyncHandler(async (req, res) => {
-  const { nuId } = req.body;
+  let { nuId } = req.body;
 
   if (!nuId) {
     throw new ApiError(400, "nuID is required");
   }
-
+  nuId= nuId.toLowerCase();
   const graduate = await Graduate.findOne({ nuId });
 
   if (!graduate) {
