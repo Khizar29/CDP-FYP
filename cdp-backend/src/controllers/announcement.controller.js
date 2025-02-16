@@ -13,6 +13,9 @@ export const createAnnouncement = asyncHandler(async (req, res) => {
   if (!heading || !text) {
     throw new ApiError(400, "Heading and text are required");
   }
+  if (!req.user || !['admin', 'faculty'].includes(req.user.role)) {
+    throw new ApiError(403, "Forbidden: Admins and Faculty only");
+  }
 
   const announcement = await Announcement.create({
     heading,
@@ -35,7 +38,7 @@ export const createAnnouncement = asyncHandler(async (req, res) => {
 
     const mailOptions = {
       from: `"Career Services and IL Office" <${process.env.GMAIL}>`,
-      to: "k213335@nu.edu.pk", // Add multiple emails separated by commas in .env
+      to: "k213329@nu.edu.pk", // Add multiple emails separated by commas in .env
       subject: "New Announcement Posted",
       html: `<p><strong>${heading}</strong></p>
              <p>${text}</p>
@@ -56,11 +59,62 @@ export const createAnnouncement = asyncHandler(async (req, res) => {
 });
 
 export const getAnnouncements = asyncHandler(async (req, res) => {
-    const announcements = await Announcement.find().populate("postedBy", "fullName role");
-  
-    return res.status(200).json(new ApiResponse(200, announcements, "Announcements fetched successfully"));
+  try {
+    // Extract query parameters with default values
+    const { page = 1, limit = 10, searchTerm = "" } = req.query;
+
+    // Convert page & limit to integers for safety
+    const parsedPage = Math.max(parseInt(page, 10), 1);
+    const parsedLimit = Math.max(parseInt(limit, 10), 10);
+
+    // Determine which announcements to fetch based on user role
+    let query = {};
+    if (req.user.role === "faculty") {
+      query.postedBy = req.user.id; // Show only their own announcements
+    }
+
+    // Apply search filter
+    if (searchTerm) {
+      query.heading = { $regex: searchTerm, $options: "i" };
+    }
+
+    // Get total number of announcements matching query
+    const total = await Announcement.countDocuments(query);
+
+    // Fetch paginated announcements
+    const announcements = await Announcement.find(query)
+      .sort({ postedOn: -1 }) // Newest first
+      .skip((parsedPage - 1) * parsedLimit)
+      .limit(parsedLimit)
+      .populate("postedBy", "fullName role");
+
+    // Return paginated results
+    return res.status(200).json({
+      data: announcements,
+      totalPages: parsedLimit > 0 ? Math.ceil(total / parsedLimit) : 1,
+      currentPage: parsedPage,
+      totalAnnouncements: total,
+    });
+  } catch (error) {
+    console.error("Error fetching announcements:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
 });
+
+
+  /**
+   * Fetch Announcement by ID
+   */
+  export const getAnnouncementsById = asyncHandler(async (req, res) => {
+    const { announcementId } = req.params;
   
+    const announcement = await Announcement.findById(announcementId).populate("postedBy", "fullName role"); 
+    if (!announcement) {
+      throw new ApiError(404, "Announcement not found");
+    }
+  
+    res.status(200).json(new ApiResponse(200, announcement, "Announcement fetched successfully"));
+  });
   /**
    * Update an announcement (Admin & Faculty only)
    */
