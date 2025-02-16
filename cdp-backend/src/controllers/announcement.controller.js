@@ -102,55 +102,61 @@ export const getAnnouncements = asyncHandler(async (req, res) => {
 });
 
 
-  /**
-   * Fetch Announcement by ID
-   */
-  export const getAnnouncementsById = asyncHandler(async (req, res) => {
-    const { announcementId } = req.params;
-  
-    const announcement = await Announcement.findById(announcementId).populate("postedBy", "fullName role"); 
-    if (!announcement) {
-      throw new ApiError(404, "Announcement not found");
-    }
-  
-    res.status(200).json(new ApiResponse(200, announcement, "Announcement fetched successfully"));
-  });
-  /**
-   * Update an announcement (Admin & Faculty only)
-   */
-export const updateAnnouncement = asyncHandler(async (req, res) => {
-    const { announcementId } = req.params;
-    const { heading, text } = req.body;
-  
-    const announcement = await Announcement.findById(announcementId);
-    if (!announcement) {
-      throw new ApiError(404, "Announcement not found");
-    }
-  
-    if (req.user.role !== "admin" && req.user._id.toString() !== announcement.postedBy.toString()) {
-      throw new ApiError(403, "You can only update your own announcements");
-    }
-  
-    announcement.heading = heading || announcement.heading;
-    announcement.text = text || announcement.text;
-  
-    await announcement.save();
-  
-    return res.status(200).json(new ApiResponse(200, announcement, "Announcement updated successfully"));
+/**
+ * Fetch Announcement by ID
+ */
+export const getAnnouncementsById = asyncHandler(async (req, res) => {
+  const { announcementId } = req.params;
+
+  const announcement = await Announcement.findById(announcementId).populate("postedBy", "fullName role");
+  if (!announcement) {
+    throw new ApiError(404, "Announcement not found");
+  }
+
+  res.status(200).json(new ApiResponse(200, announcement, "Announcement fetched successfully"));
 });
-  
+/**
+ * Update an announcement (Admin & Faculty only)
+ */
+export const updateAnnouncement = asyncHandler(async (req, res) => {
+  const { announcementId } = req.params;
+  const { heading, text } = req.body;
+
+  const announcement = await Announcement.findById(announcementId);
+  if (!announcement) {
+    throw new ApiError(404, "Announcement not found");
+  }
+
+  if (req.user.role !== "admin" && req.user._id.toString() !== announcement.postedBy.toString()) {
+    throw new ApiError(403, "You can only update your own announcements");
+  }
+
+  announcement.heading = heading || announcement.heading;
+  announcement.text = text || announcement.text;
+
+  await announcement.save();
+
+  return res.status(200).json(new ApiResponse(200, announcement, "Announcement updated successfully"));
+});
+
 /**
  * Delete an announcement (Admin only)
  */
 export const deleteAnnouncement = asyncHandler(async (req, res) => {
-    const { announcementId } = req.params;
-  
-    const announcement = await Announcement.findById(announcementId);
-    if (!announcement) {
-      throw new ApiError(404, "Announcement not found");
-    }
-  
-    await announcement.deleteOne();
-  
-    return res.status(200).json(new ApiResponse(200, null, "Announcement deleted successfully"));
+  const { announcementId } = req.params;
+
+  const announcement = await Announcement.findById(announcementId);
+  if (!announcement) {
+    throw new ApiError(404, "Announcement not found");
+  }
+
+  //  Faculty can only delete their own posts
+  if (req.user.role === "faculty" && announcement.postedBy.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Forbidden: You can only delete your own news feeds.");
+  }
+
+  //  Admin can delete any newsFeed
+  await announcement.deleteOne();
+
+  return res.status(200).json(new ApiResponse(200, null, "Announcement deleted successfully"));
 });
