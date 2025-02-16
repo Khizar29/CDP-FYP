@@ -41,7 +41,10 @@ import RecruiterManageJobs from './components/Recruiter/PostedJobs';
 import RecruiterLayout from './components/Recruiter/RecruiterLayout';
 import AddJobRecruiter from './components/Recruiter/AddJobRecruiter';
 import AdminRecruiters from './components/admin/manage/Recruiters/AdminRecruiters';
-
+import FacultyLayout from './components/Faculty/FacultyLayout';
+import FacultyManageAnnouncements from './components/Faculty/PostedAnnouncements';
+import AddAnnouncement from './components/Faculty/AddAnnouncement';
+import EditAnnouncement from './components/Faculty/EditAnnouncement';
 
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
@@ -132,6 +135,18 @@ function App() {
           }>
             <Route path="" element= {<RecruiterManageJobs/>}/>
             <Route path="addjob" element= {<AddJobRecruiter/>}/>
+          </Route>
+
+           {/* Faculty Dashboard */}
+           <Route path="/faculty/*" element={
+             <ProtectedRoute allowedRoles={['faculty']}>
+              <FacultyLayout/>
+            </ProtectedRoute>
+          }>
+            <Route path="announcements" element= {<FacultyManageAnnouncements/>}/>
+            <Route path="announcements/add" element= {<AddAnnouncement/>}/>
+            <Route path="announcements/edit/:announcementId" element={<EditAnnouncement />} />
+            
           </Route>
 
         </Routes>
