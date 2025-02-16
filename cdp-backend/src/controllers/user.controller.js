@@ -34,28 +34,32 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "NU ID, Email, and Full Name are required");
   }
 
+  // ✅ Convert all values to lowercase for consistency
   nuId = nuId.toLowerCase();
+  email = email.toLowerCase();
 
-  // Check if email OR nuId already exists in DB
+  // ✅ Check if email OR nuId already exists in DB
   const existedUser = await User.findOne({ $or: [{ email }, { nuId }] });
   if (existedUser) {
     throw new ApiError(409, "User with this Email or NU ID already exists");
   }
 
-  // Validate Email Format (Should be like K21xxxx@nu.edu.pk or I21xxxx@nu.edu.pk)
-  const emailRegex = /^([A-Z])(\d{2})(\d{4})@nu\.edu\.pk$/; 
+  // ✅ Validate Email Format
+  const emailRegex = /^([A-Z])(\d{2})(\d{4})@nu\.edu\.pk$/i; 
   const match = email.match(emailRegex);
 
   if (!match) {
     throw new ApiError(400, "Invalid email format. Use format: X21xxxx@nu.edu.pk where X is your campus code.");
   }
 
-  // Extract campus code, batch year & student ID from email
-  const campusCode = match[1]; // A-Z (e.g., K, I, L)
-  const batchYear = match[2]; // 21 (for batch 2021)
-  const studentNumber = match[3]; // 3329
-  const expectedNuId = `${campusCode}${batchYear}-${studentNumber}`; 
+  //  Extract campus code, batch year & student ID from email
+  const campusCode = match[1].toLowerCase(); // Convert to lowercase
+  const batchYear = match[2]; // 21 (Batch Year)
+  const studentNumber = match[3]; // 3249
 
+  const expectedNuId = `${batchYear}${campusCode}-${studentNumber}`; // Convert format to lowercase
+
+  //  Ensure NU ID matches expected format
   if (nuId !== expectedNuId) {
     throw new ApiError(400, `NU ID must match email pattern. Expected: ${expectedNuId}`);
   }
@@ -79,7 +83,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Error while registering the user");
   }
 
-
+  //  Send Email with Credentials
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
