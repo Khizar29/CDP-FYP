@@ -8,12 +8,7 @@ const graduateSchema = new Schema(
       trim: true,
       unique: true, // Ensuring nuId is unique
     },
-    firstName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    lastName: {
+    fullName: {  // ✅ Replacing firstName & lastName with fullName
       type: String,
       required: true,
       trim: true,

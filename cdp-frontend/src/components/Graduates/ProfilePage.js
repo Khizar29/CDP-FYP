@@ -110,12 +110,12 @@ const ProfilePage = () => {
         <div className="w-full flex flex-col items-center bg-[#C1E4FB] p-6 rounded-lg shadow-md mb-8 max-w-sm mx-auto">
           <img
             src={profileImageUrl || `${placeholder}`}
-            alt={`Profile of ${alumni.firstName} ${alumni.lastName}`}
+            alt={`Profile of ${alumni.fullName}`}
             className="rounded-lg w-64 h-64 object-cover mb-6 shadow-md"
           />
           <div className="text-center">
             <h1 className="text-2xl font-bold text-yellow-500">
-              {alumni.firstName} {alumni.lastName}
+              {alumni.fullName}
             </h1>
             <p className="text-sm font-bold text-gray-500 mt-2">
               {alumni.tagline || "No tagline available"}

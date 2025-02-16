@@ -63,14 +63,15 @@ const SearchBar = ({ onSearch }) => {
             >
               <option value="">All Programs</option>
               <option value="Business Analytics">Business Analytics</option>
-              <option value="Computer Science">Computer Science</option>
-              <option value="Artificial Intelligence">Artificial Intelligence</option>
-              <option value="Data Science">Data Science</option>
-              <option value="Software Engineering">Software Engineering</option>
-              <option value="Cyber Security">Cyber Security</option>
+              <option value="BS(CS)">Computer Science</option>
+              <option value="BS(AI and Data Science)">Artificial Intelligence</option>
+              <option value="BS(SE)">Software Engineering</option>
+              <option value="BS(CY)">Cyber Security</option>
+              <option value="BS(AI and Data Science)">Data Science</option>
               <option value="Financial Technology">Financial Technology</option>
             </select>
           </div>
+
 
           <div className="ml-4 flex justify-center items-center">
             <button
