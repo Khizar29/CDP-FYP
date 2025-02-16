@@ -11,9 +11,7 @@ const RecruiterLayout = () => {
 
     return (
         <div className="flex h-screen bg-gray-100">
-            {/* Sidebar (Uncomment if needed) */}
-            {/* <SidebarRecruiter isOpen={isSidebarOpen} /> */}
-
+          
             {/* Main Content */}
             <div className="flex-1 flex flex-col">
                 {/* Recruiter Header */}
