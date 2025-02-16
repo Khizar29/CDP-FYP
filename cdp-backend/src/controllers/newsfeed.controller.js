@@ -68,7 +68,7 @@ const fetchNewsFeeds = asyncHandler(async (req, res) => {
 
   let query = { isPublic: true }; // Default: Public newsfeeds for non-logged-in users
 
-  // ✅ If user is logged in, apply role-based filtering
+  //  If user is logged in, apply role-based filtering
   if (req.user) {
     if (req.user.role === "faculty") {
       query = { postedBy: req.user._id }; // Faculty sees only their own newsfeeds
@@ -77,14 +77,14 @@ const fetchNewsFeeds = asyncHandler(async (req, res) => {
     }
   }
 
-  // ✅ Ensure correct faculty filtering
+  //  Ensure correct faculty filtering
   console.log(`Fetching newsfeeds for role: ${req.user?.role}`);
   console.log(`Applied Query:`, query);
 
-  // ✅ Get total count for pagination
+  //  Get total count for pagination
   const totalItems = await NewsFeed.countDocuments(query);
 
-  // ✅ Fetch news feeds with pagination & include the poster's name
+  //  Fetch news feeds with pagination & include the poster's name
   const newsFeeds = await NewsFeed.find(query)
     .populate("postedBy", "fullName role") // Get the faculty/admin name
     .skip(skip)
