@@ -15,6 +15,10 @@ const DashboardHeader = ({ role, onToggleSidebar }) => {
     const dropdownRef = useRef(null);
 
     useEffect(() => {
+        console.log("Role in DashboardHeader: ", role);
+    }, [role]);
+    
+    useEffect(() => {
         if (user && user.role) {
             setName(user.fullName);
         }
@@ -53,7 +57,9 @@ const DashboardHeader = ({ role, onToggleSidebar }) => {
                 </button>
                 <img src={logo} alt="Logo" className="h-10 ml-4 mr-2" />
                 <h1 className="ml-4 text-xl font-bold text-blue-900">
-                    {role === "admin" ? "Admin Dashboard" : "Recruiter Dashboard"}
+                    {role === "admin" && "Admin Dashboard"}
+                    {role === "recruiter" && "Recruiter Dashboard"}
+                    {role === "faculty" && "Faculty Dashboard"} {/* Add faculty role here */}
                 </h1>
             </div>
 
