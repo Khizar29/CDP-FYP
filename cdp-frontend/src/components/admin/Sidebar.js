@@ -42,6 +42,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <FaUser className="mr-3" />
                     Recruiters
                 </Link>
+                <Link to="/admin/faculty" onClick={toggleSidebar} className="flex items-center mt-4 py-2 px-6 text-xl text-gray-100 hover:bg-blue-700 rounded">
+                    <FaUser className="mr-3" />
+                    Faculty
+                </Link>
                 <Link to="/admin/users" onClick={toggleSidebar} className="flex items-center mt-4 py-2 px-6 text-xl text-gray-100 hover:bg-blue-700 rounded">
                     <FaUser className="mr-3" />
                     Users
