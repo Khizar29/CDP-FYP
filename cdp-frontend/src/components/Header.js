@@ -1,11 +1,14 @@
 import React, { useState, useContext, useEffect, useRef} from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faHome, faInfoCircle, faGraduationCap, faCalendar, faUser, faPhone, faGift, faBriefcase } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faHome, faInfoCircle, faGraduationCap, faCalendar, faUser, faPhone, faGift, faBriefcase, faKey, faRightFromBracket, faUserShield } from '@fortawesome/free-solid-svg-icons';
 import logo from '../Images/logo-FAST-NU.png';
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
 import SignIn from './SignIn'; // Import the SignIn component
+import { IoMdLogOut } from "react-icons/io";
+import { BsThreeDotsVertical } from "react-icons/bs";
+
 
 const Header = ({ scrollToSection }) => {
   const navigate = useNavigate(); // Initialize navigate for programmatic navigation
@@ -13,7 +16,9 @@ const Header = ({ scrollToSection }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
   const { user, logout } = useContext(UserContext);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
 
   
 
@@ -30,9 +35,7 @@ const Header = ({ scrollToSection }) => {
     }
   };
 
-  const handleDropdownToggle = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
+  
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -53,6 +56,25 @@ const Header = ({ scrollToSection }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isDropdownOpen]);
+
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!dropdownOpen);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
 
   return (
     <header className="bg-gradient-to-r from-blue-100 to-sky-600 text-white py-2 md:py-4">
@@ -83,38 +105,46 @@ const Header = ({ scrollToSection }) => {
             <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
           </Link>
           {user ? (
-            <div className="relative">
-              <div
-                className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer"
-                onClick={handleDropdownToggle}
-              >
-                <FontAwesomeIcon icon={faUser} /> <span>{user.fullName}</span>
-              </div>
-              {isDropdownOpen && (
-                <div ref={dropdownRef} className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
-                  <Link to="/change-password" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                    Change Password
-                  </Link>
-                  {user.role === 'admin' && (
-                    <Link to="/admin" id="adminpanel" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                      Admin Panel
-                    </Link>
-                  )}
-                  {(user.role === 'user' &&
-                    <Link to={`/edit-profile/${user.nuId}`} className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                      Update Profile
-                    </Link>
-                  )}
-                  <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
-                    Logout
-                  </div>
-                </div>
-              )}
-              
-            </div>
-          ) : (
-            <div onClick={handleOpenSignIn} className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
-              <FontAwesomeIcon icon={faUser} /> <span>Login</span>
+            <div className="relative" ref={dropdownRef}>
+              <button onClick={toggleDropdown} className="flex items-center focus:outline-none">
+      <span className="text-white mr-2 hidden md:inline-block">{user.fullName}</span>
+      <span className="text-white md:hidden">
+        <BsThreeDotsVertical />
+      </span>
+      <span className={`transform transition-transform ${dropdownOpen ? "rotate-180" : ""} hidden md:inline-block`}>
+        ▼
+      </span>
+    </button>
+    {dropdownOpen && (
+      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+        <div className="px-4 py-2 text-gray-800">{user.fullName}</div>
+        <hr className="border-gray-300" />
+        <Link to="/change-password" className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
+          <FontAwesomeIcon icon={faKey} className="mr-2 text-blue-600" /> {/* Key Icon for Password */}
+          Change Password
+        </Link>
+        {user.role === "admin" && (
+          <Link to="/admin" className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
+            <FontAwesomeIcon icon={faUserShield} className="mr-2 text-purple-600" /> {/* Admin Panel icon */}
+            Admin Panel
+          </Link>
+        )}
+        {(user.role === "user" && (
+          <Link to={`/edit-profile/${user.nuId}`} className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
+            <FontAwesomeIcon icon={faUser} className="mr-2 text-green-600" /> {/* User Icon for Profile */}
+          Update Profile
+          </Link>
+        ))}
+        <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-gray-800 hover:bg-gray-100">
+          <FontAwesomeIcon icon={faRightFromBracket} className="mr-2 text-red-600" /> {/* Logout icon */}
+          Logout
+        </button>
+      </div>
+    )}
+  </div>
+) : (
+  <div onClick={handleOpenSignIn} className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
+    <FontAwesomeIcon icon={faUser} /> <span>Login</span>
             </div>
           )}
         </nav>
@@ -158,7 +188,7 @@ const Header = ({ scrollToSection }) => {
               </Link>
               {user ? (
                 <div className="relative">
-                  <div className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={handleDropdownToggle}>
+                  <div className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleDropdown}>
                     <FontAwesomeIcon icon={faUser} /> <span>{user.fullName}</span>
                   </div>
                   {isDropdownOpen && (
