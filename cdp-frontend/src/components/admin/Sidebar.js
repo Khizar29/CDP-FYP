@@ -38,6 +38,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <FaGraduationCap className="mr-2 w-5" />
                     Graduates
                 </Link>
+                <Link to="/admin/recruiters" onClick={toggleSidebar} className="flex items-center mt-4 py-2 px-6 text-xl text-gray-100 hover:bg-blue-700 rounded">
+                    <FaUser className="mr-3" />
+                    Recruiters
+                </Link>
                 <Link to="/admin/users" onClick={toggleSidebar} className="flex items-center mt-4 py-2 px-6 text-xl text-gray-100 hover:bg-blue-700 rounded">
                     <FaUser className="mr-3" />
                     Users

@@ -40,12 +40,41 @@ const registerRecruiter = asyncHandler(async (req, res) => {
  * Get all recruiters (admin route)
  */
 const getAllRecruiters = asyncHandler(async (req, res) => {
-  const recruiters = await Recruiter.find();
+  let { page = 1, limit = 10, searchTerm = '', filterStatus = '' } = req.query;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
+  
+  const query = {};
+
+  // Apply search filters
+  if (searchTerm) {
+    query.$or = [
+      { companyName: { $regex: searchTerm, $options: "i" } },
+      { companyEmail: { $regex: searchTerm, $options: "i" } },
+    ];
+  }
+
+  // Apply status filter
+  if (filterStatus === "verified") query.isVerified = true;
+  if (filterStatus === "pending") query.isVerified = false;
+
+  const total = await Recruiter.countDocuments(query);
+  
+  const recruiters = await Recruiter.find(query)
+    .sort({ createdAt: -1 })  // Sort by latest created recruiters
+    .skip((page - 1) * limit)
+    .limit(limit);
 
   return res.status(200).json(
-    new ApiResponse(200, recruiters, "All recruiters fetched successfully.")
+    new ApiResponse(200, recruiters, "All recruiters fetched successfully.", {
+      totalJobs: total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    })
   );
 });
+
 
 /**
  * Get pending recruiters for admin (protected route)

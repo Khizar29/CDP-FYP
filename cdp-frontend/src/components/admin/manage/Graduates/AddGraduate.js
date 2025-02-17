@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const AddGraduate = ({ show, onClose, onErrors, onRefresh }) => {
     const [file, setFile] = useState(null);
-    const [loading, setLoading] = useState(false); // Add loading state for import process
+    const [loading, setLoading] = useState(false); // Loading state for the import process
 
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
@@ -11,19 +11,20 @@ const AddGraduate = ({ show, onClose, onErrors, onRefresh }) => {
 
     const handleImport = async () => {
         if (!file) return;
-        
+
         setLoading(true); // Set loading to true while importing
         const formData = new FormData();
         formData.append('file', file);
 
         try {
-            const token = localStorage.getItem('accessToken'); // Get the token from localStorage
-            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/import`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    Authorization: `Bearer ${token}` // Add the authorization header
+            const response = await axios.post(
+                `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/import`, 
+                formData, 
+                {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                    withCredentials: true, // Include credentials for cookie-based auth
                 }
-            });
+            );
 
             // Check if there were any errors returned by the server
             if (response.data.errors) {
@@ -37,13 +38,13 @@ const AddGraduate = ({ show, onClose, onErrors, onRefresh }) => {
             onClose();
         } catch (error) {
             console.error("Error importing graduates", error);
-            const message = error.response && error.response.data ? error.response.data.message : error.message;
+            const message = error.response?.data?.message || error.message;
             onErrors([message]);
         } finally {
-            setLoading(false); // Set loading to false after import process
+            setLoading(false); // Set loading to false after the import process
         }
     };
-
+    
     return show ? (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white rounded-lg p-6 shadow-lg">

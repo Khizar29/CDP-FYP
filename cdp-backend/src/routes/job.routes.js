@@ -7,20 +7,25 @@ import {
   getAllJobs,
   getJobById,
   getJobCount,
+  getRecruiterJobs,
+  approveJob,
 } from '../controllers/job.controller.js';
 import { verifyJWT, verifyAdmin, verifyRole } from '../middlewares/auth.middleware.js';
 
 const router = Router();
 
-// Apply JWT verification for all routes
+// ✅ Apply JWT verification for all routes
 router.use(verifyJWT);
 
-// Routes accessible to all authenticated users
+// ✅ Routes accessible to all authenticated users
 router.get('/count', getJobCount);
-router.route('/').get(getAllJobs);
-router.route('/:jobId').get(getJobById);
+router.get('/', getAllJobs); // ✅ Merged GET and POST routes
+router.post('/', verifyRole(['admin', 'recruiter']), createJob); 
 
-// Extract job information (Authenticated users only)
+// ✅ Fix: Move `/recruiter` above `/:jobId` to prevent conflicts
+router.get('/recruiter', verifyRole(['recruiter']), getRecruiterJobs);
+
+// ✅ Job extraction route (not role-protected)
 router.post('/extract', async (req, res) => {
   try {
     const { job_ad_text } = req.body;
@@ -32,11 +37,9 @@ router.post('/extract', async (req, res) => {
   }
 });
 
-// Allow only admin and recruiter roles to post jobs
-router.route('/').post(verifyRole(['admin', 'recruiter']), createJob);
-
-// Admin-only routes for updating and deleting jobs
-router.use(verifyAdmin);
-router.route('/:jobId').put(updateJob).delete(deleteJob);
+// ✅ Fix: Ensure `/recruiter` is above dynamic `/:jobId` routes
+router.use(verifyAdmin); // ✅ Ensure admin verification is applied before modifying jobs
+router.put("/:jobId/approve", approveJob);
+router.route('/:jobId').get(getJobById).put(updateJob).delete(deleteJob);
 
 export default router;

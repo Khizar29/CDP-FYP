@@ -7,8 +7,8 @@ import path from 'path';
 
 // Create a new news or event
 const createNewsFeed = asyncHandler(async (req, res) => {
-  if (!req.user || req.user.role !== 'admin') {
-      throw new ApiError(403, 'Forbidden: Admins only');
+  if (!req.user || !['admin', 'faculty'].includes(req.user.role)) {
+    throw new ApiError(403, "Forbidden: Admins and Faculty only");
   }
 
   const { title, description, category, isPublic  } = req.body;
@@ -20,7 +20,8 @@ const createNewsFeed = asyncHandler(async (req, res) => {
       description, 
       image: imageUrl, 
       category: category || 'news',
-      isPublic: isPublic !== undefined ? isPublic : true 
+      isPublic: isPublic !== undefined ? isPublic : true,
+      postedBy: req.user._id,
   });
 
   await newsFeed.save();
@@ -29,8 +30,8 @@ const createNewsFeed = asyncHandler(async (req, res) => {
 
 // Update a news or event
 const updateNewsFeed = asyncHandler(async (req, res) => {
-  if (!req.user || req.user.role !== 'admin') {
-    throw new ApiError(403, 'Forbidden: Admins only');
+  if (!req.user || !['admin', 'faculty'].includes(req.user.role)) {
+    throw new ApiError(403, "Forbidden: Admins and Faculty only");
   }
 
   const { id } = req.params;
@@ -39,6 +40,10 @@ const updateNewsFeed = asyncHandler(async (req, res) => {
   const newsFeed = await NewsFeed.findById(id);
   if (!newsFeed) {
     throw new ApiError(404, 'NewsFeed not found');
+  }
+
+  if (req.user.role !== "admin" && req.user._id.toString() !== newsFeed.postedBy.toString()) {
+    throw new ApiError(403, "You can only update your own newsfeed");
   }
 
   newsFeed.title = title || newsFeed.title;
@@ -61,13 +66,30 @@ const fetchNewsFeeds = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
 
-  // Get the total count of public newsfeeds
-  const totalItems = await NewsFeed.countDocuments({ isPublic: true });
+  let query = { isPublic: true }; // Default: Public newsfeeds for non-logged-in users
 
-  // Fetch news feeds with pagination
-  const newsFeeds = await NewsFeed.find({ isPublic: true })
+  //  If user is logged in, apply role-based filtering
+  if (req.user) {
+    if (req.user.role === "faculty") {
+      query = { postedBy: req.user._id }; // Faculty sees only their own newsfeeds
+    } else if (req.user.role === "admin") {
+      query = {}; // Admin sees all newsfeeds (no filter)
+    }
+  }
+
+  //  Ensure correct faculty filtering
+  console.log(`Fetching newsfeeds for role: ${req.user?.role}`);
+  console.log(`Applied Query:`, query);
+
+  //  Get total count for pagination
+  const totalItems = await NewsFeed.countDocuments(query);
+
+  //  Fetch news feeds with pagination & include the poster's name
+  const newsFeeds = await NewsFeed.find(query)
+    .populate("postedBy", "fullName role") // Get the faculty/admin name
     .skip(skip)
-    .limit(limit);
+    .limit(limit)
+    .sort({ createdAt: -1 });
 
   const totalPages = Math.ceil(totalItems / limit);
 
@@ -78,12 +100,10 @@ const fetchNewsFeeds = asyncHandler(async (req, res) => {
     meta: {
       currentPage: page,
       totalPages,
-      totalItems
-    }
+      totalItems,
+    },
   });
 });
-
-
 
 // Fetch a single news feed by ID
 const fetchNewsFeedById = asyncHandler(async (req, res) => {
@@ -98,20 +118,28 @@ const fetchNewsFeedById = asyncHandler(async (req, res) => {
 });
 
 
-// Delete a news or event (Admin only)
 const deleteNewsFeed = asyncHandler(async (req, res) => {
-  if (!req.user || req.user.role !== 'admin') {
-    throw new ApiError(403, 'Forbidden: Admins only');
+  if (!req.user || !['admin', 'faculty'].includes(req.user.role)) {
+    throw new ApiError(403, "Forbidden: Admins and Faculty only");
   }
 
   const { id } = req.params;
 
-  const newsFeed = await NewsFeed.findByIdAndDelete(id);
+  const newsFeed = await NewsFeed.findById(id);
   if (!newsFeed) {
-    throw new ApiError(404, 'NewsFeed not found');
+    throw new ApiError(404, "NewsFeed not found");
   }
 
-  res.status(200).json(new ApiResponse(200, null, 'NewsFeed deleted successfully'));
+  //  Faculty can only delete their own posts
+  if (req.user.role === "faculty" && newsFeed.postedBy.toString() !== req.user._id.toString()) {
+    throw new ApiError(403, "Forbidden: You can only delete your own news feeds.");
+  }
+
+  //  Admin can delete any newsFeed
+  await newsFeed.deleteOne();
+
+  res.status(200).json(new ApiResponse(200, null, "NewsFeed deleted successfully"));
 });
+
 
 export { createNewsFeed, fetchNewsFeeds, fetchNewsFeedById, updateNewsFeed, deleteNewsFeed };

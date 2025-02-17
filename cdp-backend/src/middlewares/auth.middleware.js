@@ -43,3 +43,29 @@ export const verifyRole = (roles) => {
     next();
   });
 };
+
+// ✅ Create an optional version for public routes
+verifyJWT.optional = asyncHandler(async (req, res, next) => {
+  const token = req.cookies?.accessToken || req.header("Authorization")?.split(" ")[1];
+
+  if (!token) {
+    req.user = null; // ✅ Public access, no authentication required
+    return next();
+  }
+
+  try {
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    const user = await User.findById(decodedToken?._id).select("-password -refreshToken");
+
+    if (!user) {
+      req.user = null; // ✅ Treat as unauthenticated user
+      return next();
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    req.user = null; // ✅ Continue as unauthenticated user
+    return next();
+  }
+});

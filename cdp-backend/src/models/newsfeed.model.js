@@ -26,6 +26,11 @@ const newsFeedSchema = new Schema(
       type: Date,
       default: Date.now,
     },
+    postedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     isPublic: {
       type: Boolean,
       default: true,
