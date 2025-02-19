@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useContext, useRef } from "react";
-import { IoMdLogOut } from "react-icons/io";
-import { FaGlobe, FaBars } from "react-icons/fa";
+import {  FaBars } from "react-icons/fa";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGlobe, faRightFromBracket } from "@fortawesome/free-solid-svg-icons"; // Import icons
+
 import { BsThreeDotsVertical } from "react-icons/bs"; 
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -80,11 +82,11 @@ const DashboardHeader = ({ role, onToggleSidebar }) => {
                         </div>
                         <hr className="border-gray-300" />
                         <Link to="/" className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
-                            <FaGlobe className="mr-2" />
+                            <FontAwesomeIcon icon={faGlobe} className="mr-2 text-blue-600" /> {/* Webpage icon */}
                             WebPage
                         </Link>
                         <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-gray-800 hover:bg-gray-100">
-                            <IoMdLogOut className="mr-2" />
+                            <FontAwesomeIcon icon={faRightFromBracket} className="mr-2 text-red-600" /> {/* Logout icon */}
                             Sign Out
                         </button>
                     </div>

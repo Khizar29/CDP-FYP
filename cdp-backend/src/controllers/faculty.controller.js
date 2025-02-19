@@ -40,11 +40,58 @@ const registerFaculty = asyncHandler(async (req, res) => {
  * Get all faculty members (admin route)
  */
 const getAllFaculty = asyncHandler(async (req, res) => {
-  const facultyMembers = await Faculty.find();
+  let { page = 1, limit = 10, searchTerm = '', filterStatus = '' } = req.query;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
+  
+  const query = {};
+
+  // Apply search filters
+  if (searchTerm) {
+    query.$or = [
+      { fullName: { $regex: searchTerm, $options: "i" } },
+      { nuEmail: { $regex: searchTerm, $options: "i" } },
+    ];
+  }
+
+  // Apply status filter
+  if (filterStatus === "verified") query.isVerified = true;
+  if (filterStatus === "pending") query.isVerified = false;
+
+  const total = await Faculty.countDocuments(query);
+  
+  const facultymembers = await Faculty.find(query)
+    .sort({ createdAt: -1 })  // Sort by latest created recruiters
+    .skip((page - 1) * limit)
+    .limit(limit);
 
   return res.status(200).json(
-    new ApiResponse(200, facultyMembers, "All faculty members fetched successfully.")
+    new ApiResponse(200, facultymembers, "All faculty members fetched successfully.", {
+      totalJobs: total,
+      totalPages: Math.ceil(total / limit),
+      currentPage: page,
+    })
   );
+});
+
+const updateFaculty = asyncHandler(async (req, res) => {
+  const { facultyId } = req.params;
+  const { fullName, nuEmail, phoneNumber, department } = req.body;
+
+  const faculty = await Faculty.findById(facultyId);
+  if (!faculty) {
+    throw new ApiError(404, "Recruiter not found");
+  }
+
+  faculty.fullName = fullName || faculty.fullName;
+  faculty.nuEmail = nuEmail || faculty.nuEmail;
+  faculty.phoneNumber = phoneNumber || faculty.phoneNumber;
+  faculty.department = department || faculty.department;
+
+  await faculty.save();
+
+  return res.status(200).json(new ApiResponse(200, faculty, "Recruiter details updated successfully."));
 });
 
 /**
@@ -185,6 +232,7 @@ const deleteFaculty = asyncHandler(async (req, res) => {
 export {
   registerFaculty,
   getAllFaculty,
+  updateFaculty,
   getPendingFaculty,
   verifyFaculty,
   unverifyFaculty,

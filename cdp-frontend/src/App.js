@@ -45,6 +45,7 @@ import FacultyLayout from './components/Faculty/FacultyLayout';
 import FacultyManageAnnouncements from './components/Faculty/PostedAnnouncements';
 import AddAnnouncement from './components/Faculty/AddAnnouncement';
 import EditAnnouncement from './components/Faculty/EditAnnouncement';
+import AdminFaculty from './components/admin/manage/Faculty/AdminFaculty';
 
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
@@ -123,6 +124,8 @@ function App() {
 
             {/* Recruiter */}
             <Route path="recruiters" element={<AdminRecruiters />} />
+            {/* Faculty */}
+            <Route path="faculty" element={<AdminFaculty />} />
             
             
           </Route>
