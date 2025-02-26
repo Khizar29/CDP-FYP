@@ -14,18 +14,17 @@ import { verifyJWT, verifyAdmin, verifyRole } from '../middlewares/auth.middlewa
 
 const router = Router();
 
-// ✅ Apply JWT verification for all routes
 router.use(verifyJWT);
 
-// ✅ Routes accessible to all authenticated users
+// Routes accessible to all authenticated users
 router.get('/count', getJobCount);
-router.get('/', getAllJobs); // ✅ Merged GET and POST routes
+router.get('/', getAllJobs); 
 router.post('/', verifyRole(['admin', 'recruiter']), createJob); 
 
-// ✅ Fix: Move `/recruiter` above `/:jobId` to prevent conflicts
+
 router.get('/recruiter', verifyRole(['recruiter']), getRecruiterJobs);
 
-// ✅ Job extraction route (not role-protected)
+//  Job extraction route (not role-protected)
 router.post('/extract', async (req, res) => {
   try {
     const { job_ad_text } = req.body;
@@ -37,9 +36,9 @@ router.post('/extract', async (req, res) => {
   }
 });
 
-// ✅ Fix: Ensure `/recruiter` is above dynamic `/:jobId` routes
-router.use(verifyAdmin); // ✅ Ensure admin verification is applied before modifying jobs
-router.put("/:jobId/approve", approveJob);
+
+router.use(verifyAdmin); 
+router.patch("/:jobId/approve", approveJob);
 router.route('/:jobId').get(getJobById).put(updateJob).delete(deleteJob);
 
 export default router;

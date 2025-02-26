@@ -173,7 +173,7 @@ const getAllJobs = asyncHandler(async (req, res) => {
     throw new ApiError(401, 'Unauthorized request');
   }
 
-  const { page = 1, limit = 10, searchTerm = '', filterDate = '' } = req.query;
+  const { page = 1, limit = 10, searchTerm = '', filterDate = '', filterStatus = '' } = req.query;
 
   const query = {};
 
@@ -193,13 +193,17 @@ const getAllJobs = asyncHandler(async (req, res) => {
     query.posted_on = { $gte: start, $lt: end };
   }
 
+  if (filterStatus === "approved") query.status = "approved";
+  if (filterStatus === "pending") query.status = "pending";
+  if (filterStatus === "rejected") query.status = "rejected";
   const total = await Job.countDocuments(query);
   
   const startIndex = (page - 1) * limit;
   const jobs = await Job.find(query)
     .sort({ posted_on: -1 }) // Sort by posted_on in descending order
     .skip(startIndex)
-    .limit(parseInt(limit));
+    .limit(parseInt(limit))
+    .populate('postedBy', 'email');
 
   return res.status(200).json({
     data: jobs,
