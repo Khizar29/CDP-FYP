@@ -2,11 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "Backend for CDP-FYP",
-  "type": "module",
+  "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon -r dotenv/config src/index.js",
-    "start": "node src/index.js"
+    "dev": "nodemon -r dotenv/config index.js",
+    "start": "node index.js"
   },
   "author": "TEAM CDP-FYP",
   "license": "ISC",
