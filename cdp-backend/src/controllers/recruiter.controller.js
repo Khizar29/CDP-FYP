@@ -1,10 +1,10 @@
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/ApiError.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
-import Recruiter from "../models/recruiter.model.js";
-import { User } from "../models/user.model.js";
-import nodemailer from "nodemailer";
-import crypto from "crypto";
+const asyncHandler  = require("../utils/asyncHandler.js");
+const ApiError  = require("../utils/ApiError.js");
+const  ApiResponse  = require("../utils/ApiResponse.js");
+const Recruiter = require("../models/recruiter.model.js");
+const  User  = require("../models/user.model.js");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 /**
  * Register a recruiter (public route)
@@ -62,7 +62,7 @@ const getAllRecruiters = asyncHandler(async (req, res) => {
   const total = await Recruiter.countDocuments(query);
   
   const recruiters = await Recruiter.find(query)
-    .sort({ createdAt: -1 })  // Sort by latest created recruiters
+    .sort({ createdAt: -1 })
     .skip((page - 1) * limit)
     .limit(limit);
 
@@ -74,7 +74,6 @@ const getAllRecruiters = asyncHandler(async (req, res) => {
     })
   );
 });
-
 
 /**
  * Get pending recruiters for admin (protected route)
@@ -117,7 +116,7 @@ const verifyRecruiter = asyncHandler(async (req, res) => {
     email: recruiter.companyEmail,
     fullName: recruiter.fullName,
     password: generatedPassword,
-    role: "recruiter", // Set role as recruiter
+    role: "recruiter",
   });
 
   try {
@@ -234,7 +233,8 @@ const updateRecruiter = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, recruiter, "Recruiter details updated successfully."));
 });
 
-export {
+// Export functions using CommonJS syntax
+module.exports = {
   registerRecruiter,
   getAllRecruiters,
   getPendingRecruiters,

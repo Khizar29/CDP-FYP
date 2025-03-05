@@ -1,9 +1,8 @@
-import NewsFeed from '../models/newsfeed.model.js';
-import { asyncHandler } from '../utils/asyncHandler.js';
-import { ApiError } from '../utils/ApiError.js';
-import { ApiResponse } from '../utils/ApiResponse.js';
-import path from 'path';
-
+const NewsFeed = require('../models/newsfeed.model.js');
+const  asyncHandler  = require('../utils/asyncHandler.js');
+const  ApiError  = require('../utils/ApiError.js');
+const ApiResponse  = require('../utils/ApiResponse.js');
+const path = require('path');
 
 // Create a new news or event
 const createNewsFeed = asyncHandler(async (req, res) => {
@@ -11,17 +10,17 @@ const createNewsFeed = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Forbidden: Admins and Faculty only");
   }
 
-  const { title, description, category, isPublic  } = req.body;
+  const { title, description, category, isPublic } = req.body;
   const imagePath = req.savedImagePath || '';
 
   const imageUrl = `${req.protocol}://${req.get('host')}/temp/${path.basename(imagePath)}`;
   const newsFeed = new NewsFeed({ 
-      title, 
-      description, 
-      image: imageUrl, 
-      category: category || 'news',
-      isPublic: isPublic !== undefined ? isPublic : true,
-      postedBy: req.user._id,
+    title, 
+    description, 
+    image: imageUrl, 
+    category: category || 'news',
+    isPublic: isPublic !== undefined ? isPublic : true,
+    postedBy: req.user._id,
   });
 
   await newsFeed.save();
@@ -52,7 +51,6 @@ const updateNewsFeed = asyncHandler(async (req, res) => {
   newsFeed.isPublic = isPublic !== undefined ? isPublic : newsFeed.isPublic;
   
   if (req.savedImagePath) {
-    // Update the image URL only if a new image is uploaded
     newsFeed.image = `${req.protocol}://${req.get('host')}${req.savedImagePath}`;
   }
 
@@ -68,25 +66,18 @@ const fetchNewsFeeds = asyncHandler(async (req, res) => {
 
   let query = { isPublic: true }; // Default: Public newsfeeds for non-logged-in users
 
-  //  If user is logged in, apply role-based filtering
   if (req.user) {
     if (req.user.role === "faculty") {
       query = { postedBy: req.user._id }; // Faculty sees only their own newsfeeds
     } else if (req.user.role === "admin") {
-      query = {}; // Admin sees all newsfeeds (no filter)
+      query = {}; // Admin sees all newsfeeds
     }
   }
 
-  //  Ensure correct faculty filtering
-  console.log(`Fetching newsfeeds for role: ${req.user?.role}`);
-  console.log(`Applied Query:`, query);
-
-  //  Get total count for pagination
   const totalItems = await NewsFeed.countDocuments(query);
 
-  //  Fetch news feeds with pagination & include the poster's name
   const newsFeeds = await NewsFeed.find(query)
-    .populate("postedBy", "fullName role") // Get the faculty/admin name
+    .populate("postedBy", "fullName role")
     .skip(skip)
     .limit(limit)
     .sort({ createdAt: -1 });
@@ -117,7 +108,7 @@ const fetchNewsFeedById = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, newsFeed, 'NewsFeed fetched successfully'));
 });
 
-
+// Delete a news feed (Admin & Faculty)
 const deleteNewsFeed = asyncHandler(async (req, res) => {
   if (!req.user || !['admin', 'faculty'].includes(req.user.role)) {
     throw new ApiError(403, "Forbidden: Admins and Faculty only");
@@ -130,16 +121,20 @@ const deleteNewsFeed = asyncHandler(async (req, res) => {
     throw new ApiError(404, "NewsFeed not found");
   }
 
-  //  Faculty can only delete their own posts
   if (req.user.role === "faculty" && newsFeed.postedBy.toString() !== req.user._id.toString()) {
     throw new ApiError(403, "Forbidden: You can only delete your own news feeds.");
   }
 
-  //  Admin can delete any newsFeed
   await newsFeed.deleteOne();
 
   res.status(200).json(new ApiResponse(200, null, "NewsFeed deleted successfully"));
 });
 
-
-export { createNewsFeed, fetchNewsFeeds, fetchNewsFeedById, updateNewsFeed, deleteNewsFeed };
+// Export functions using CommonJS syntax
+module.exports = {
+  createNewsFeed,
+  fetchNewsFeeds,
+  fetchNewsFeedById,
+  updateNewsFeed,
+  deleteNewsFeed
+};

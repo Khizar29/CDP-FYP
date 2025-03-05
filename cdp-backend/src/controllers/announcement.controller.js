@@ -1,13 +1,13 @@
-import Announcement from "../models/announcement.model.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/ApiError.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
-import nodemailer from "nodemailer";
+const Announcement = require("../models/announcement.model.js");
+const  asyncHandler  = require("../utils/asyncHandler.js");
+const  ApiError = require("../utils/ApiError.js");
+const  ApiResponse  = require("../utils/ApiResponse.js");
+const nodemailer = require("nodemailer");
 
 /**
  * Create an announcement (Admin & Faculty only)
  */
-export const createAnnouncement = asyncHandler(async (req, res) => {
+const createAnnouncement = asyncHandler(async (req, res) => {
   const { heading, text } = req.body;
 
   if (!heading || !text) {
@@ -55,10 +55,15 @@ export const createAnnouncement = asyncHandler(async (req, res) => {
     console.error("Error sending email:", error);
   }
 
-  return res.status(201).json(new ApiResponse(201, announcement, "Announcement created successfully & email sent."));
+  return res
+    .status(201)
+    .json(new ApiResponse(201, announcement, "Announcement created successfully & email sent."));
 });
 
-export const getAnnouncements = asyncHandler(async (req, res) => {
+/**
+ * Fetch all announcements with pagination and filtering
+ */
+const getAnnouncements = asyncHandler(async (req, res) => {
   try {
     // Extract query parameters with default values
     const { page = 1, limit = 10, searchTerm = "" } = req.query;
@@ -101,24 +106,29 @@ export const getAnnouncements = asyncHandler(async (req, res) => {
   }
 });
 
-
 /**
  * Fetch Announcement by ID
  */
-export const getAnnouncementsById = asyncHandler(async (req, res) => {
+const getAnnouncementsById = asyncHandler(async (req, res) => {
   const { announcementId } = req.params;
 
-  const announcement = await Announcement.findById(announcementId).populate("postedBy", "fullName role");
+  const announcement = await Announcement.findById(announcementId).populate(
+    "postedBy",
+    "fullName role"
+  );
   if (!announcement) {
     throw new ApiError(404, "Announcement not found");
   }
 
-  res.status(200).json(new ApiResponse(200, announcement, "Announcement fetched successfully"));
+  res
+    .status(200)
+    .json(new ApiResponse(200, announcement, "Announcement fetched successfully"));
 });
+
 /**
  * Update an announcement (Admin & Faculty only)
  */
-export const updateAnnouncement = asyncHandler(async (req, res) => {
+const updateAnnouncement = asyncHandler(async (req, res) => {
   const { announcementId } = req.params;
   const { heading, text } = req.body;
 
@@ -127,7 +137,10 @@ export const updateAnnouncement = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Announcement not found");
   }
 
-  if (req.user.role !== "admin" && req.user._id.toString() !== announcement.postedBy.toString()) {
+  if (
+    req.user.role !== "admin" &&
+    req.user._id.toString() !== announcement.postedBy.toString()
+  ) {
     throw new ApiError(403, "You can only update your own announcements");
   }
 
@@ -136,13 +149,15 @@ export const updateAnnouncement = asyncHandler(async (req, res) => {
 
   await announcement.save();
 
-  return res.status(200).json(new ApiResponse(200, announcement, "Announcement updated successfully"));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, announcement, "Announcement updated successfully"));
 });
 
 /**
  * Delete an announcement (Admin only)
  */
-export const deleteAnnouncement = asyncHandler(async (req, res) => {
+const deleteAnnouncement = asyncHandler(async (req, res) => {
   const { announcementId } = req.params;
 
   const announcement = await Announcement.findById(announcementId);
@@ -150,13 +165,27 @@ export const deleteAnnouncement = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Announcement not found");
   }
 
-  //  Faculty can only delete their own posts
-  if (req.user.role === "faculty" && announcement.postedBy.toString() !== req.user._id.toString()) {
+  // Faculty can only delete their own posts
+  if (
+    req.user.role === "faculty" &&
+    announcement.postedBy.toString() !== req.user._id.toString()
+  ) {
     throw new ApiError(403, "Forbidden: You can only delete your own news feeds.");
   }
 
-  //  Admin can delete any newsFeed
+  // Admin can delete any newsFeed
   await announcement.deleteOne();
 
-  return res.status(200).json(new ApiResponse(200, null, "Announcement deleted successfully"));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, "Announcement deleted successfully"));
 });
+
+// Export all controllers using module.exports
+module.exports = {
+  createAnnouncement,
+  getAnnouncements,
+  getAnnouncementsById,
+  updateAnnouncement,
+  deleteAnnouncement,
+};

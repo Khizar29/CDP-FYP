@@ -1,14 +1,14 @@
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/ApiError.js";
-import { User } from "../models/user.model.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
-import Graduate from '../models/graduate.model.js';
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import nodemailer from "nodemailer";
-import path from "path";
-import crypto from "crypto";
-import { log } from "console";
+const  asyncHandler  = require("../utils/asyncHandler.js");
+const  ApiError  = require("../utils/ApiError.js");
+const  User  = require("../models/user.model.js");
+const  ApiResponse  = require("../utils/ApiResponse.js");
+const Graduate = require("../models/graduate.model.js");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+const path = require("path");
+const crypto = require("crypto");
+const { log } = require("console");
 
 // Generate Access and Refresh Tokens
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -236,6 +236,8 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!email || !password) {
     throw new ApiError(400, "Email and password are required");
   }
+  console.log(email, password);
+  
 
   const user = await User.findOne({ email });
 
@@ -382,7 +384,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 
-export const checkSession = asyncHandler(async (req, res) => {
+const checkSession = asyncHandler(async (req, res) => {
   try {
     const token = req.cookies?.accessToken || req.header("Authorization")?.split(" ")[1];
 
@@ -562,7 +564,7 @@ const serveResetPasswordPage = (req, res) => {
   res.sendFile(path.join(__dirname, '../cdp-frontend', 'build', 'index.html'));
 };
 
-export {
+module.exports = {
   registerUser,
   checkGraduate,
   registerGraduateAsUser,
@@ -574,4 +576,6 @@ export {
   forgetPassword,
   resetPassword,
   serveResetPasswordPage,
+  checkSession,
 };
+

@@ -1,8 +1,8 @@
-import Job from '../models/job.model.js';
-import { asyncHandler } from '../utils/asyncHandler.js';
-import { ApiError } from '../utils/ApiError.js';
-import { ApiResponse } from '../utils/ApiResponse.js';
-import nodemailer from 'nodemailer';
+const Job = require('../models/job.model.js');
+const  asyncHandler  = require('../utils/asyncHandler.js');
+const ApiError  = require('../utils/ApiError.js');
+const ApiResponse  = require('../utils/ApiResponse.js');
+const nodemailer = require('nodemailer');
 
 const createJob = asyncHandler(async (req, res) => {
   let { 
@@ -22,10 +22,8 @@ const createJob = asyncHandler(async (req, res) => {
     throw new ApiError(403, "Forbidden: Admins and Recruiters only");
   }
 
-  //  Determine job status based on user role
   const status = req.user.role === "admin" ? "approved" : "pending";
 
-  //  Ensure email fields are arrays or empty
   toEmails = Array.isArray(toEmails) ? toEmails : (toEmails ? [toEmails] : []);
   ccEmails = Array.isArray(ccEmails) ? ccEmails : (ccEmails ? [ccEmails] : []);
   bccEmails = Array.isArray(bccEmails) ? bccEmails : (bccEmails ? [bccEmails] : []);
@@ -44,7 +42,6 @@ const createJob = asyncHandler(async (req, res) => {
 
   await job.save();
 
-  //  Setup email transporter
   const transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: {
@@ -53,7 +50,6 @@ const createJob = asyncHandler(async (req, res) => {
     },
   });
 
-  //  If admin posts a job AND `toEmails` exists, send to students
   if (status === "approved" && toEmails.length > 0) {
     const subject = `Exciting Career Opportunity: ${title}`;
     const html = `
@@ -88,7 +84,6 @@ const createJob = asyncHandler(async (req, res) => {
     }
   }
 
-  //  Only send approval email if a **recruiter** posted the job (status === "pending")
   if (status === "pending") {
     const adminEmail = "s.khizarali03@gmail.com";
     const adminSubject = `New Job Pending Approval: ${title}`;
@@ -117,8 +112,6 @@ const createJob = asyncHandler(async (req, res) => {
 
   return res.status(201).json(new ApiResponse(201, job, "Job posted successfully"));
 });
-
-
 
 // Update a job (Admin only)
 const updateJob = asyncHandler(async (req, res) => {
@@ -167,17 +160,11 @@ const deleteJob = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, 'Job deleted successfully'));
 });
 
+// Fetch all jobs with filters
 const getAllJobs = asyncHandler(async (req, res) => {
-
-  if (!req.user) {
-    throw new ApiError(401, 'Unauthorized request');
-  }
-
   const { page = 1, limit = 10, searchTerm = '', filterDate = '', filterStatus = '' } = req.query;
-
   const query = {};
 
-  // Build search query
   if (searchTerm) {
     query.$or = [
       { company_name: { $regex: searchTerm, $options: 'i' } },
@@ -185,7 +172,6 @@ const getAllJobs = asyncHandler(async (req, res) => {
     ];
   }
 
-  // Add date filter
   if (filterDate) {
     const start = new Date(filterDate);
     const end = new Date(filterDate);
@@ -193,46 +179,39 @@ const getAllJobs = asyncHandler(async (req, res) => {
     query.posted_on = { $gte: start, $lt: end };
   }
 
-  if (filterStatus === "approved") query.status = "approved";
-  if (filterStatus === "pending") query.status = "pending";
-  if (filterStatus === "rejected") query.status = "rejected";
+  if (filterStatus) query.status = filterStatus;
+
   const total = await Job.countDocuments(query);
-  
-  const startIndex = (page - 1) * limit;
-  const jobs = await Job.find(query)
-    .sort({ posted_on: -1 }) // Sort by posted_on in descending order
-    .skip(startIndex)
-    .limit(parseInt(limit))
-    .populate('postedBy', 'email');
+  const jobs = await Job.find(query).sort({ posted_on: -1 }).skip((page - 1) * limit).limit(parseInt(limit)).populate('postedBy', 'email');
 
   return res.status(200).json({
     data: jobs,
-    totalPages: limit > 0 ? Math.ceil(total / limit) : 1,
+    totalPages: Math.ceil(total / limit),
     currentPage: page,
     totalJobs: total,
   });
 });
 
-const approveJob = asyncHandler(async (req, res) => {
+// Fetch a single job by ID
+const getJobById = asyncHandler(async (req, res) => {
   const { jobId } = req.params;
-  const { status } = req.body; // Can be 'approved' or 'rejected'
-
-  if (!req.user || req.user.role !== "admin") {
-    throw new ApiError(403, "Forbidden: Admins only");
-  }
-
-  if (!["approved", "rejected"].includes(status)) {
-    throw new ApiError(400, "Invalid status value");
-  }
-
   const job = await Job.findById(jobId);
-  if (!job) throw new ApiError(404, "Job not found");
 
-  job.status = status;
-  job.updated_on = Date.now();
-  await job.save();
+  if (!job) {
+    throw new ApiError(404, 'Job not found');
+  }
 
-  return res.status(200).json(new ApiResponse(200, job, `Job has been ${status}`));
+  return res.status(200).json(new ApiResponse(200, job, 'Job fetched successfully'));
+});
+
+// Get job count
+const getJobCount = asyncHandler(async (req, res) => {
+  try {
+    const count = await Job.countDocuments();
+    return res.status(200).json(new ApiResponse(200, { count }, 'Job count retrieved successfully'));
+  } catch (error) {
+    return res.status(500).json(new ApiError(500, 'Error counting jobs', error.message));
+  }
 });
 
 const getRecruiterJobs = asyncHandler(async (req, res) => {
@@ -288,38 +267,36 @@ const getRecruiterJobs = asyncHandler(async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 });
-
-// Fetch a single job by ID
-const getJobById = asyncHandler(async (req, res) => {
+const approveJob = asyncHandler(async (req, res) => {
   const { jobId } = req.params;
+  const { status } = req.body; // Can be 'approved' or 'rejected'
+
+  if (!req.user || req.user.role !== "admin") {
+    throw new ApiError(403, "Forbidden: Admins only");
+  }
+
+  if (!["approved", "rejected"].includes(status)) {
+    throw new ApiError(400, "Invalid status value");
+  }
 
   const job = await Job.findById(jobId);
+  if (!job) throw new ApiError(404, "Job not found");
 
-  if (!job) {
-    throw new ApiError(404, 'Job not found');
-  }
+  job.status = status;
+  job.updated_on = Date.now();
+  await job.save();
 
-  return res.status(200).json(new ApiResponse(200, job, 'Job fetched successfully'));
+  return res.status(200).json(new ApiResponse(200, job, `Job has been ${status}`));
 });
 
-
-const getJobCount = async (req, res) => {
-  try {
-    const count = await Job.countDocuments(); // Count the documents in the Job collection
-    return res.status(200).json(new ApiResponse(200, { count }, 'Job count retrieved successfully'));
-  } catch (error) {
-    console.error('Error counting jobs:', error);
-    return res.status(500).json(new ApiError(500, 'Error counting jobs', error.message));
-  }
-};
-
-export {
+// Export functions
+module.exports = {
   createJob,
   updateJob,
   deleteJob,
-  approveJob,
   getAllJobs,
   getJobById,
   getJobCount,
-  getRecruiterJobs
+  getRecruiterJobs,
+  approveJob,
 };
