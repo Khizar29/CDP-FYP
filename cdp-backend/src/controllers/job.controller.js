@@ -163,8 +163,10 @@ const deleteJob = asyncHandler(async (req, res) => {
 // Fetch all jobs with filters
 const getAllJobs = asyncHandler(async (req, res) => {
   const { page = 1, limit = 10, searchTerm = '', filterDate = '', filterStatus = '' } = req.query;
+
   const query = {};
 
+  // Search query
   if (searchTerm) {
     query.$or = [
       { company_name: { $regex: searchTerm, $options: 'i' } },
@@ -172,6 +174,7 @@ const getAllJobs = asyncHandler(async (req, res) => {
     ];
   }
 
+  // Date filter
   if (filterDate) {
     const start = new Date(filterDate);
     const end = new Date(filterDate);
@@ -179,15 +182,29 @@ const getAllJobs = asyncHandler(async (req, res) => {
     query.posted_on = { $gte: start, $lt: end };
   }
 
-  if (filterStatus) query.status = filterStatus;
+  // Status filter (ignore if "all" is selected)
+  if (filterStatus && filterStatus !== "all") {
+    query.status = filterStatus;
+  }
 
+  // Convert page & limit to numbers
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+
+  // Get total count
   const total = await Job.countDocuments(query);
-  const jobs = await Job.find(query).sort({ posted_on: -1 }).skip((page - 1) * limit).limit(parseInt(limit)).populate('postedBy', 'email');
+
+  // Fetch jobs with pagination & sorting
+  const jobs = await Job.find(query)
+    .sort({ posted_on: -1 })
+    .skip((pageNum - 1) * limitNum)
+    .limit(limitNum)
+    .populate('postedBy', 'email');
 
   return res.status(200).json({
     data: jobs,
-    totalPages: Math.ceil(total / limit),
-    currentPage: page,
+    totalPages: Math.ceil(total / limitNum),
+    currentPage: pageNum,
     totalJobs: total,
   });
 });
