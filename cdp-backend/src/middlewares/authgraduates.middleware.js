@@ -1,7 +1,7 @@
-import Graduate from '../models/graduate.model.js';
-import { ApiError } from '../utils/ApiError.js';
+const Graduate = require('../models/graduate.model.js');
+const { ApiError } = require('../utils/ApiError.js');
 
-export const authorizeGraduate = async (req, res, next) => {
+const authorizeGraduate = async (req, res, next) => {
   const { nuId, role } = req.user; // Get nuId and role from the logged-in user's token
 
   const graduateId = req.params.nuId; // Get nuId from request parameters
@@ -18,4 +18,9 @@ export const authorizeGraduate = async (req, res, next) => {
 
   // Graduate is authorized to update their own profile
   next();
+};
+
+// Export the middleware function using CommonJS
+module.exports = {
+  authorizeGraduate,
 };

@@ -1,11 +1,9 @@
-// src/middlewares/auth.middleware.js
+const  ApiError  = require("../utils/ApiError.js");
+const  asyncHandler  = require("../utils/asyncHandler.js");
+const jwt = require("jsonwebtoken");
+const { User } = require("../models/user.model.js");
 
-import { ApiError } from "../utils/ApiError.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
-import jwt from "jsonwebtoken";
-import { User } from "../models/user.model.js";
-
-export const verifyJWT = asyncHandler(async (req, _, next) => {
+const verifyJWT = asyncHandler(async (req, _, next) => {
   try {
     const token = req.cookies?.accessToken || req.header("Authorization")?.split(" ")[1];
 
@@ -28,14 +26,14 @@ export const verifyJWT = asyncHandler(async (req, _, next) => {
   }
 });
 
-export const verifyAdmin = asyncHandler(async (req, _, next) => {
+const verifyAdmin = asyncHandler(async (req, _, next) => {
   if (req.user.role !== "admin") {
     throw new ApiError(403, "Forbidden: Admins only");
   }
   next();
 });
 
-export const verifyRole = (roles) => {
+const verifyRole = (roles) => {
   return asyncHandler(async (req, _, next) => {
     if (!roles.includes(req.user.role)) {
       throw new ApiError(403, "Forbidden: Insufficient role permissions");
@@ -69,3 +67,10 @@ verifyJWT.optional = asyncHandler(async (req, res, next) => {
     return next();
   }
 });
+
+// Export functions using CommonJS syntax
+module.exports = {
+  verifyJWT,
+  verifyAdmin,
+  verifyRole,
+};
