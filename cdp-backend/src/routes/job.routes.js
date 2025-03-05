@@ -1,6 +1,6 @@
-import { Router } from 'express';
-import axios from 'axios';
-import {
+const express = require("express");
+const axios = require("axios");
+const {
   createJob,
   updateJob,
   deleteJob,
@@ -9,22 +9,21 @@ import {
   getJobCount,
   getRecruiterJobs,
   approveJob,
-} from '../controllers/job.controller.js';
-import { verifyJWT, verifyAdmin, verifyRole } from '../middlewares/auth.middleware.js';
+} = require("../controllers/job.controller.js");
+const { verifyJWT, verifyAdmin, verifyRole } = require("../middlewares/auth.middleware.js");
 
-const router = Router();
+const router = express.Router();
 
 router.use(verifyJWT);
 
 // Routes accessible to all authenticated users
 router.get('/count', getJobCount);
-router.get('/', getAllJobs); 
-router.post('/', verifyRole(['admin', 'recruiter']), createJob); 
-
+router.get('/', getAllJobs);
+router.post('/', verifyRole(['admin', 'recruiter']), createJob);
 
 router.get('/recruiter', verifyRole(['recruiter']), getRecruiterJobs);
 
-//  Job extraction route (not role-protected)
+// Job extraction route (not role-protected)
 router.post('/extract', async (req, res) => {
   try {
     const { job_ad_text } = req.body;
@@ -36,9 +35,8 @@ router.post('/extract', async (req, res) => {
   }
 });
 
-
-router.use(verifyAdmin); 
+router.use(verifyAdmin);
 router.patch("/:jobId/approve", approveJob);
 router.route('/:jobId').get(getJobById).put(updateJob).delete(deleteJob);
 
-export default router;
+module.exports = router;

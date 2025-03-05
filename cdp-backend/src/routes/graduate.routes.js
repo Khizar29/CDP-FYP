@@ -1,17 +1,17 @@
-import { Router } from 'express';
-import { 
+const express = require("express");
+const {
     importGraduates, 
     updateGraduate,
     deleteGraduate,
     fetchGraduates,
     getGraduateById,
     getGraduateCount
-} from '../controllers/graduate.controller.js';
-import { verifyJWT, verifyAdmin } from '../middlewares/auth.middleware.js';
-import { upload } from '../middlewares/multer.middleware.js'; 
-import { authorizeGraduate } from '../middlewares/authgraduates.middleware.js'; 
+} = require("../controllers/graduate.controller.js");
+const { verifyJWT, verifyAdmin } = require("../middlewares/auth.middleware.js");
+const { upload } = require("../middlewares/multer.middleware.js"); 
+const { authorizeGraduate } = require("../middlewares/authgraduates.middleware.js"); 
 
-const router = Router();
+const router = express.Router();
 
 // Public routes
 router.get('/count', getGraduateCount); // Fetch the count of graduates
@@ -32,4 +32,5 @@ router.put(
     authorizeGraduate,           // Check if the user is authorized to update the profile
     updateGraduate               // Update graduate information
 );
-export default router;
+
+module.exports = router;
