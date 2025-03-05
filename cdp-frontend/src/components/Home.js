@@ -71,15 +71,27 @@ const Home = ({ aboutRef, contactRef }) => {
             Your Gateway to a Successful Career Journey
           </p>
           <div className="mt-8 space-y-4 lg:space-y-0 lg:space-x-4 flex flex-col lg:flex-row">
-            {user && user.role === 'admin' ? (
+            {user && user.role === 'admin' && (
               <RouterLink to="/admin" className="bg-blue-900 text-white py-2 px-6 rounded-full hover:bg-blue-600 transition duration-300 cursor-pointer">
                 Admin Dashboard
               </RouterLink>
-            ) : (
+            )}
+            {user && user.role === 'recruiter' && (
+              <RouterLink to="/recruiter" className="bg-blue-900 text-white py-2 px-6 rounded-full hover:bg-blue-600 transition duration-300 cursor-pointer">
+                Recruiter Dashboard
+              </RouterLink>
+            )}
+            {user && user.role === 'faculty' && (
+              <RouterLink to="/faculty/announcements" className="bg-blue-900 text-white py-2 px-6 rounded-full hover:bg-blue-600 transition duration-300 cursor-pointer">
+                Faculty Dashboard
+              </RouterLink>
+            )}
+            {!user && (
               <ScrollLink to="about" smooth={true} duration={500} className="bg-blue-900 text-white py-2 px-6 rounded-full hover:bg-blue-600 transition duration-300 cursor-pointer">
                 Find Out More
               </ScrollLink>
             )}
+
             {user ? (
               <button onClick={handleLogout} className="bg-blue-900 text-white py-2 px-6 rounded-full hover:bg-blue-600 transition duration-300 cursor-pointer">
                 Logout
