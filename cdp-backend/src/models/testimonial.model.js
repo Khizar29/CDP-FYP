@@ -1,4 +1,5 @@
-import mongoose, { Schema } from "mongoose";
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const testimonialSchema = new Schema(
     {
@@ -41,5 +42,4 @@ const testimonialSchema = new Schema(
       
 )
 
-const Testimonial = mongoose.model("testimonial", testimonialSchema);
-export default Testimonial;
+module.exports = mongoose.model("testimonial", testimonialSchema);
