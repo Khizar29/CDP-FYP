@@ -1,12 +1,12 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   createAnnouncement,
   getAnnouncements,
   updateAnnouncement,
   deleteAnnouncement,
   getAnnouncementsById
-} from "../controllers/announcement.controller.js";
-import { verifyJWT, verifyRole } from "../middlewares/auth.middleware.js";
+} = require("../controllers/announcement.controller.js");
+const { verifyJWT, verifyRole } = require("../middlewares/auth.middleware.js");
 
 const router = express.Router();
 
@@ -20,4 +20,4 @@ router.put("/:announcementId", verifyJWT, verifyRole(["admin", "faculty"]), upda
 // Admin-only route
 router.delete("/:announcementId", verifyJWT, verifyRole(["admin", "faculty"]), deleteAnnouncement);
 
-export default router;
+module.exports = router;

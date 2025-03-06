@@ -1,5 +1,5 @@
-import { Router } from "express";
-import {
+const express = require("express");
+const {
   registerUser,
   checkGraduate,
   registerGraduateAsUser,
@@ -12,30 +12,29 @@ import {
   forgetPassword,
   resetPassword,
   serveResetPasswordPage
-} from "../controllers/user.controller.js";
+} = require("../controllers/user.controller.js");
 
-import { verifyJWT } from "../middlewares/auth.middleware.js";
+const { verifyJWT } = require("../middlewares/auth.middleware.js");
 
-const router = Router();
+const router = express.Router();
 
-router.route("/register").post(registerUser);
-router.route("/login").post(loginUser);
-router.route("/check-session").get(checkSession);
+router.post("/register", registerUser);
+router.post("/login", loginUser);
+router.get("/check-session", checkSession);
 
 // Graduate registration routes
-router.route("/check-graduate").post(checkGraduate);
-router.route("/register-graduate").post(registerGraduateAsUser);
+router.post("/check-graduate", checkGraduate);
+router.post("/register-graduate", registerGraduateAsUser);
 
 // Secured routes
-router.route("/logout").post(verifyJWT, logoutUser);
-router.route("/refresh-token").post(refreshAccessToken);
-router.route("/change-password").post(verifyJWT, changeCurrentPassword);
-router.route("/current-user").get(verifyJWT, getCurrentUser);
-
+router.post("/logout", verifyJWT, logoutUser);
+router.post("/refresh-token", refreshAccessToken);
+router.post("/change-password", verifyJWT, changeCurrentPassword);
+router.get("/current-user", verifyJWT, getCurrentUser);
 
 // Password reset routes
 router.post("/forgot-password", forgetPassword);
 router.post("/reset-password/:id/:token", resetPassword);
 router.get("/reset-password/:id/:token", serveResetPasswordPage);
 
-export default router;
+module.exports = router;

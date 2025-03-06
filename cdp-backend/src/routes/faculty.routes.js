@@ -1,5 +1,5 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   registerFaculty,
   getAllFaculty,
   getPendingFaculty,
@@ -7,9 +7,8 @@ import {
   unverifyFaculty,
   deleteFaculty,
   updateFaculty,
-  //updateFaculty
-} from "../controllers/faculty.controller.js";
-import { verifyJWT, verifyAdmin } from "../middlewares/auth.middleware.js";
+} = require("../controllers/faculty.controller.js");
+const { verifyJWT, verifyAdmin } = require("../middlewares/auth.middleware.js");
 
 const router = express.Router();
 
@@ -21,4 +20,4 @@ router.put("/unverify/:facultyId", verifyJWT, verifyAdmin, unverifyFaculty);
 router.delete("/:facultyId", verifyJWT, verifyAdmin, deleteFaculty);
 router.put("/:facultyId", verifyJWT, verifyAdmin, updateFaculty);
 
-export default router;
+module.exports = router;

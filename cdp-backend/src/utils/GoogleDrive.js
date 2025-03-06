@@ -1,5 +1,5 @@
-import { google } from 'googleapis';
-import fs from 'fs';
+const { google } = require('googleapis');
+const fs = require('fs');
 
 const oAuth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
@@ -15,7 +15,7 @@ oAuth2Client.setCredentials({
 const drive = google.drive({ version: 'v3', auth: oAuth2Client });
 
 // Upload file to Google Drive
-export const uploadFileToGoogleDrive = async (file) => {
+const uploadFileToGoogleDrive = async (file) => {
   try {
     const fileMetadata = {
       name: file.originalname,
@@ -45,7 +45,7 @@ export const uploadFileToGoogleDrive = async (file) => {
 };
 
 // Set file permissions to be publicly accessible
-export const setFilePublicPermission = async (fileId) => {
+const setFilePublicPermission = async (fileId) => {
   try {
     await drive.permissions.create({
       fileId: fileId,
@@ -62,12 +62,12 @@ export const setFilePublicPermission = async (fileId) => {
 };
 
 // Get the thumbnail URL for public access
-export const getFilePublicUrl = (fileId) => {
+const getFilePublicUrl = (fileId) => {
   return `https://drive.google.com/thumbnail?id=${fileId}&sz=s4000`; // URL format for embedding images
 };
 
 // Delete the local file after uploading
-export const deleteLocalFile = (filePath) => {
+const deleteLocalFile = (filePath) => {
   fs.unlink(filePath, (err) => {
     if (err) {
       console.error('Error deleting local file:', err);
@@ -75,4 +75,12 @@ export const deleteLocalFile = (filePath) => {
       console.log('Local file deleted:', filePath);
     }
   });
+};
+
+// Export functions using CommonJS syntax
+module.exports = {
+  uploadFileToGoogleDrive,
+  setFilePublicPermission,
+  getFilePublicUrl,
+  deleteLocalFile,
 };

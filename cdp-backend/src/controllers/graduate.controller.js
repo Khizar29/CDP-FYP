@@ -1,10 +1,10 @@
-import Graduate from '../models/graduate.model.js';
-import { asyncHandler } from '../utils/asyncHandler.js';
-import { ApiError } from '../utils/ApiError.js';
-import { ApiResponse } from '../utils/ApiResponse.js';
-import XLSX from 'xlsx'; // Library to parse Excel files
-import { uploadFileToGoogleDrive, deleteLocalFile, getFilePublicUrl } from '../utils/GoogleDrive.js';
-import fs from 'fs'; // To work with the filesystem
+const Graduate = require('../models/graduate.model.js');
+const asyncHandler  = require('../utils/asyncHandler.js');
+const ApiError  = require('../utils/ApiError.js');
+const ApiResponse  = require('../utils/ApiResponse.js');
+const XLSX = require('xlsx'); // Library to parse Excel files
+const { uploadFileToGoogleDrive, deleteLocalFile, getFilePublicUrl } = require('../utils/GoogleDrive.js');
+const fs = require('fs'); // To work with the filesystem
 
 const BATCH_SIZE = 100; // Adjust batch size according to your needs
 
@@ -18,7 +18,6 @@ const importGraduates = asyncHandler(async (req, res) => {
   }
 
   try {
-    // Use the saved path from multer
     const workbook = XLSX.readFile(`./public/temp/${req.file.filename}`);
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
@@ -33,11 +32,9 @@ const importGraduates = asyncHandler(async (req, res) => {
     for (let i = 0; i < graduatesData.length; i++) {
       let graduate = graduatesData[i];
 
-      // Normalize and trim data
       graduate.nuId = graduate.nuId ? graduate.nuId.toLowerCase().trim() : null;
       graduate.nuEmail = graduate.nuEmail ? graduate.nuEmail.toLowerCase().trim() : null;
 
-      // Check for missing required fields
       if (!graduate.nuId || !graduate.firstName || !graduate.lastName || !graduate.nuEmail || !graduate.discipline || !graduate.yearOfGraduation || !graduate.cgpa) {
         errors.push(`Row ${i + 1}: Missing required field(s).`);
         continue;
@@ -59,7 +56,6 @@ const importGraduates = asyncHandler(async (req, res) => {
         const result = await Graduate.insertMany(batch, { ordered: false }); // Continue on error
         totalInserted += result.length;
       } catch (error) {
-        // Handle duplicate key errors and log specific duplicates
         if (error.code === 11000) {
           const dupKeyError = error.writeErrors || [];
           dupKeyError.forEach(err => {
@@ -70,17 +66,15 @@ const importGraduates = asyncHandler(async (req, res) => {
               duplicateNuIds.push(keyValue.nuId);
             }
           });
-          totalFailed += error.writeErrors.length;  // Increment failed insert count
+          totalFailed += error.writeErrors.length;
         } else {
           console.error('Error inserting batch:', error);
         }
       }
     }
 
-    // Delete the uploaded file after processing
     fs.unlinkSync(`./public/temp/${req.file.filename}`);
 
-    // Return a more accurate response message
     return res.status(201).json(
       new ApiResponse(
         201,
@@ -142,7 +136,6 @@ const updateGraduate = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, graduate, "Graduate updated successfully"));
 });
 
-
 // Delete a graduate profile (Admin only)
 const deleteGraduate = asyncHandler(async (req, res) => {
   const { nuId } = req.params;
@@ -160,20 +153,17 @@ const deleteGraduate = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, 'Graduate deleted successfully'));
 });
 
-
 // Fetch paginated graduates with filters (Public route)
 const fetchGraduates = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
 
-  // Retrieve filters from query parameters
   const { searchTerm, filterYear, filterDiscipline } = req.query;
 
-  // Build the search criteria
   const criteria = {};
   if (searchTerm) {
-    const regex = new RegExp(searchTerm, 'i'); // Case-insensitive regex
+    const regex = new RegExp(searchTerm, 'i');
     criteria.$or = [{ firstName: regex }, { lastName: regex }, { nuId: regex }];
   }
   if (filterYear) {
@@ -198,8 +188,6 @@ const fetchGraduates = asyncHandler(async (req, res) => {
   }
 });
 
-
-
 // Fetch a single Graduate by ID
 const getGraduateById = asyncHandler(async (req, res) => {
   const { nuId } = req.params;
@@ -215,18 +203,20 @@ const getGraduateById = asyncHandler(async (req, res) => {
 
 const getGraduateCount = async (req, res) => {
   try {
-    const count = await Graduate.countDocuments(); // Count the documents in the Graduate collection
+    const count = await Graduate.countDocuments();
     return res.status(200).json(new ApiResponse(200, { count }, 'Graduate count retrieved successfully'));
   } catch (error) {
     console.error('Error counting Graduates:', error);
     return res.status(500).json(new ApiError(500, 'Error counting Graduate', error.message));
   }
 };
-export {
+
+// Export all functions using CommonJS syntax
+module.exports = {
   importGraduates,
   updateGraduate,
   deleteGraduate,
   fetchGraduates,
   getGraduateById,
-  getGraduateCount
+  getGraduateCount,
 };

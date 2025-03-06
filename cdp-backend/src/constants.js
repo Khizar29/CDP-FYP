@@ -1,1 +1,3 @@
-export const DB_NAME = "FYP-CDP"
+const DB_NAME = "FYP-CDP";
+
+module.exports = { DB_NAME };

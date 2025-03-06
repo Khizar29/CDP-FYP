@@ -1,14 +1,14 @@
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/ApiError.js";
-import { User } from "../models/user.model.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
-import Graduate from '../models/graduate.model.js';
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import nodemailer from "nodemailer";
-import path from "path";
-import crypto from "crypto";
-import { log } from "console";
+const  asyncHandler  = require("../utils/asyncHandler.js");
+const  ApiError  = require("../utils/ApiError.js");
+const  User  = require("../models/user.model.js");
+const  ApiResponse  = require("../utils/ApiResponse.js");
+const Graduate = require("../models/graduate.model.js");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+const path = require("path");
+const crypto = require("crypto");
+const { log } = require("console");
 
 // Generate Access and Refresh Tokens
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -34,17 +34,17 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "NU ID, Email, and Full Name are required");
   }
 
-  // ✅ Convert all values to lowercase for consistency
+  //  Convert all values to lowercase for consistency
   nuId = nuId.toLowerCase();
   email = email.toLowerCase();
 
-  // ✅ Check if email OR nuId already exists in DB
+  //  Check if email OR nuId already exists in DB
   const existedUser = await User.findOne({ $or: [{ email }, { nuId }] });
   if (existedUser) {
     throw new ApiError(409, "User with this Email or NU ID already exists");
   }
 
-  // ✅ Validate Email Format
+  //  Validate Email Format
   const emailRegex = /^([A-Z])(\d{2})(\d{4})@nu\.edu\.pk$/i; 
   const match = email.match(emailRegex);
 
@@ -236,6 +236,8 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!email || !password) {
     throw new ApiError(400, "Email and password are required");
   }
+  console.log(email, password);
+  
 
   const user = await User.findOne({ email });
 
@@ -254,9 +256,10 @@ const loginUser = asyncHandler(async (req, res) => {
   // Secure cookie options
   const options = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Secure only in production
-    sameSite: "Strict",
+    secure: true, // Ensures cookies are only sent over HTTPS
+    sameSite: "None", //  Allows cookies to be sent in cross-origin requests
   };
+  
 
   return res
     .status(200)
@@ -289,6 +292,8 @@ const logoutUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
+    sameSite: "None", // Ensure cookies are deleted in cross-origin requests
+    path: "/", // Important for clearing cookies
   };
 
   return res
@@ -333,9 +338,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     // Secure cookie options
     const options = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: true, // Ensures cookies are only sent over HTTPS
+      sameSite: "None", //  Allows cookies to be sent in cross-origin requests
     };
+    
 
     return res
       .status(200)
@@ -382,7 +388,7 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 });
 
 
-export const checkSession = asyncHandler(async (req, res) => {
+const checkSession = asyncHandler(async (req, res) => {
   try {
     const token = req.cookies?.accessToken || req.header("Authorization")?.split(" ")[1];
 
@@ -562,7 +568,7 @@ const serveResetPasswordPage = (req, res) => {
   res.sendFile(path.join(__dirname, '../cdp-frontend', 'build', 'index.html'));
 };
 
-export {
+module.exports = {
   registerUser,
   checkGraduate,
   registerGraduateAsUser,
@@ -574,4 +580,6 @@ export {
   forgetPassword,
   resetPassword,
   serveResetPasswordPage,
+  checkSession,
 };
+

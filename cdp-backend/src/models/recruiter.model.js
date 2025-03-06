@@ -1,4 +1,5 @@
-import mongoose, { Schema } from "mongoose";
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const recruiterSchema = new Schema(
   {
@@ -45,4 +46,4 @@ const recruiterSchema = new Schema(
   }
 );
 
-export default mongoose.model("Recruiter", recruiterSchema);
+module.exports = mongoose.model("Recruiter", recruiterSchema);

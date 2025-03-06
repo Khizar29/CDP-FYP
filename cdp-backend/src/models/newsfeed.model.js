@@ -1,4 +1,5 @@
-import mongoose, { Schema } from 'mongoose';
+const mongoose = require("mongoose");
+const { Schema } = mongoose;
 
 const newsFeedSchema = new Schema(
   {
@@ -41,6 +42,6 @@ const newsFeedSchema = new Schema(
   }
 );
 
-const NewsFeed = mongoose.model('NewsFeed', newsFeedSchema);
+module.exports = mongoose.model('NewsFeed', newsFeedSchema);
 
-export default NewsFeed;
+

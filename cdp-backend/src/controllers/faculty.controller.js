@@ -1,17 +1,17 @@
-import { asyncHandler } from "../utils/asyncHandler.js";
-import { ApiError } from "../utils/ApiError.js";
-import { ApiResponse } from "../utils/ApiResponse.js";
-import Faculty from "../models/faculty.model.js";
-import { User } from "../models/user.model.js";
-import nodemailer from "nodemailer";
-import crypto from "crypto";
+const asyncHandler  = require("../utils/asyncHandler.js");
+const ApiError  = require("../utils/ApiError.js");
+const  ApiResponse  = require("../utils/ApiResponse.js");
+const Faculty = require("../models/faculty.model.js");
+const User  = require("../models/user.model.js");
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 
 /**
  * Register a faculty member (public route)
  */
 const registerFaculty = asyncHandler(async (req, res) => {
   const { fullName, nuEmail, phoneNumber, department } = req.body;
-  console.log(fullName,nuEmail,phoneNumber,department);
+  console.log(fullName, nuEmail, phoneNumber, department);
 
   if (!fullName || !nuEmail || !phoneNumber || !department) {
     throw new ApiError(400, "All fields are required");
@@ -40,11 +40,11 @@ const registerFaculty = asyncHandler(async (req, res) => {
  * Get all faculty members (admin route)
  */
 const getAllFaculty = asyncHandler(async (req, res) => {
-  let { page = 1, limit = 10, searchTerm = '', filterStatus = '' } = req.query;
+  let { page = 1, limit = 10, searchTerm = "", filterStatus = "" } = req.query;
 
   page = parseInt(page);
   limit = parseInt(limit);
-  
+
   const query = {};
 
   // Apply search filters
@@ -60,9 +60,9 @@ const getAllFaculty = asyncHandler(async (req, res) => {
   if (filterStatus === "pending") query.isVerified = false;
 
   const total = await Faculty.countDocuments(query);
-  
+
   const facultymembers = await Faculty.find(query)
-    .sort({ createdAt: -1 })  // Sort by latest created recruiters
+    .sort({ createdAt: -1 }) // Sort by latest created recruiters
     .skip((page - 1) * limit)
     .limit(limit);
 
@@ -91,7 +91,9 @@ const updateFaculty = asyncHandler(async (req, res) => {
 
   await faculty.save();
 
-  return res.status(200).json(new ApiResponse(200, faculty, "Recruiter details updated successfully."));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, faculty, "Recruiter details updated successfully."));
 });
 
 /**
@@ -171,9 +173,11 @@ const verifyFaculty = asyncHandler(async (req, res) => {
     faculty.verifiedAt = new Date();
     await faculty.save();
 
-    return res.status(200).json(
-      new ApiResponse(200, { user }, "Faculty verified successfully and credentials sent via email.")
-    );
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, { user }, "Faculty verified successfully and credentials sent via email.")
+      );
   } catch (error) {
     // Rollback user creation if email sending fails
     await User.findByIdAndDelete(user._id);
@@ -205,9 +209,9 @@ const unverifyFaculty = asyncHandler(async (req, res) => {
   faculty.verifiedAt = null;
   await faculty.save();
 
-  return res.status(200).json(
-    new ApiResponse(200, { faculty, deletedUser: user }, "Faculty unverified successfully.")
-  );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, { faculty, deletedUser: user }, "Faculty unverified successfully."));
 });
 
 /**
@@ -229,7 +233,8 @@ const deleteFaculty = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, null, "Faculty deleted successfully."));
 });
 
-export {
+// Export all functions using CommonJS syntax
+module.exports = {
   registerFaculty,
   getAllFaculty,
   updateFaculty,

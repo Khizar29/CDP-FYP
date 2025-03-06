@@ -1,10 +1,9 @@
-import { asyncHandler } from '../utils/asyncHandler.js';
-import { ApiError } from '../utils/ApiError.js';
-import { ApiResponse } from '../utils/ApiResponse.js';
-import Testimonial from "../models/testimonial.model.js";
-import { uploadFileToGoogleDrive, deleteLocalFile, getFilePublicUrl } from '../utils/GoogleDrive.js';
-import fs from 'fs';
-
+const  asyncHandler  = require('../utils/asyncHandler.js');
+const  ApiError  = require('../utils/ApiError.js');
+const  ApiResponse  = require('../utils/ApiResponse.js');
+const Testimonial = require("../models/testimonial.model.js");
+const { uploadFileToGoogleDrive, deleteLocalFile, getFilePublicUrl } = require('../utils/GoogleDrive.js');
+const fs = require('fs');
 
 // Admin-only function to create a testimonial
 const createTestimonial = asyncHandler(async (req, res) => {
@@ -19,7 +18,7 @@ const createTestimonial = asyncHandler(async (req, res) => {
     if (file) {
         // Upload the image to Google Drive and get the public thumbnail URL
         const googleDriveFileId = await uploadFileToGoogleDrive(file);
-        imageUrl = getFilePublicUrl(googleDriveFileId); // Use the thumbnail URL for embedding
+        imageUrl = getFilePublicUrl(googleDriveFileId); 
 
         // Remove the file from local storage after uploading to Drive
         deleteLocalFile(file.path);
@@ -58,7 +57,7 @@ const updateTestimonial = asyncHandler(async (req, res) => {
     if (file) {
         // Upload the new image to Google Drive and get the public thumbnail URL
         const googleDriveFileId = await uploadFileToGoogleDrive(file);
-        imageUrl = getFilePublicUrl(googleDriveFileId); // Use the thumbnail URL for embedding
+        imageUrl = getFilePublicUrl(googleDriveFileId); 
 
         // Remove the file from local storage after uploading to Drive
         deleteLocalFile(file.path);
@@ -76,6 +75,7 @@ const updateTestimonial = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, testimonial, 'Testimonial updated successfully'));
 });
 
+// Admin-only function to delete a testimonial
 const deleteTestimonial = asyncHandler(async (req, res) => {
     const { testimonialId } = req.params;
 
@@ -92,6 +92,7 @@ const deleteTestimonial = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, null, 'Testimonial deleted successfully'));
 });
 
+// Fetch a single testimonial by ID
 const getTestimonialById = asyncHandler(async (req, res) => {
     const { testimonialId } = req.params;
 
@@ -104,6 +105,7 @@ const getTestimonialById = asyncHandler(async (req, res) => {
     return res.status(200).json(new ApiResponse(200, testimonial, 'Testimonial fetched successfully'));
 });
 
+// Fetch all approved testimonials
 const fetchTestimonials = asyncHandler(async (req, res) => {
     try {
         // Fetch only approved testimonials from the database
@@ -117,7 +119,8 @@ const fetchTestimonials = asyncHandler(async (req, res) => {
     }
 });
 
-export {
+// Export functions using CommonJS syntax
+module.exports = {
     createTestimonial,
     updateTestimonial,
     deleteTestimonial,

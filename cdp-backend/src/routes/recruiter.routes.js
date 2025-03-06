@@ -1,5 +1,5 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   registerRecruiter,
   getAllRecruiters,
   getPendingRecruiters,
@@ -7,8 +7,8 @@ import {
   unverifyRecruiter,
   deleteRecruiter,
   updateRecruiter
-} from "../controllers/recruiter.controller.js";
-import { verifyJWT, verifyAdmin } from "../middlewares/auth.middleware.js";
+} = require("../controllers/recruiter.controller.js");
+const { verifyJWT, verifyAdmin } = require("../middlewares/auth.middleware.js");
 
 const router = express.Router();
 
@@ -20,4 +20,4 @@ router.put("/unverify/:recruiterId", verifyJWT, verifyAdmin, unverifyRecruiter);
 router.delete("/:recruiterId", verifyJWT, verifyAdmin, deleteRecruiter);
 router.put("/:recruiterId", verifyJWT, verifyAdmin, updateRecruiter);
 
-export default router;
+module.exports = router;
