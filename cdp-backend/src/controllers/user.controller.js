@@ -34,17 +34,17 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(400, "NU ID, Email, and Full Name are required");
   }
 
-  // ✅ Convert all values to lowercase for consistency
+  //  Convert all values to lowercase for consistency
   nuId = nuId.toLowerCase();
   email = email.toLowerCase();
 
-  // ✅ Check if email OR nuId already exists in DB
+  //  Check if email OR nuId already exists in DB
   const existedUser = await User.findOne({ $or: [{ email }, { nuId }] });
   if (existedUser) {
     throw new ApiError(409, "User with this Email or NU ID already exists");
   }
 
-  // ✅ Validate Email Format
+  //  Validate Email Format
   const emailRegex = /^([A-Z])(\d{2})(\d{4})@nu\.edu\.pk$/i; 
   const match = email.match(emailRegex);
 
@@ -256,9 +256,10 @@ const loginUser = asyncHandler(async (req, res) => {
   // Secure cookie options
   const options = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production", // Secure only in production
-    sameSite: "Strict",
+    secure: true, // Ensures cookies are only sent over HTTPS
+    sameSite: "None", //  Allows cookies to be sent in cross-origin requests
   };
+  
 
   return res
     .status(200)
@@ -291,6 +292,8 @@ const logoutUser = asyncHandler(async (req, res) => {
   const options = {
     httpOnly: true,
     secure: true,
+    sameSite: "None", // Ensure cookies are deleted in cross-origin requests
+    path: "/", // Important for clearing cookies
   };
 
   return res
@@ -335,9 +338,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     // Secure cookie options
     const options = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
+      secure: true, // Ensures cookies are only sent over HTTPS
+      sameSite: "None", //  Allows cookies to be sent in cross-origin requests
     };
+    
 
     return res
       .status(200)
