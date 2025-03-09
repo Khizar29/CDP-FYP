@@ -1,5 +1,5 @@
 // src/App.js
-
+import { Toaster } from 'react-hot-toast';
 import React, { useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { UserProvider } from './contexts/UserContext';
@@ -73,10 +73,12 @@ function App() {
   return (
     <UserProvider>
       <Router>
+      <Toaster /> 
         <Routes>
           {/* User Routes */}
           <Route path="/" element={<UserLayout><Home /></UserLayout>} />
-          <Route path="/about" element={<UserLayout><section className="min-h-screen py-10 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10" style={{ backgroundImage: `url(${require('./Images/bg-5.jpg')})` }}><About /></section></UserLayout>} />          <Route path="/benefits" element={<UserLayout><Benefits /></UserLayout>} />
+          <Route path="/about" element={<UserLayout><section className="min-h-screen py-10 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10" style={{ backgroundImage: `url(${require('./Images/bg-5.jpg')})` }}><About /></section></UserLayout>} />
+          <Route path="/benefits" element={<UserLayout><Benefits /></UserLayout>} />
           <Route path="/alumni" element={<UserLayout><Alumni /></UserLayout>} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/edit-profile/:nuId" element={<EditGraduateProfile />} />
@@ -96,41 +98,27 @@ function App() {
               <AdminLayout />
             </ProtectedRoute>
           }>
-          
-          {/* Managing Jobs, Graduates, Newsfeed, Testimonialsm Recruiters for Admins */}
-
-             {/* Jobs */}
+            {/* Managing Jobs, Graduates, Newsfeed, Testimonials, Recruiters for Admins */}
             <Route path="" element={<DashboardHome />} />
             <Route path="jobs" element={<AdminJobs />} />
             <Route path="jobs/manage" element={<AddJob />} />
             <Route path="jobs/manage/:id" element={<AddJob />} />
-            
-            {/* Graduate */}
             <Route path="graduates" element={<AdminGraduates />} />
             <Route path="graduates/import" element={<AddGraduate />} />
             <Route path="graduates/view/:nuId" element={<ViewGraduate />} />
             <Route path="graduates/edit/:nuId" element={<UpdateGraduate />} />
-
-            {/* Newsfeed */}
             <Route path="newsfeeds" element={<AdminNewsfeed />} />
             <Route path="newsfeeds/add" element={<AddNews />} />
             <Route path="newsfeeds/view/:id" element={<ViewNews />} />
             <Route path="newsfeeds/edit/:id" element={<EditNews />} />
-
-            {/* Testimonials */}
             <Route path="testimonials" element={<AdminTestimonials />} />
             <Route path="testimonials/add" element={<AddEditTestimonial />} />
             <Route path="testimonials/edit/:id" element={<AddEditTestimonial />} />
-
-            {/* Recruiter */}
             <Route path="recruiters" element={<AdminRecruiters />} />
-            {/* Faculty */}
             <Route path="faculty" element={<AdminFaculty />} />
-            
-            
           </Route>
 
-             {/* Recruiter Dashboard */}
+          {/* Recruiter Dashboard */}
           <Route path="/recruiter/*" element={
              <ProtectedRoute allowedRoles={['recruiter']}>
               <RecruiterLayout/>
@@ -140,8 +128,8 @@ function App() {
             <Route path="addjob" element= {<AddJobRecruiter/>}/>
           </Route>
 
-           {/* Faculty Dashboard */}
-           <Route path="/faculty/*" element={
+          {/* Faculty Dashboard */}
+          <Route path="/faculty/*" element={
              <ProtectedRoute allowedRoles={['faculty']}>
               <FacultyLayout/>
             </ProtectedRoute>
@@ -149,9 +137,7 @@ function App() {
             <Route path="announcements" element= {<FacultyManageAnnouncements/>}/>
             <Route path="announcements/add" element= {<AddAnnouncement/>}/>
             <Route path="announcements/edit/:announcementId" element={<EditAnnouncement />} />
-            
           </Route>
-
         </Routes>
       </Router>
     </UserProvider>
