@@ -132,21 +132,16 @@ const EditGraduateProfile = () => {
             formData.append("profilePic", graduate.profilePic, "cropped-image.jpg");
         }
 
-        const token = localStorage.getItem("accessToken");
-        if (!token) {
-            throw new Error("Unauthorized: No access token found.");
-        }
-
         await axios.put(
-            `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`,
-            formData,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data",
-                },
-            }
-        );
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`,
+          formData,
+          {
+              headers: {
+                  "Content-Type": "multipart/form-data",
+              },
+              withCredentials: true, // Include cookies in the request
+          }
+      );
 
         alert("Profile updated successfully!");
         navigate(`/profile/${nuId}`);
