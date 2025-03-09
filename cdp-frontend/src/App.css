@@ -13,4 +13,16 @@
     list-style-type: disc;
     margin-bottom: 0.5rem;
   }
+  .Toastify__toast-container {
+    z-index: 9999; /* Ensure the toast is above other elements */
+  }
   
+  .Toastify__toast {
+    font-family: inherit; /* Use your app's font */
+    background: #333; /* Dark background for visibility */
+    color: #fff; /* White text */
+  }
+  
+  .Toastify__toast--error {
+    background: #ff4d4f; /* Red background for error toasts */
+  }
