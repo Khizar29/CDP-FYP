@@ -11,16 +11,37 @@ const crypto = require("crypto");
  */
 const registerFaculty = asyncHandler(async (req, res) => {
   const { fullName, nuEmail, phoneNumber, department } = req.body;
-  console.log(fullName, nuEmail, phoneNumber, department);
 
+  // Validate required fields
   if (!fullName || !nuEmail || !phoneNumber || !department) {
-    throw new ApiError(400, "All fields are required");
+    throw new ApiError(400, "All fields are required", {
+      errors: {
+        ...(!fullName && { fullName: "Full name is required" }),
+        ...(!nuEmail && { nuEmail: "NU email is required" }),
+        ...(!phoneNumber && { phoneNumber: "Phone number is required" }),
+        ...(!department && { department: "Department is required" }),
+      },
+    });
+  }
+
+  // Validate NU email format (if needed)
+  const emailRegex = /^[a-zA-Z]+\.[a-zA-Z]+@nu\.edu\.pk$/;
+  if (!emailRegex.test(nuEmail)) {
+    throw new ApiError(400, "Invalid email format. Example: firstname.lastname@nu.edu.pk", {
+      errors: {
+        nuEmail: "Invalid email format. Example: firstname.lastname@nu.edu.pk",
+      },
+    });
   }
 
   // Check if the faculty is already registered
   const existingFaculty = await Faculty.findOne({ nuEmail });
   if (existingFaculty) {
-    throw new ApiError(409, "Faculty with this email already exists");
+    throw new ApiError(409, "Faculty with this email already exists", {
+      errors: {
+        nuEmail: "This email is already registered",
+      },
+    });
   }
 
   // Create a new faculty record
@@ -35,7 +56,6 @@ const registerFaculty = asyncHandler(async (req, res) => {
     new ApiResponse(201, faculty, "Faculty registered successfully. Pending admin approval.")
   );
 });
-
 /**
  * Get all faculty members (admin route)
  */
