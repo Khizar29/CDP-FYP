@@ -6,122 +6,71 @@ export const UserContext = createContext();
 export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isFetching, setIsFetching] = useState(false);
+  let isRefreshing = false;
 
-  const api = axios.create({
-    baseURL: process.env.REACT_APP_BACKEND_URL,
-    withCredentials: true, 
-  });
-
-  // Fetch current user (ONLY IF NOT FETCHING)
-  const fetchCurrentUser = async () => {
-    if (isFetching) return; // 🛑 Prevent duplicate calls
+  // Refresh Token Function
+  const refreshAccessToken = async () => {
+    if (isRefreshing) return false;
+    isRefreshing = true;
 
     try {
-      setIsFetching(true);
-      
-      const response = await api.get("/api/v1/users/current-user");
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/refresh-token`,
+        {},
+        { withCredentials: true }
+      );
 
-      if (response.data.data) {
-        
-        setUser(response.data.data);
-      } else {
-        console.warn("No user found, setting user to null.");
-        setUser(null);
-      }
+      isRefreshing = false;
+      return !!response.data.data;
+    } catch {
+      isRefreshing = false;
+      return false;
+    }
+  };
+
+  // Fetch Current User
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/current-user`,
+        { withCredentials: true }
+      );
+      setUser(response.data.data || null);
     } catch (error) {
       if (error.response?.status === 401) {
-        console.warn("Unauthorized request. Checking if refresh is needed...");
-
-        const hasSession = await checkSessionExists();
-        if (!hasSession) {
-          console.warn("No valid session. Skipping refresh & fetch.");
-          setUser(null);
-          return;
-        }
-
         const refreshed = await refreshAccessToken();
-        if (refreshed) {
-          
-          return fetchCurrentUser();
-        }
-
-        console.warn("Refresh failed. No user session.");
+        if (refreshed) return fetchCurrentUser();
         setUser(null);
       }
     } finally {
-      setIsFetching(false);
       setLoading(false);
     }
   };
 
-  // Check if session exists BEFORE calling fetch
+  // Check Session Exists
   const checkSessionExists = async () => {
     try {
-     
-      const response = await api.get("/api/v1/users/check-session"); 
-      return response.data.sessionActive; 
-    } catch (error) {
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/check-session`,
+        { withCredentials: true }
+      );
+      return response.data.sessionActive;
+    } catch {
       return false;
     }
   };
 
-  // Refresh token (ONLY if backend confirms session exists)
-  const refreshAccessToken = async () => {
-    try {
-      console.log("Attempting to refresh access token...");
-      const response = await api.post("/api/v1/users/refresh-token");
-
-      if (response.data.data) {
-        console.log("Token refreshed successfully.");
-        return true;
-      }
-      return false;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  // Initialize Authentication ONCE
+  // Global Axios Interceptor for Handling Expired Tokens
   useEffect(() => {
-    const initAuth = async () => {
-      try {
-        
-        const hasSession = await checkSessionExists(); 
-
-        if (hasSession) {
-          
-          await fetchCurrentUser();
-        } else {
-          
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error("Error initializing authentication:", error);
-      }
-    };
-
-    initAuth();
-  }, []);
-
-  // Axios interceptor (Prevent infinite refresh loop)
-  useEffect(() => {
-    const interceptor = api.interceptors.response.use(
+    const interceptor = axios.interceptors.response.use(
       (response) => response,
       async (error) => {
         const originalRequest = error.config;
 
-        if (error.response?.status === 401 && !originalRequest._retry && user) {
+        if (error.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
-          console.warn("401 Unauthorized. Attempting token refresh...");
-
           const refreshed = await refreshAccessToken();
-          if (refreshed) {
-            console.log("Token refreshed, retrying original request...");
-            return api(originalRequest);
-          }
-
-          console.warn("Token refresh failed. Logging out.");
+          if (refreshed) return axios(originalRequest);
           setUser(null);
         }
 
@@ -129,29 +78,43 @@ export const UserProvider = ({ children }) => {
       }
     );
 
-    return () => api.interceptors.response.eject(interceptor);
-  }, [user]);
+    return () => axios.interceptors.response.eject(interceptor);
+  }, []);
 
-  // Login function
+  // Initialize Authentication on Mount
+  useEffect(() => {
+    const initAuth = async () => {
+      if (await checkSessionExists()) await fetchCurrentUser();
+      else setLoading(false);
+    };
+
+    initAuth();
+  }, []);
+
+  // Login Function
   const login = async (credentials) => {
     try {
-      const response = await api.post("/api/v1/users/login", credentials);
-      if (response.data.data.user) {
-        setUser(response.data.data.user);
-        return true;
-      }
-      return false;
-    } catch (error) {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/login`,
+        credentials,
+        { withCredentials: true }
+      );
+      setUser(response.data.data.user || null);
+      return !!response.data.data.user;
+    } catch {
       return false;
     }
   };
 
-  // Logout function
+  // Logout Function
   const logout = async () => {
     try {
-      await api.post("/api/v1/users/logout");
-      setUser(null);
-    } catch (error) {
+      await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/users/logout`,
+        {},
+        { withCredentials: true }
+      );
+    } finally {
       setUser(null);
     }
   };
