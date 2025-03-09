@@ -5,10 +5,12 @@ const Recruiter = require("../models/recruiter.model.js");
 const  User  = require("../models/user.model.js");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const { sendEmail } = require("../utils/EmailUtil.js");
 
 /**
  * Register a recruiter (public route)
  */
+
 const registerRecruiter = asyncHandler(async (req, res) => {
   const { fullName, companyName, companyEmail, companyPhone, designation } = req.body;
 
@@ -31,10 +33,47 @@ const registerRecruiter = asyncHandler(async (req, res) => {
     designation,
   });
 
-  return res.status(201).json(
-    new ApiResponse(201, recruiter, "Recruiter registered successfully. Pending admin approval.")
-  );
+  try {
+    // Email to Admin
+    const adminEmailContent = `
+      <p>Hello Admin,</p>
+      <p>A new recruiter has registered and is pending your approval:</p>
+      <p><strong>Recruiter Name:</strong> ${recruiter.fullName}</p>
+      <p><strong>Company Name:</strong> ${recruiter.companyName}</p>
+      <p><strong>Company Email:</strong> ${recruiter.companyEmail}</p>
+      <p><strong>Company Phone:</strong> ${recruiter.companyPhone}</p>
+      <p><strong>Designation:</strong> ${recruiter.designation}</p>
+      <p>Please review and approve the registration at your earliest convenience.</p>
+      <p style="font-size: medium; color: black;">
+        <b>Best Regards,</b><br>
+        Industrial Liaison/Career Services Office<br>
+        021 111 128 128 ext. 184
+      </p>
+    `;
+    await sendEmail("s.khizarali03@gmail.com", "New Recruiter Registration Pending Approval", adminEmailContent);
+
+    // Email to Recruiter
+    const recruiterEmailContent = `
+      <p>Hello ${recruiter.fullName},</p>
+      <p>Thank you for registering as a recruiter. Your account is pending admin approval.</p>
+      <p>You will receive a confirmation email once your account is approved.</p>
+      <p style="font-size: medium; color: black;">
+        <b>Best Regards,</b><br>
+        Industrial Liaison/Career Services Office<br>
+        021 111 128 128 ext. 184
+      </p>
+    `;
+    await sendEmail(recruiter.companyEmail, "Recruiter Registration Received", recruiterEmailContent);
+
+    return res.status(201).json(
+      new ApiResponse(201, recruiter, "Recruiter registered successfully. Pending admin approval.")
+    );
+  } catch (error) {
+    console.error("Error sending emails:", error);
+    throw new ApiError(500, "Failed to send confirmation emails. Recruiter registration saved, but emails not sent.");
+  }
 });
+
 
 /**
  * Get all recruiters (admin route)
