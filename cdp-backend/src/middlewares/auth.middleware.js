@@ -3,12 +3,11 @@ const  asyncHandler  = require("../utils/asyncHandler.js");
 const jwt = require("jsonwebtoken");
 const  User  = require("../models/user.model.js");
 
-const verifyJWT = asyncHandler(async (req, _, next) => {
+const verifyJWT = asyncHandler(async (req, res, next) => {
   try {
-    const token = req.cookies?.accessToken || req.header("Authorization")?.split(" ")[1];
-
+    const token = req.cookies.accessToken; // Ensure you get token from cookies
     if (!token) {
-      throw new ApiError(401, "Unauthorized request");
+      return res.status(401).json({ message: "Access token missing" });
     }
 
     const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
@@ -16,13 +15,13 @@ const verifyJWT = asyncHandler(async (req, _, next) => {
     const user = await User.findById(decodedToken?._id).select("-password -refreshToken");
 
     if (!user) {
-      throw new ApiError(401, "Invalid Access Token");
+      return next(new ApiError(401, "Invalid Access Token"));
     }
 
     req.user = user;
     next();
   } catch (error) {
-    throw new ApiError(401, error?.message || "Invalid access token");
+    return next(new ApiError(401, "Invalid access token"));
   }
 });
 
@@ -42,12 +41,12 @@ const verifyRole = (roles) => {
   });
 };
 
-// ✅ Create an optional version for public routes
+// Create an optional version for public routes
 verifyJWT.optional = asyncHandler(async (req, res, next) => {
   const token = req.cookies?.accessToken || req.header("Authorization")?.split(" ")[1];
 
   if (!token) {
-    req.user = null; // ✅ Public access, no authentication required
+    req.user = null; //  Public access, no authentication required
     return next();
   }
 
@@ -56,14 +55,14 @@ verifyJWT.optional = asyncHandler(async (req, res, next) => {
     const user = await User.findById(decodedToken?._id).select("-password -refreshToken");
 
     if (!user) {
-      req.user = null; // ✅ Treat as unauthenticated user
+      req.user = null; //  Treat as unauthenticated user
       return next();
     }
 
     req.user = user;
     next();
   } catch (error) {
-    req.user = null; // ✅ Continue as unauthenticated user
+    req.user = null; // Continue as unauthenticated user
     return next();
   }
 });
