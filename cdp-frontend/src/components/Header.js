@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect, useRef} from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faHome, faInfoCircle, faGraduationCap, faCalendar, faUser, faPhone, faGift, faBriefcase, faKey, faRightFromBracket, faUserShield } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faHome, faInfoCircle, faChalkboardTeacher,faGraduationCap, faCalendar, faUser, faPhone, faGift, faBriefcase, faKey, faRightFromBracket, faUserShield } from '@fortawesome/free-solid-svg-icons';
 import logo from '../Images/logo-FAST-NU.png';
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
@@ -129,6 +129,12 @@ const Header = ({ scrollToSection }) => {
             Admin Panel
           </Link>
         )}
+        {/* Faculty Panel Link */}
+        {user.role === 'faculty' && (
+          <Link to="/faculty" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+            <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" /> Faculty Panel
+          </Link>
+        )}
         {(user.role === "user" && (
           <Link to={`/edit-profile/${user.nuId}`} className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
             <FontAwesomeIcon icon={faUser} className="mr-2 text-green-600" /> {/* User Icon for Profile */}
@@ -199,6 +205,12 @@ const Header = ({ scrollToSection }) => {
                       {user.role === 'admin' && (
                         <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                           Admin Panel
+                        </Link>
+                      )}
+                      {/* Faculty Panel Link */}
+                      {user.role === 'faculty' && (
+                        <Link to="/faculty" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                          <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" /> Faculty Panel
                         </Link>
                       )}
                       <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
