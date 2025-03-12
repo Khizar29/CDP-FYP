@@ -47,9 +47,7 @@ import AddAnnouncement from './components/Faculty/AddAnnouncement';
 import EditAnnouncement from './components/Faculty/EditAnnouncement';
 import AdminFaculty from './components/admin/manage/Faculty/AdminFaculty';
 import FacultyNewsfeed from './components/Faculty/FacultyNewsfeed';
-import FacultyAddNews from './components/Faculty/FacultyAddNews';
-import FacultyEditNews from './components/Faculty/FacultyEditNews';
-import FacultyViewNews from './components/Faculty/FacultyViewNews';
+import AddNews from './components/Faculty/AddNews';
 
 
 
@@ -144,11 +142,7 @@ function App() {
             <Route path="announcements/add" element= {<AddAnnouncement/>}/>
             <Route path="announcements/edit/:announcementId" element={<EditAnnouncement />} />
             <Route path="newsfeed" element={<FacultyNewsfeed />} />
-            <Route path="newsfeed/add" element={<FacultyAddNews />} />
-            <Route path="newsfeed/edit/:id" element={<FacultyEditNews />} />
-            <Route path="newsfeed/view/:id" element={<FacultyViewNews/>} />
-
-
+            <Route path="newsfeed/add" element={<AddNews />} />
 
           </Route>
         </Routes>
