@@ -46,12 +46,12 @@ app.use("/api/v1/announcements", announcementRoutes);
 // app.use("/api/v1/jobapplications", jobApplicationRoutes);
 
 // Serve static files from the React frontend app's build folder
-app.use(express.static(path.join(__dirname, '../cdp-frontend/build')));
+// app.use(express.static(path.join(__dirname, '../cdp-frontend/build')));
 
 // Catch-all handler for serving React's index.html file
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../cdp-frontend/build', 'index.html'));
-});
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, '../cdp-frontend/build', 'index.html'));
+// });
 
 // Global error handler middleware
 const errorHandler = (err, req, res, next) => {
