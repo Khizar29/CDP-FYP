@@ -65,38 +65,36 @@ const createAnnouncement = asyncHandler(async (req, res) => {
 */
 const getAnnouncements = asyncHandler(async (req, res) => {
   try {
-    const { page = 1, limit = 10, searchTerm = "", facultyName = "" } = req.query;
-
-    // Convert page & limit to integers for safety
+    const { page = 1, limit = 10, searchTerm = "", facultyName = "" , facultyOnly= false } = req.query;
     const parsedPage = Math.max(parseInt(page, 10), 1);
     const parsedLimit = Math.max(parseInt(limit, 10), 10);
 
     let query = {};
-    if (req.user.role === "faculty") {
-      query.postedBy = req.user.id; // Show only their own announcements
+
+    if (facultyOnly === "true" && req.user.role === "faculty") {
+      query.postedBy = req.user.id;
     }
 
-    // Apply search filter for heading
     if (searchTerm) {
       query.heading = { $regex: searchTerm, $options: "i" };
     }
 
-    // Apply faculty name filter if provided
     if (facultyName) {
-      query["postedBy.fullName"] = { $regex: facultyName, $options: "i" }; // Case-insensitive filter for faculty name
+      const facultyUsers = await User.find({
+        fullName: { $regex: facultyName, $options: "i" },
+      }).select("_id");
+
+      query["postedBy"] = { $in: facultyUsers.map((faculty) => faculty._id) };
     }
 
-    // Get total number of announcements matching query
     const total = await Announcement.countDocuments(query);
 
-    // Fetch paginated announcements
     const announcements = await Announcement.find(query)
-      .sort({ postedOn: -1 }) // Newest first
+      .sort({ postedOn: -1 })
       .skip((parsedPage - 1) * parsedLimit)
       .limit(parsedLimit)
-      .populate("postedBy", "fullName role"); // Populate fullName and role from postedBy
+      .populate("postedBy", "fullName role");
 
-    // Return paginated results
     return res.status(200).json({
       data: announcements,
       totalPages: parsedLimit > 0 ? Math.ceil(total / parsedLimit) : 1,
@@ -108,6 +106,7 @@ const getAnnouncements = asyncHandler(async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
+
 
 // Endpoint to fetch faculty names for the filter dropdown
 const getFacultyNames = asyncHandler(async (req, res) => {
