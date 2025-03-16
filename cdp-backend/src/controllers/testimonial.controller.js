@@ -7,8 +7,9 @@ const fs = require('fs');
 
 // Admin-only function to create a testimonial
 const createTestimonial = asyncHandler(async (req, res) => {
+
     const { name, message, title, isApproved } = req.body;
-    const file = req.file; // The uploaded image
+    const file = req.file; 
 
     if (!req.user || req.user.role !== 'admin') {
         throw new ApiError(403, 'Forbidden: Admins only');
@@ -16,12 +17,17 @@ const createTestimonial = asyncHandler(async (req, res) => {
 
     let imageUrl = '';
     if (file) {
-        // Upload the image to Google Drive and get the public thumbnail URL
-        const googleDriveFileId = await uploadFileToGoogleDrive(file);
-        imageUrl = getFilePublicUrl(googleDriveFileId); 
+        try {
+            const googleDriveFileId = await uploadFileToGoogleDrive(file);
+            imageUrl = getFilePublicUrl(googleDriveFileId);
+            console.log("Generated Google Drive URL:", imageUrl);
 
-        // Remove the file from local storage after uploading to Drive
-        deleteLocalFile(file.path);
+            // Remove local file
+            deleteLocalFile(file.path);
+        } catch (error) {
+            console.error("File upload failed:", error);
+            throw new ApiError(500, "File upload to Google Drive failed");
+        }
     }
 
     const testimonial = new Testimonial({
@@ -33,9 +39,9 @@ const createTestimonial = asyncHandler(async (req, res) => {
     });
 
     await testimonial.save();
-
-    return res.status(201).json(new ApiResponse(201, testimonial, 'Testimonial created successfully'));
+    res.status(201).json(new ApiResponse(201, testimonial, "Testimonial created successfully"));
 });
+
 
 // Admin-only function to update a testimonial
 const updateTestimonial = asyncHandler(async (req, res) => {
