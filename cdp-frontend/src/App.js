@@ -8,7 +8,7 @@ import About from './components/About';
 import Footer from './components/Footer';
 import SignIn from './components/SignIn';
 import Home from './components/Home';
-import Benefits from './components/AlumniBenefits';
+import Announcements from './components/Announcements';
 import Alumni from './components/Graduates/AlumniPage';
 import ProfilePage from './components/Graduates/ProfilePage';
 import SignUp from './components/SignUp';
@@ -46,6 +46,12 @@ import FacultyManageAnnouncements from './components/Faculty/PostedAnnouncements
 import AddAnnouncement from './components/Faculty/AddAnnouncement';
 import EditAnnouncement from './components/Faculty/EditAnnouncement';
 import AdminFaculty from './components/admin/manage/Faculty/AdminFaculty';
+import FacultyNewsfeed from './components/Faculty/FacultyNewsfeed';
+import FacultyAddNews from './components/Faculty/FacultyAddNews';
+import FacultyEditNews from './components/Faculty/FacultyEditNews';
+import FacultyViewNews from './components/Faculty/FacultyViewNews';
+
+
 
 // User Layout Component
 const UserLayout = ({ children, scrollToSection }) => (
@@ -78,7 +84,7 @@ function App() {
           {/* User Routes */}
           <Route path="/" element={<UserLayout><Home /></UserLayout>} />
           <Route path="/about" element={<UserLayout><section className="min-h-screen py-10 flex flex-col items-center justify-center bg-cover bg-center relative space-y-10" style={{ backgroundImage: `url(${require('./Images/bg-5.jpg')})` }}><About /></section></UserLayout>} />
-          <Route path="/benefits" element={<UserLayout><Benefits /></UserLayout>} />
+          <Route path="/announcements" element={<UserLayout><Announcements /></UserLayout>} />
           <Route path="/alumni" element={<UserLayout><Alumni /></UserLayout>} />
           <Route path="/profile/:id" element={<ProfilePage />} />
           <Route path="/edit-profile/:nuId" element={<EditGraduateProfile />} />
@@ -137,6 +143,13 @@ function App() {
             <Route path="announcements" element= {<FacultyManageAnnouncements/>}/>
             <Route path="announcements/add" element= {<AddAnnouncement/>}/>
             <Route path="announcements/edit/:announcementId" element={<EditAnnouncement />} />
+            <Route path="newsfeed" element={<FacultyNewsfeed />} />
+            <Route path="newsfeed/add" element={<FacultyAddNews />} />
+            <Route path="newsfeed/edit/:id" element={<FacultyEditNews />} />
+            <Route path="newsfeed/view/:id" element={<FacultyViewNews/>} />
+
+
+
           </Route>
         </Routes>
       </Router>

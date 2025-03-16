@@ -17,6 +17,13 @@ const drive = google.drive({ version: 'v3', auth: oAuth2Client });
 // Upload file to Google Drive
 const uploadFileToGoogleDrive = async (file) => {
   try {
+    if (!file) {
+      console.error("No file received for upload.");
+      throw new Error("No file received");
+    }
+    
+    console.log("Uploading file:", file.originalname, file.path);
+
     const fileMetadata = {
       name: file.originalname,
     };
@@ -32,15 +39,19 @@ const uploadFileToGoogleDrive = async (file) => {
       fields: 'id',
     });
 
-    const fileId = response.data.id;
+    if (!response.data.id) {
+      throw new Error("Failed to upload file, no file ID returned.");
+    }
 
-    // Set file permissions to public
+    const fileId = response.data.id;
+    console.log("File uploaded successfully, ID:", fileId);
+
     await setFilePublicPermission(fileId);
 
-    return fileId; // Return file ID
+    return fileId; // Return the file ID
   } catch (error) {
-    console.error('Error uploading file to Google Drive:', error);
-    throw new Error('Google Drive upload failed');
+    console.error("Error uploading file to Google Drive:", error);
+    throw new Error("Google Drive upload failed: " + error.message);
   }
 };
 

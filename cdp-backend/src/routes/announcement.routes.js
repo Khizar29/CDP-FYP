@@ -4,11 +4,13 @@ const {
   getAnnouncements,
   updateAnnouncement,
   deleteAnnouncement,
-  getAnnouncementsById
+  getAnnouncementsById,
+  getFacultyNames
 } = require("../controllers/announcement.controller.js");
 const { verifyJWT, verifyRole } = require("../middlewares/auth.middleware.js");
 
 const router = express.Router();
+router.get('/faculty-names', getFacultyNames);
 
 router.get("/", verifyJWT, getAnnouncements);
 router.get("/:announcementId", verifyJWT, getAnnouncementsById);

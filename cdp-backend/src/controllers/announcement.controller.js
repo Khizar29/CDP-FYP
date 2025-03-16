@@ -1,8 +1,9 @@
 const Announcement = require("../models/announcement.model.js");
-const  asyncHandler  = require("../utils/asyncHandler.js");
-const  ApiError = require("../utils/ApiError.js");
-const  ApiResponse  = require("../utils/ApiResponse.js");
+const asyncHandler = require("../utils/asyncHandler.js");
+const ApiError = require("../utils/ApiError.js");
+const ApiResponse = require("../utils/ApiResponse.js");
 const nodemailer = require("nodemailer");
+const User = require("../models/user.model.js");
 
 /**
  * Create an announcement (Admin & Faculty only)
@@ -59,41 +60,41 @@ const createAnnouncement = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, announcement, "Announcement created successfully & email sent."));
 });
-
 /**
- * Fetch all announcements with pagination and filtering
- */
+// Get all announcements with pagination and filtering
+*/
 const getAnnouncements = asyncHandler(async (req, res) => {
   try {
-    // Extract query parameters with default values
-    const { page = 1, limit = 10, searchTerm = "" } = req.query;
-
-    // Convert page & limit to integers for safety
+    const { page = 1, limit = 10, searchTerm = "", facultyName = "" , facultyOnly= false } = req.query;
     const parsedPage = Math.max(parseInt(page, 10), 1);
     const parsedLimit = Math.max(parseInt(limit, 10), 10);
 
-    // Determine which announcements to fetch based on user role
     let query = {};
-    if (req.user.role === "faculty") {
-      query.postedBy = req.user.id; // Show only their own announcements
+
+    if (facultyOnly === "true" && req.user.role === "faculty") {
+      query.postedBy = req.user.id;
     }
 
-    // Apply search filter
     if (searchTerm) {
       query.heading = { $regex: searchTerm, $options: "i" };
     }
 
-    // Get total number of announcements matching query
+    if (facultyName) {
+      const facultyUsers = await User.find({
+        fullName: { $regex: facultyName, $options: "i" },
+      }).select("_id");
+
+      query["postedBy"] = { $in: facultyUsers.map((faculty) => faculty._id) };
+    }
+
     const total = await Announcement.countDocuments(query);
 
-    // Fetch paginated announcements
     const announcements = await Announcement.find(query)
-      .sort({ postedOn: -1 }) // Newest first
+      .sort({ postedOn: -1 })
       .skip((parsedPage - 1) * parsedLimit)
       .limit(parsedLimit)
       .populate("postedBy", "fullName role");
 
-    // Return paginated results
     return res.status(200).json({
       data: announcements,
       totalPages: parsedLimit > 0 ? Math.ceil(total / parsedLimit) : 1,
@@ -106,6 +107,20 @@ const getAnnouncements = asyncHandler(async (req, res) => {
   }
 });
 
+
+// Endpoint to fetch faculty names for the filter dropdown
+const getFacultyNames = asyncHandler(async (req, res) => {
+  try {
+    // Fetch all faculty users (assuming faculty has role 'faculty')
+    const facultyMembers = await User.find({ role: "faculty" }).select("fullName"); // Adjust this query as per your user schema
+    return res.status(200).json({
+      data: facultyMembers, // Send back faculty names
+    });
+  } catch (error) {
+    console.error("Error fetching faculty names:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+});
 /**
  * Fetch Announcement by ID
  */
@@ -188,4 +203,5 @@ module.exports = {
   getAnnouncementsById,
   updateAnnouncement,
   deleteAnnouncement,
+  getFacultyNames,
 };

@@ -29,7 +29,7 @@ const FacultyManageAnnouncements = () => {
     setIsModalOpen(false);
   };
 
-  // ✅ Fetch announcements from the server
+  // Fetch announcements from the server
   const fetchAnnouncements = async (page = 1) => {
     if (!user || user.role !== "faculty") return;
 
@@ -38,7 +38,7 @@ const FacultyManageAnnouncements = () => {
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/announcements`, 
         {
           withCredentials: true,
-          params: { page, limit: announcementsPerPage, searchTerm },
+          params: { page, limit: announcementsPerPage, searchTerm, facultyOnly: true},
         }
       );
       setAnnouncements(response.data.data);
@@ -61,12 +61,12 @@ const FacultyManageAnnouncements = () => {
   };
   
 
-  // ✅ Handle search input change
+  // Handle search input change
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
   };
 
-  // ✅ Handle delete announcement
+  // Handle delete announcement
   const handleDeleteAnnouncement = async (announcementId) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this announcement?");
     if (!confirmDelete) return;
@@ -76,7 +76,7 @@ const FacultyManageAnnouncements = () => {
         withCredentials: true,
       });
 
-      // ✅ Remove from UI after successful delete
+      // Remove from UI after successful delete
       setAnnouncements((prev) => prev.filter((ann) => ann._id !== announcementId));
       setFilteredAnnouncements((prev) => prev.filter((ann) => ann._id !== announcementId));
 

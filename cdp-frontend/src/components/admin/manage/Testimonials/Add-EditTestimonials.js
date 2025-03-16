@@ -62,37 +62,45 @@ const AddEditTestimonial = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
     
-        try {
-            const submitData = new FormData();
-            submitData.append("name", formData.name);
-            submitData.append("message", formData.message);
-            submitData.append("title", formData.title);
-            submitData.append("isApproved", formData.isApproved);
-            
-            if (formData.image) {
-                submitData.append("image", formData.image);
-            }
+        const submitData = new FormData();
+        submitData.append("name", formData.name);
+        submitData.append("message", formData.message);
+        submitData.append("title", formData.title);
+        submitData.append("isApproved", formData.isApproved);
     
+        if (formData.image) {
+            console.log("Appending Image:", formData.image);  // Debugging
+            submitData.append("image", formData.image);
+        } else {
+            console.log("No image found in formData.");
+        }
+    
+        for (let pair of submitData.entries()) {
+            console.log(pair[0], pair[1]);  // Check if image is appended properly
+        }
+    
+        try {
             const apiUrl = testimonial
                 ? `${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials/${testimonial._id}`
                 : `${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials`;
     
-            const method = testimonial ? 'put' : 'post';
+            const method = testimonial ? "put" : "post";
     
             await axios({
                 method: method,
                 url: apiUrl,
                 data: submitData,
-                headers: { 'Content-Type': 'multipart/form-data' },
-                withCredentials: true, // Include credentials for cookies
+                headers: { "Content-Type": "multipart/form-data" },
+                withCredentials: true,
             });
     
-            navigate('/admin/testimonials');
+            navigate("/admin/testimonials");
         } catch (error) {
-            console.error('Error saving testimonial:', error);
-            alert('Error saving testimonial: ' + error.message);
+            console.error("Error saving testimonial:", error);
+            alert("Error saving testimonial: " + error.message);
         }
     };
+    
     // Handle field changes
     const handleChange = (e) => {
         const { name, value } = e.target;
