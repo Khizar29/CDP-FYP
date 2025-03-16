@@ -1,10 +1,8 @@
 ---
 deployment:
   tasks:
-    - export NODE_ENV=production
-    - cd cdp-backend
-    - git pull origin main  # Pull latest code
+    - export DEPLOYPATH=/home/projectv/fastcdpapi.projectvault.pk/cdp-backend/
+    - cd $DEPLOYPATH
+    - git pull origin main  # Pull latest changes
     - npm install           # Install dependencies
-    - npm run build         # If you have a build step
-    - npx pm2 restart all   # Restart app (if using PM2)
-    - touch tmp/restart.txt # Restart app (for Passenger apps)
+    - touch tmp/restart.txt # Restart if using Passenger
