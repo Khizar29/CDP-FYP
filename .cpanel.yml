@@ -1,0 +1,7 @@
+---
+deployment:
+  tasks:
+    - export NODE_ENV=production
+    - cd cdp-backend
+    - /opt/cpanel/ea-nodejs22/bin/npm install --production
+    - /opt/cpanel/ea-nodejs22/bin/npm run start
