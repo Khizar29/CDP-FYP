@@ -2,7 +2,7 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/projectv/fastcdpapi.projectvault.pk/cdp-backend/
+    - /bin/cp -R * $DEPLOYPATH
     - cd $DEPLOYPATH
-    - git pull origin main  # Pull latest changes
-    - npm install           # Install dependencies
-    - touch tmp/restart.txt # Restart if using Passenger
+    - npm install --production
+    - touch tmp/restart.txt
