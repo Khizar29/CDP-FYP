@@ -3,5 +3,8 @@ deployment:
   tasks:
     - export NODE_ENV=production
     - cd cdp-backend
-    - /opt/cpanel/ea-nodejs22/bin/npm install --production
-    - /opt/cpanel/ea-nodejs22/bin/npm run start
+    - git pull origin main  # Pull latest code
+    - npm install           # Install dependencies
+    - npm run build         # If you have a build step
+    - npx pm2 restart all   # Restart app (if using PM2)
+    - touch tmp/restart.txt # Restart app (for Passenger apps)
