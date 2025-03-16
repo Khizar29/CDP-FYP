@@ -10,7 +10,7 @@ const path = require("path");
 const crypto = require("crypto");
 const { log } = require("console");
 
-// Generate Access and Refresh Tokens
+// Generate Access and Refresh Tokens--
 const generateAccessAndRefereshTokens = async (userId) => {
   try {
     const user = await User.findById(userId);
