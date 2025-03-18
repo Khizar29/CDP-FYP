@@ -15,7 +15,12 @@ const trackApplication = asyncHandler(async (req, res) => {
   if (!jobId) throw new ApiError(400, "Job ID is required");
 
   try {
+    // Create the job application
     await Application.create({ userId, jobId });
+
+    // ✅ Update job's application count
+    await Job.findByIdAndUpdate(jobId, { $inc: { applicationCount: 1 } });
+
     return res.status(201).json({ message: "Application tracked successfully" });
   } catch (error) {
     if (error.code === 11000) {
@@ -24,7 +29,6 @@ const trackApplication = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Error tracking application");
   }
 });
-
 /**
  * @desc Get trending job niches
  * @route GET /api/applications/trending-niches
@@ -69,18 +73,72 @@ const getMonthlyApplications = asyncHandler(async (req, res) => {
   const monthlyData = await Application.aggregate([
     {
       $group: {
-        _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
-        count: { $sum: 1 }
+        _id: { 
+          year: { $year: "$createdAt" }, 
+          month: { $month: "$createdAt" } 
+        },
+        totalApplications: { $sum: 1 } // Count applications
       }
     },
-    { $sort: { "_id.year": 1, "_id.month": 1 } }
+    { $sort: { "_id.year": 1, "_id.month": 1 } } // Sort by year & month
   ]);
 
-  return res.json(monthlyData);
+  // Convert month numbers to names (optional)
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const formattedData = monthlyData.map((data) => ({
+    year: data._id.year,
+    month: months[data._id.month - 1], // Convert number to name
+    totalApplications: data.totalApplications
+  }));
+
+  return res.json(formattedData);
+});
+
+
+/**
+ * @desc Get job applications count per job
+ * @route GET /api/applications/count-per-job
+ * @access Private (Admin Only)
+ */
+const getJobApplicationsCount = asyncHandler(async (req, res) => {
+  const jobApplications = await Application.aggregate([
+    {
+      $group: {
+        _id: "$jobId", // Group by jobId
+        count: { $sum: 1 }, // Count number of applications
+      },
+    },
+    {
+      $lookup: {
+        from: "jobs", // Join with Jobs collection
+        localField: "_id",
+        foreignField: "_id",
+        as: "jobDetails",
+      },
+    },
+    { $unwind: "$jobDetails" }, // Flatten the job details array
+    {
+      $project: {
+        _id: 0,
+        jobId: "$_id",
+        title: "$jobDetails.title",
+        company: "$jobDetails.company_name",
+        job_type: "$jobDetails.job_type",
+        applicationCount: "$count",
+      },
+    },
+  ]);
+
+  return res.status(200).json(jobApplications);
 });
 
 module.exports = {
   trackApplication,
   getMostSoughtJobs,
-  getMonthlyApplications
+  getMonthlyApplications,
+  getJobApplicationsCount, // Add new function to exports
 };

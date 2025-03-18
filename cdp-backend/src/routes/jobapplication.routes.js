@@ -4,7 +4,9 @@ const {
   trackApplication,
   // getTrendingJobNiches,
   getMostSoughtJobs,
-  getMonthlyApplications
+  getMonthlyApplications,
+  getJobApplicationCount,
+  getAllJobsApplicationCount,
 } = require("../controllers/jobapplication.controller");
 
 const router = express.Router();
@@ -16,5 +18,6 @@ router.post("/track", verifyJWT, trackApplication);
 // router.get("/trending-niches", verifyJWT, verifyAdmin, getTrendingJobNiches);
 router.get("/most-sought", verifyJWT, verifyAdmin, getMostSoughtJobs);
 router.get("/monthly-breakdown", verifyJWT, verifyAdmin, getMonthlyApplications);
+
 
 module.exports = router;

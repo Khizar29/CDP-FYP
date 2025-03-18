@@ -56,12 +56,19 @@ const jobSchema = new Schema(
       type: Date,
     },
     postedBy: { 
-      type: mongoose.Schema.Types.ObjectId, ref: 'User' 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'User' 
     },
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"], 
       default: "pending" 
+    },
+
+    // New field to store the number of applications for this job
+    applicationCount: {
+      type: Number,
+      default: 0,
     }
   },
   {
@@ -70,5 +77,3 @@ const jobSchema = new Schema(
 );
 
 module.exports = mongoose.model("Job", jobSchema);
-
-
