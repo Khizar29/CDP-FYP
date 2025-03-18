@@ -5,6 +5,7 @@ const Faculty = require("../models/faculty.model.js");
 const User  = require("../models/user.model.js");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto");
+const { sendEmail } = require("../utils/EmailUtil.js");
 
 /**
  * Register a faculty member (public route)
@@ -52,10 +53,46 @@ const registerFaculty = asyncHandler(async (req, res) => {
     department,
   });
 
-  return res.status(201).json(
-    new ApiResponse(201, faculty, "Faculty registered successfully. Pending admin approval.")
-  );
+  try {
+    // Email to Admin
+    const adminEmailContent = `
+      <p>Hello Admin,</p>
+      <p>A new Faculty has registered and is pending your approval:</p>
+      <p><strong>Faculty Name:</strong> ${faculty.fullName}</p>
+      <p><strong>Faculty Email:</strong> ${faculty.nuEmail}</p>
+      <p><strong>Faculty Phone:</strong> ${faculty.phoneNumber}</p>
+      <p><strong>Department:</strong> ${faculty.department}</p>
+      <p>Please review and approve the registration at your earliest convenience.</p>
+      <p style="font-size: medium; color: black;">
+        <b>Best Regards,</b><br>
+        Industrial Liaison/Career Services Office<br>
+        021 111 128 128 ext. 184
+      </p>
+    `;
+    await sendEmail("s.khizarali03@gmail.com", "New Faculty Registration Pending Approval", adminEmailContent);
+
+    // Email to Recruiter
+    const FacultyEmailContent = `
+      <p>Hello ${faculty.fullName},</p>
+      <p>Thank you for registering as a Faculty. Your account is pending admin approval.</p>
+      <p>You will receive a confirmation email once your account is approved.</p>
+      <p style="font-size: medium; color: black;">
+        <b>Best Regards,</b><br>
+        Industrial Liaison/Career Services Office<br>
+        021 111 128 128 ext. 184
+      </p>
+    `;
+    await sendEmail(faculty.nuEmail, "Faculty Registration Received", FacultyEmailContent);
+
+    return res.status(201).json(
+      new ApiResponse(201, faculty, "Faculty registered successfully. Pending admin approval.")
+    );
+  } catch (error) {
+    console.error("Error sending emails:", error);
+    throw new ApiError(500, "Failed to send confirmation emails. Faculty registration saved, but emails not sent.");
+  }
 });
+
 /**
  * Get all faculty members (admin route)
  */
