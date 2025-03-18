@@ -605,13 +605,13 @@ const SignUp = () => {
                       )}
                     >
                       <option value="" disabled>Select a department</option>
-                      <option value="Department of Computer Science">Computer Science</option>
-                      <option value="Department of Cyber Security">Cyber Security</option>
-                      <option value="Department of Artificial Intelligence">Artificial Intelligence</option>
-                      <option value="Department of Software Engineering">Software Engineering</option>
-                      <option value="Department of Electrical Engineering">Electrical Engineering</option>
-                      <option value="Department of Management Sciences">Management Sciences</option>
-                      <option value="Department of Sciences & Humanities">Sciences & Humanities</option>
+                      <option value="Computer Science">Computer Science</option>
+                      <option value="Cyber Security">Cyber Security</option>
+                      <option value="Artificial Intelligence">Artificial Intelligence</option>
+                      <option value="Software Engineering">Software Engineering</option>
+                      <option value="Electrical Engineering">Electrical Engineering</option>
+                      <option value="Management Sciences">Management Sciences</option>
+                      <option value="Sciences & Humanities">Sciences & Humanities</option>
                     </select>
                   </div>
                   {errors.department && (
