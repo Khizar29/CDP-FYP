@@ -44,7 +44,7 @@ const uploadFileToGoogleDrive = async (file) => {
     }
 
     const fileId = response.data.id;
-    console.log("File uploaded successfully, ID:", fileId);
+
 
     await setFilePublicPermission(fileId);
 
@@ -65,7 +65,7 @@ const setFilePublicPermission = async (fileId) => {
         type: 'anyone',
       },
     });
-    console.log(`Public access granted for file ID: ${fileId}`);
+    // console.log(`Public access granted for file ID: ${fileId}`);
   } catch (error) {
     console.error('Error setting file permissions:', error);
     throw new Error('Failed to set public permissions');
