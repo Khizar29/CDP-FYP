@@ -1,7 +1,7 @@
-import React, { useState, useContext, useEffect, useRef} from 'react';
-import { Link, useNavigate } from 'react-router-dom'; 
+import React, { useState, useContext, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faTimes, faHome, faInfoCircle, faChalkboardTeacher,faGraduationCap, faCalendar, faUser, faPhone, faBullhorn, faBriefcase, faKey, faRightFromBracket, faUserShield } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faHome, faInfoCircle, faChalkboardTeacher, faGraduationCap, faCalendar, faUser, faPhone, faBullhorn, faBriefcase, faKey, faRightFromBracket, faUserShield } from '@fortawesome/free-solid-svg-icons';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons'; // Import the arrow icons
 
 import logo from '../Images/logo-FAST-NU.png';
@@ -22,7 +22,7 @@ const Header = ({ scrollToSection }) => {
   const dropdownRef = useRef(null);
 
 
-  
+
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -30,14 +30,14 @@ const Header = ({ scrollToSection }) => {
   const handleLogout = async () => {
     try {
       await logout();
-        navigate('/'); // Redirect to Home page after logout
-        alert('Log out Successful');
+      navigate('/'); // Redirect to Home page after logout
+      alert('Log out Successful');
     } catch (error) {
       console.error("Error during logout", error);
     }
   };
 
-  
+
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -91,9 +91,11 @@ const Header = ({ scrollToSection }) => {
           <Link to="/about" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faInfoCircle} /> <span>About Us</span>
           </Link>
-          <Link to="/announcements" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
-            <FontAwesomeIcon icon={faBullhorn} /> <span>Announcement</span>
-          </Link>
+          {user && (
+            <Link to="/announcements" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
+              <FontAwesomeIcon icon={faBullhorn} /> <span>Announcement</span>
+            </Link>
+          )}
           <Link to="/jobs" id="jobs" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faBriefcase} /> <span>Jobs</span>
           </Link>
@@ -109,50 +111,50 @@ const Header = ({ scrollToSection }) => {
           {user ? (
             <div className="relative" ref={dropdownRef}>
               <button onClick={toggleDropdown} className="flex items-center focus:outline-none">
-      <span className="text-white mr-2 hidden md:inline-block">{user.fullName}</span>
-      <span className="text-white md:hidden">
-        <BsThreeDotsVertical />
-      </span>
-      <span className={`transform transition-transform ${dropdownOpen ? "rotate-180" : ""} hidden md:inline-block`}>
-        ▼
-      </span>
-    </button>
-    {dropdownOpen && (
-      <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
-        <div className="px-4 py-2 text-gray-800">{user.fullName}</div>
-        <hr className="border-gray-300" />
-        <Link to="/change-password" className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
-          <FontAwesomeIcon icon={faKey} className="mr-2 text-blue-600" /> {/* Key Icon for Password */}
-          Change Password
-        </Link>
-        {user.role === "admin" && (
-          <Link to="/admin" className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
-            <FontAwesomeIcon icon={faUserShield} className="mr-2 text-purple-600" /> {/* Admin Panel icon */}
-            Admin Panel
-          </Link>
-        )}
-        {/* Faculty Panel Link */}
-        {user.role === 'faculty' && (
-          <Link to="/faculty" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-            <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" /> Faculty Panel
-          </Link>
-        )}
-        {(user.role === "user" && (
-          <Link to={`/edit-profile/${user.nuId}`} className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
-            <FontAwesomeIcon icon={faUser} className="mr-2 text-green-600" /> {/* User Icon for Profile */}
-          Update Profile
-          </Link>
-        ))}
-        <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-gray-800 hover:bg-gray-100">
-          <FontAwesomeIcon icon={faRightFromBracket} className="mr-2 text-red-600" /> {/* Logout icon */}
-          Logout
-        </button>
-      </div>
-    )}
-  </div>
-) : (
-  <div onClick={handleOpenSignIn} className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
-    <FontAwesomeIcon icon={faUser} /> <span>Login</span>
+                <span className="text-white mr-2 hidden md:inline-block">{user.fullName}</span>
+                <span className="text-white md:hidden">
+                  <BsThreeDotsVertical />
+                </span>
+                <span className={`transform transition-transform ${dropdownOpen ? "rotate-180" : ""} hidden md:inline-block`}>
+                  ▼
+                </span>
+              </button>
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
+                  <div className="px-4 py-2 text-gray-800">{user.fullName}</div>
+                  <hr className="border-gray-300" />
+                  <Link to="/change-password" className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
+                    <FontAwesomeIcon icon={faKey} className="mr-2 text-blue-600" /> {/* Key Icon for Password */}
+                    Change Password
+                  </Link>
+                  {user.role === "admin" && (
+                    <Link to="/admin" className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
+                      <FontAwesomeIcon icon={faUserShield} className="mr-2 text-purple-600" /> {/* Admin Panel icon */}
+                      Admin Panel
+                    </Link>
+                  )}
+                  {/* Faculty Panel Link */}
+                  {user.role === 'faculty' && (
+                    <Link to="/faculty" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                      <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" /> Faculty Panel
+                    </Link>
+                  )}
+                  {(user.role === "user" && (
+                    <Link to={`/edit-profile/${user.nuId}`} className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
+                      <FontAwesomeIcon icon={faUser} className="mr-2 text-green-600" /> {/* User Icon for Profile */}
+                      Update Profile
+                    </Link>
+                  ))}
+                  <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-gray-800 hover:bg-gray-100">
+                    <FontAwesomeIcon icon={faRightFromBracket} className="mr-2 text-red-600" /> {/* Logout icon */}
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div onClick={handleOpenSignIn} className="text-white no-underline font-semibold flex items-center space-x-1 cursor-pointer">
+              <FontAwesomeIcon icon={faUser} /> <span>Login</span>
             </div>
           )}
         </nav>
@@ -179,9 +181,11 @@ const Header = ({ scrollToSection }) => {
               <Link to="/about" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faInfoCircle} /> <span>About Us</span>
               </Link>
-              <Link to="/announcements" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
-                <FontAwesomeIcon icon={faBullhorn} /> <span>Announcements</span>
-              </Link>
+              {user && (
+                <Link to="/announcements" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
+                  <FontAwesomeIcon icon={faBullhorn} /> <span>Announcements</span>
+                </Link>
+              )}
               <Link to="/jobs" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faBriefcase} /> <span>Jobs</span>
               </Link>
@@ -191,10 +195,10 @@ const Header = ({ scrollToSection }) => {
               <Link to="/news" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faCalendar} /> <span>News & Events</span>
               </Link>
-              <Link to="/contactUs" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick = {toggleMenu}>
+              <Link to="/contactUs" className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleMenu}>
                 <FontAwesomeIcon icon={faPhone} /> <span>Contact Us</span>
               </Link>
-              
+
               {user ? (
                 <div className="relative">
                   <div className="text-white no-underline px-6 py-2 font-semibold flex items-center space-x-1 cursor-pointer" onClick={toggleDropdown}>
