@@ -1,8 +1,12 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/projectv/fastcdpapi.projectvault.pk/cdp-backend/
-    - rsync -av --exclude='cdp-frontend' cdp-backend/ $DEPLOYPATH
-    - cd $DEPLOYPATH
-    - npm install --production
+    # - export DEPLOYPATH=/home/projectv/fastcdpapi.projectvault.pk/cdp-backend/
+    # - rsync -av --exclude='cdp-frontend' cdp-backend/ $DEPLOYPATH
+    # - cd $DEPLOYPATH
+    # - npm install --production
+    # - touch tmp/restart.txt
+    - cd /home/projectv/fastcdpapi.projectvault.pk
+    - git pull origin main
+    - cd cdp-backend
     - touch tmp/restart.txt
