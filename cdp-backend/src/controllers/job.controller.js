@@ -166,6 +166,9 @@ const getAllJobs = asyncHandler(async (req, res) => {
 
   const query = {};
 
+  if (!req.user) {
+    throw new ApiError(403, 'Forbidden: Please login');
+  }
   // Search query
   if (searchTerm) {
     query.$or = [
