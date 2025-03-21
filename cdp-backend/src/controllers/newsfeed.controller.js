@@ -3,17 +3,32 @@ const  asyncHandler  = require('../utils/asyncHandler.js');
 const  ApiError  = require('../utils/ApiError.js');
 const ApiResponse  = require('../utils/ApiResponse.js');
 const path = require('path');
+const { uploadFileToGoogleDrive, deleteLocalFile, getFilePublicUrl } = require('../utils/GoogleDrive.js');
+const fs = require('fs');
 
-// Create a new news or event
 const createNewsFeed = asyncHandler(async (req, res) => {
   if (!req.user || !['admin', 'faculty'].includes(req.user.role)) {
     throw new ApiError(403, "Forbidden: Admins and Faculty only");
   }
 
   const { title, description, category, isPublic } = req.body;
-  const imagePath = req.savedImagePath || '';
+  const file = req.file; 
 
-  const imageUrl = `${req.protocol}://${req.get('host')}/temp/${path.basename(imagePath)}`;
+  let imageUrl = '';
+    if (file) {
+        try {
+            const googleDriveFileId = await uploadFileToGoogleDrive(file);
+            imageUrl = getFilePublicUrl(googleDriveFileId);
+            console.log("Generated Google Drive URL:", imageUrl);
+
+            // Remove local file
+            deleteLocalFile(file.path);
+        } catch (error) {
+            console.error("File upload failed:", error);
+            throw new ApiError(500, "File upload to Google Drive failed");
+        }
+    }
+
   const newsFeed = new NewsFeed({ 
     title, 
     description, 
@@ -35,6 +50,7 @@ const updateNewsFeed = asyncHandler(async (req, res) => {
 
   const { id } = req.params;
   const { title, description, isPublic, category } = req.body;
+  const file = req.file;
 
   const newsFeed = await NewsFeed.findById(id);
   if (!newsFeed) {
@@ -45,15 +61,22 @@ const updateNewsFeed = asyncHandler(async (req, res) => {
     throw new ApiError(403, "You can only update your own newsfeed");
   }
 
+  let imageUrl = newsFeed.image;
+    if (file) {
+        // Upload the new image to Google Drive and get the public thumbnail URL
+        const googleDriveFileId = await uploadFileToGoogleDrive(file);
+        imageUrl = getFilePublicUrl(googleDriveFileId); 
+
+        // Remove the file from local storage after uploading to Drive
+        deleteLocalFile(file.path);
+    }
+
   newsFeed.title = title || newsFeed.title;
   newsFeed.description = description || newsFeed.description;
   newsFeed.category = category || newsFeed.category;
   newsFeed.isPublic = isPublic !== undefined ? isPublic : newsFeed.isPublic;
+  newsFeed.image = imageUrl;
   
-  if (req.savedImagePath) {
-    newsFeed.image = `${req.protocol}://${req.get('host')}${req.savedImagePath}`;
-  }
-
   await newsFeed.save();
   res.status(200).json(new ApiResponse(200, newsFeed, 'NewsFeed updated successfully'));
 });

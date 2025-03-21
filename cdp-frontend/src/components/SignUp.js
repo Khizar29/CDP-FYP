@@ -93,19 +93,19 @@ const SignUp = () => {
 
   const validateForm = () => {
     const newErrors = {};
-  
+
     if (userType === 'student' || userType === 'faculty' || userType === 'recruiter') {
       if (!formData.fullName.trim()) {
         newErrors.fullName = 'Full name is required';
       }
     }
-  
+
     if (userType === 'student' || userType === 'faculty') {
       if (!formData.nuEmail.trim()) {
         newErrors.nuEmail = 'NU email is required';
       }
     }
-  
+
     if (userType === 'faculty') {
       if (!formData.department?.trim()) {
         newErrors.department = 'Department is required';
@@ -114,7 +114,7 @@ const SignUp = () => {
         newErrors.phoneNumber = 'Phone number is required';
       }
     }
-  
+
     if (userType === 'student' || userType === 'graduate') {
       if (!formData.nuid?.trim()) {
         newErrors.nuid = 'NU ID is required';
@@ -122,7 +122,7 @@ const SignUp = () => {
         newErrors.nuid = 'Invalid NU ID format. Example: 21K-3329';
       }
     }
-  
+
     if (userType === 'recruiter') {
       if (!formData.companyName?.trim()) {
         newErrors.companyName = 'Company name is required';
@@ -137,7 +137,7 @@ const SignUp = () => {
         newErrors.designation = 'Designation is required';
       }
     }
-  
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -187,24 +187,24 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!validateForm()) {
       toast.error('Please fix the errors in the form before submitting.'); // Error alert
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       let response;
-  
+
       if (userType === 'student') {
         if (!validateStudentEmail(formData.nuEmail, formData.nuid)) {
           toast.error('Invalid student email or NU ID.'); // Error alert
           setLoading(false);
           return;
         }
-  
+
         response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/register`, {
           fullName: formData.fullName,
           email: formData.nuEmail,
@@ -220,7 +220,7 @@ const SignUp = () => {
           setLoading(false);
           return;
         }
-  
+
         response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/users/register-graduate`, {
           nuId: formData.nuid,
         });
@@ -230,7 +230,7 @@ const SignUp = () => {
           setLoading(false);
           return;
         }
-  
+
         response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/faculty/register`, {
           fullName: formData.fullName,
           nuEmail: formData.nuEmail,
@@ -247,14 +247,14 @@ const SignUp = () => {
           designation: formData.designation,
         });
       }
-  
+
       toast.success(response.data.message || 'Registration successful!');
       navigate('/signin');
     } catch (error) {
       // Handle different types of error responses
       let errorMessage = error.response?.data?.message || 'Registration failed. Please try again.';
       toast.error(errorMessage); // Error alert
-  
+
       // Set form-specific errors if they exist
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
@@ -440,7 +440,7 @@ const SignUp = () => {
             )}
             {userType === 'recruiter' && (
               <>
-                              <div>
+                <div>
                   <label htmlFor="fullName" className="block text-sm font-medium text-gray-700">
                     Full Name
                   </label>
@@ -592,20 +592,27 @@ const SignUp = () => {
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Building2 className="h-5 w-5 text-gray-400" />
                     </div>
-                    <input
-                      type="text"
+                    <select
                       name="department"
                       id="department"
                       value={formData.department}
                       onChange={handleInputChange}
                       className={clsx(
-                        'block w-full pl-10 sm:text-sm rounded-md',
+                        "block w-full pl-10 sm:text-sm rounded-md",
                         errors.department
-                          ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500'
-                          : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                          ? "border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500"
+                          : "border-gray-300 focus:ring-blue-500 focus:border-blue-500"
                       )}
-                      placeholder="Computer Science"
-                    />
+                    >
+                      <option value="" disabled>Select a department</option>
+                      <option value="Computer Science">Computer Science</option>
+                      <option value="Cyber Security">Cyber Security</option>
+                      <option value="Artificial Intelligence">Artificial Intelligence</option>
+                      <option value="Software Engineering">Software Engineering</option>
+                      <option value="Electrical Engineering">Electrical Engineering</option>
+                      <option value="Management Sciences">Management Sciences</option>
+                      <option value="Sciences & Humanities">Sciences & Humanities</option>
+                    </select>
                   </div>
                   {errors.department && (
                     <p className="mt-2 text-sm text-red-600">{errors.department}</p>
