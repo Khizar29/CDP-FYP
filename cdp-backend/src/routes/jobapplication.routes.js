@@ -7,17 +7,15 @@ const {
   getMonthlyApplications,
   getJobApplicationCount,
   getAllJobsApplicationCount,
+  getApplicationsPerJobType,
+  getJobPostingsByQualification,
+  getJobPostingsVsApplicationsOverTime,
+  getAllJobsApplicationPerCompany,
 } = require("../controllers/jobapplication.controller");
 
 const router = express.Router();
 
 // Track job applications
 router.post("/track", verifyJWT, trackApplication);
-
-// Admin Analytics
-// router.get("/trending-niches", verifyJWT, verifyAdmin, getTrendingJobNiches);
-router.get("/most-sought", verifyJWT, verifyAdmin, getMostSoughtJobs);
-router.get("/monthly-breakdown", verifyJWT, verifyAdmin, getMonthlyApplications);
-
 
 module.exports = router;

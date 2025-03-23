@@ -310,105 +310,6 @@ const approveJob = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, job, `Job has been ${status}`));
 });
 
-const getJobsPostedPerMonth = asyncHandler(async (req, res) => {
-  try {
-    const jobsPerMonth = await Job.aggregate([
-      {
-        $match: { status: "approved" }, // Only count approved jobs
-      },
-      {
-        $group: {
-          _id: {
-            year: { $year: "$posted_on" },
-            month: { $month: "$posted_on" },
-          },
-          totalJobs: { $sum: 1 },
-        },
-      },
-      {
-        $sort: {
-          "_id.year": 1,
-          "_id.month": 1,
-        },
-      },
-    ]);
-
-    return res.status(200).json(new ApiResponse(200, jobsPerMonth, "Jobs posted per month"));
-  } catch (error) {
-    console.error("Error fetching jobs per month:", error);
-    return res.status(500).json(new ApiError(500, "Failed to fetch job posting data"));
-  }
-});
-
-/**
- * @desc Get job applications count per job
- * @route GET /api/applications/count-per-job
- * @access Private (Admin Only)
- */
-const getJobApplicationCount = asyncHandler(async (req, res) => {
-  const { jobId } = req.params;
-
-  const job = await Job.findById(jobId).select("title company_name applicationCount");
-
-  if (!job) {
-    throw new ApiError(404, "Job not found");
-  }
-
-  return res.status(200).json({
-    jobId: job._id,
-    title: job.title,
-    company: job.company_name,
-    applicationCount: job.applicationCount,
-  });
-});
-
-const getAllJobsApplicationCount = asyncHandler(async (req, res) => {
-  const jobs = await Job.find({}).select("title company_name applicationCount");
-
-  return res.status(200).json(jobs);
-});
-
-const getSortedJobsByApplicationCount = asyncHandler(async (req, res) => {
-  try {
-    const sortedJobs = await Application.aggregate([
-      {
-        $group: {
-          _id: "$jobId",
-          applicationCount: { $sum: 1 }
-        }
-      },
-      {
-        $sort: { applicationCount: -1 } // Sort in descending order
-      },
-      {
-        $lookup: {
-          from: "jobs", // Reference Job collection
-          localField: "_id",
-          foreignField: "_id",
-          as: "jobDetails"
-        }
-      },
-      {
-        $unwind: "$jobDetails"
-      },
-      {
-        $project: {
-          _id: "$jobDetails._id",
-          title: "$jobDetails.title",
-          company_name: "$jobDetails.company_name",
-          applicationCount: 1
-        }
-      }
-    ]);
-
-    return res.status(200).json(sortedJobs);
-  } catch (error) {
-    console.error("Error sorting jobs by application count:", error);
-    throw new ApiError(500, "Failed to retrieve sorted jobs");
-  }
-});
-
-
 // Export functions
 module.exports = {
   createJob,
@@ -419,8 +320,4 @@ module.exports = {
   getJobCount,
   getRecruiterJobs,
   approveJob,
-  getJobsPostedPerMonth,
-  getJobApplicationCount,
-  getAllJobsApplicationCount,
-  getSortedJobsByApplicationCount,
 };

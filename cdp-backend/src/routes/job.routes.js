@@ -9,10 +9,8 @@ const {
   getJobCount,
   getRecruiterJobs,
   approveJob,
-  getJobsPostedPerMonth,
-  getAllJobsApplicationCount,
   getJobApplicationCount,
-  getSortedJobsByApplicationCount,
+
 } = require("../controllers/job.controller.js");
 const { verifyJWT, verifyAdmin, verifyRole } = require("../middlewares/auth.middleware.js");
 
@@ -41,14 +39,8 @@ router.post('/extract', async (req, res) => {
 
 router.use(verifyAdmin);
 
-router.get("/application-count", getAllJobsApplicationCount);
-router.get("/sorted-by-application", getSortedJobsByApplicationCount);
-
 router.patch("/:jobId/approve", approveJob);
 router.route('/:jobId').get(getJobById).put(updateJob).delete(deleteJob);
-router.get("/analytics/jobs-per-month", getJobsPostedPerMonth);
 
-
-router.get("/:jobId/application-count", getJobApplicationCount);
 
 module.exports = router;
