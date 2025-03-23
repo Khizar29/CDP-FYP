@@ -38,6 +38,7 @@
     "react-scroll": "^1.9.0",
     "react-slick": "^0.30.2",
     "react-tag-input": "^6.10.3",
+    "recharts": "^2.15.1",
     "slick-carousel": "^1.8.1",
     "styled-components": "^6.1.12"
   },
