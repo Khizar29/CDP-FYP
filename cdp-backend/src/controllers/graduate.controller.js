@@ -9,12 +9,12 @@ const fs = require('fs'); // To work with the filesystem
 const BATCH_SIZE = 100; // Adjust batch size according to your needs
 
 const importGraduates = asyncHandler(async (req, res) => {
-  if (!req.user || req.user.role !== "admin") {
-    throw new ApiError(403, "Forbidden: Admins only");
+  if (!req.user || req.user.role !== 'admin') {
+    throw new ApiError(403, 'Forbidden: Admins only');
   }
 
   if (!req.file) {
-    throw new ApiError(400, "No file uploaded");
+    throw new ApiError(400, 'No file uploaded');
   }
 
   try {
@@ -26,8 +26,6 @@ const importGraduates = asyncHandler(async (req, res) => {
 
     const validGraduates = [];
     const errors = [];
-    const duplicateNuIds = [];
-    const duplicateNuEmails = [];
 
     for (let i = 0; i < graduatesData.length; i++) {
       let graduate = graduatesData[i];
@@ -35,26 +33,19 @@ const importGraduates = asyncHandler(async (req, res) => {
       graduate.nuId = graduate.nuId ? graduate.nuId.toLowerCase().trim() : null;
       graduate.nuEmail = graduate.nuEmail ? graduate.nuEmail.toLowerCase().trim() : null;
 
-      if (
-        !graduate.nuId ||
-        !graduate.fullName || // ✅ Updated (removed firstName and lastName)
-        !graduate.nuEmail ||
-        !graduate.discipline ||
-        !graduate.yearOfGraduation ||
-        !graduate.cgpa
-      ) {
+      if (!graduate.nuId || !graduate.fullName || !graduate.nuEmail || !graduate.discipline || !graduate.yearOfGraduation || !graduate.cgpa) {
         errors.push(`Row ${i + 1}: Missing required field(s).`);
         continue;
       }
 
-      // ✅ Convert skills column into an array if it exists
-      graduate.skills = graduate.skills ? graduate.skills.split(",").map(skill => skill.trim()) : [];
+      // ✅ Just store skills as they appear in the Excel sheet
+      graduate.skills = graduate.skills ? [graduate.skills] : [];  
 
       validGraduates.push(graduate);
     }
 
     if (validGraduates.length === 0) {
-      return res.status(400).json(new ApiError(400, "No valid records to import."));
+      return res.status(400).json(new ApiError(400, 'No valid records to import.'));
     }
 
     let totalInserted = 0;
@@ -63,23 +54,11 @@ const importGraduates = asyncHandler(async (req, res) => {
     for (let i = 0; i < validGraduates.length; i += BATCH_SIZE) {
       const batch = validGraduates.slice(i, i + BATCH_SIZE);
       try {
-        const result = await Graduate.insertMany(batch, { ordered: false }); // Continue on error
+        const result = await Graduate.insertMany(batch, { ordered: false });
         totalInserted += result.length;
       } catch (error) {
-        if (error.code === 11000) {
-          const dupKeyError = error.writeErrors || [];
-          dupKeyError.forEach((err) => {
-            const { keyValue } = err.err || {};
-            if (keyValue && keyValue.nuEmail) {
-              duplicateNuEmails.push(keyValue.nuEmail);
-            } else if (keyValue && keyValue.nuId) {
-              duplicateNuIds.push(keyValue.nuId);
-            }
-          });
-          totalFailed += error.writeErrors.length;
-        } else {
-          console.error("Error inserting batch:", error);
-        }
+        console.error('Error inserting batch:', error);
+        totalFailed += error.writeErrors ? error.writeErrors.length : 0;
       }
     }
 
@@ -89,14 +68,15 @@ const importGraduates = asyncHandler(async (req, res) => {
       new ApiResponse(
         201,
         { totalInserted, totalFailed },
-        `Successfully imported ${totalInserted} graduates. ${totalFailed} records failed. Duplicates: nuId(s): ${duplicateNuIds.join(", ")}. nuEmail(s): ${duplicateNuEmails.join(", ")}.`
+        `Successfully imported ${totalInserted} graduates. ${totalFailed} records failed.`
       )
     );
   } catch (error) {
-    console.error("Error importing graduates:", error);
-    return res.status(500).json(new ApiError(500, "Failed to import graduates", error.message));
+    console.error('Error importing graduates:', error);
+    return res.status(500).json(new ApiError(500, 'Failed to import graduates', error.message));
   }
 });
+
 
 
 const updateGraduate = asyncHandler(async (req, res) => {
