@@ -9,12 +9,12 @@ const fs = require('fs'); // To work with the filesystem
 const BATCH_SIZE = 100; // Adjust batch size according to your needs
 
 const importGraduates = asyncHandler(async (req, res) => {
-  if (!req.user || req.user.role !== 'admin') {
-    throw new ApiError(403, 'Forbidden: Admins only');
+  if (!req.user || req.user.role !== "admin") {
+    throw new ApiError(403, "Forbidden: Admins only");
   }
 
   if (!req.file) {
-    throw new ApiError(400, 'No file uploaded');
+    throw new ApiError(400, "No file uploaded");
   }
 
   try {
@@ -35,16 +35,26 @@ const importGraduates = asyncHandler(async (req, res) => {
       graduate.nuId = graduate.nuId ? graduate.nuId.toLowerCase().trim() : null;
       graduate.nuEmail = graduate.nuEmail ? graduate.nuEmail.toLowerCase().trim() : null;
 
-      if (!graduate.nuId || !graduate.firstName || !graduate.lastName || !graduate.nuEmail || !graduate.discipline || !graduate.yearOfGraduation || !graduate.cgpa) {
+      if (
+        !graduate.nuId ||
+        !graduate.fullName || // ✅ Updated (removed firstName and lastName)
+        !graduate.nuEmail ||
+        !graduate.discipline ||
+        !graduate.yearOfGraduation ||
+        !graduate.cgpa
+      ) {
         errors.push(`Row ${i + 1}: Missing required field(s).`);
         continue;
       }
+
+      // ✅ Convert skills column into an array if it exists
+      graduate.skills = graduate.skills ? graduate.skills.split(",").map(skill => skill.trim()) : [];
 
       validGraduates.push(graduate);
     }
 
     if (validGraduates.length === 0) {
-      return res.status(400).json(new ApiError(400, 'No valid records to import.'));
+      return res.status(400).json(new ApiError(400, "No valid records to import."));
     }
 
     let totalInserted = 0;
@@ -58,7 +68,7 @@ const importGraduates = asyncHandler(async (req, res) => {
       } catch (error) {
         if (error.code === 11000) {
           const dupKeyError = error.writeErrors || [];
-          dupKeyError.forEach(err => {
+          dupKeyError.forEach((err) => {
             const { keyValue } = err.err || {};
             if (keyValue && keyValue.nuEmail) {
               duplicateNuEmails.push(keyValue.nuEmail);
@@ -68,7 +78,7 @@ const importGraduates = asyncHandler(async (req, res) => {
           });
           totalFailed += error.writeErrors.length;
         } else {
-          console.error('Error inserting batch:', error);
+          console.error("Error inserting batch:", error);
         }
       }
     }
@@ -79,14 +89,15 @@ const importGraduates = asyncHandler(async (req, res) => {
       new ApiResponse(
         201,
         { totalInserted, totalFailed },
-        `Successfully imported ${totalInserted} graduates. ${totalFailed} records failed. Duplicates: nuId(s): ${duplicateNuIds.join(', ')}. nuEmail(s): ${duplicateNuEmails.join(', ')}.`
+        `Successfully imported ${totalInserted} graduates. ${totalFailed} records failed. Duplicates: nuId(s): ${duplicateNuIds.join(", ")}. nuEmail(s): ${duplicateNuEmails.join(", ")}.`
       )
     );
   } catch (error) {
-    console.error('Error importing graduates:', error);
-    return res.status(500).json(new ApiError(500, 'Failed to import graduates', error.message));
+    console.error("Error importing graduates:", error);
+    return res.status(500).json(new ApiError(500, "Failed to import graduates", error.message));
   }
 });
+
 
 const updateGraduate = asyncHandler(async (req, res) => {
   const { nuId } = req.params;
