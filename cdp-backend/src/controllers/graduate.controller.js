@@ -175,7 +175,7 @@ const fetchGraduates = asyncHandler(async (req, res) => {
   const criteria = {};
   if (searchTerm) {
     const regex = new RegExp(searchTerm, 'i');
-    criteria.$or = [{ firstName: regex }, { lastName: regex }, { nuId: regex }];
+    criteria.$or = [{ fullName: regex }, { nuId: regex }];
   }
   if (filterYear) {
     criteria.yearOfGraduation = filterYear;
