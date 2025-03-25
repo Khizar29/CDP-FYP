@@ -1,9 +1,9 @@
 import DashboardHeader from "../DashboardHeader";
 
-const HeaderAdmin = () => {
+const HeaderAdmin = ({ onToggleSidebar }) => {
   return (
     <div>
-      <DashboardHeader role="admin" />
+      <DashboardHeader role="admin" onToggleSidebar={onToggleSidebar} />
       {/* Admin Dashboard Content */}
     </div>
   );

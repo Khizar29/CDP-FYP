@@ -32,7 +32,8 @@ const newsfeedRouter = require('./src/routes/newsfeed.routes.js');
 const recruiterRouter = require('./src/routes/recruiter.routes.js');
 const facultyRoutes = require("./src/routes/faculty.routes.js");
 const announcementRoutes = require("./src/routes/announcement.routes.js");
-// const jobApplicationRoutes = require("./src/routes/jobapplication.routes.js");
+const jobApplicationRoutes = require("./src/routes/jobapplication.routes.js");
+const analyticsRoutes = require("./src/routes/analytics.routes.js");
 
 // Routes declaration
 app.use("/api/v1/users", userRouter);
@@ -43,7 +44,8 @@ app.use("/api/v1/newsfeeds", newsfeedRouter);
 app.use("/api/v1/recruiters", recruiterRouter);
 app.use("/api/v1/faculty", facultyRoutes);
 app.use("/api/v1/announcements", announcementRoutes);
-// app.use("/api/v1/jobapplications", jobApplicationRoutes);
+app.use("/api/v1/jobapplications", jobApplicationRoutes);
+app.use("/api/v1/analytics", analyticsRoutes);
 
 // Serve static files from the React frontend app's build folder
 // app.use(express.static(path.join(__dirname, '../cdp-frontend/build')));

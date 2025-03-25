@@ -15,7 +15,12 @@ const trackApplication = asyncHandler(async (req, res) => {
   if (!jobId) throw new ApiError(400, "Job ID is required");
 
   try {
+    // Create the job application
     await Application.create({ userId, jobId });
+
+    // ✅ Update job's application count
+    await Job.findByIdAndUpdate(jobId, { $inc: { applicationCount: 1 } });
+
     return res.status(201).json({ message: "Application tracked successfully" });
   } catch (error) {
     if (error.code === 11000) {
@@ -24,7 +29,6 @@ const trackApplication = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Error tracking application");
   }
 });
-
 /**
  * @desc Get trending job niches
  * @route GET /api/applications/trending-niches
@@ -47,40 +51,9 @@ const trackApplication = asyncHandler(async (req, res) => {
  * @route GET /api/applications/most-sought
  * @access Private (Admin Only)
  */
-const getMostSoughtJobs = asyncHandler(async (req, res) => {
-  const mostSought = await Application.aggregate([
-    { $group: { _id: "$jobId", count: { $sum: 1 } } },
-    { $sort: { count: -1 } },
-    { $limit: 10 },
-    { $lookup: { from: "jobs", localField: "_id", foreignField: "_id", as: "job" } },
-    { $unwind: "$job" },
-    { $project: { _id: "$job._id", title: "$job.title", company: "$job.company_name", count: 1 } }
-  ]);
 
-  return res.json(mostSought);
-});
-
-/**
- * @desc Get monthly breakdown of applications
- * @route GET /api/applications/monthly-breakdown
- * @access Private (Admin Only)
- */
-const getMonthlyApplications = asyncHandler(async (req, res) => {
-  const monthlyData = await Application.aggregate([
-    {
-      $group: {
-        _id: { month: { $month: "$createdAt" }, year: { $year: "$createdAt" } },
-        count: { $sum: 1 }
-      }
-    },
-    { $sort: { "_id.year": 1, "_id.month": 1 } }
-  ]);
-
-  return res.json(monthlyData);
-});
 
 module.exports = {
   trackApplication,
-  getMostSoughtJobs,
-  getMonthlyApplications
+
 };

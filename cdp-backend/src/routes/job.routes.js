@@ -9,6 +9,8 @@ const {
   getJobCount,
   getRecruiterJobs,
   approveJob,
+  getJobApplicationCount,
+
 } = require("../controllers/job.controller.js");
 const { verifyJWT, verifyAdmin, verifyRole } = require("../middlewares/auth.middleware.js");
 
@@ -36,7 +38,9 @@ router.post('/extract', async (req, res) => {
 });
 
 router.use(verifyAdmin);
+
 router.patch("/:jobId/approve", approveJob);
 router.route('/:jobId').get(getJobById).put(updateJob).delete(deleteJob);
+
 
 module.exports = router;

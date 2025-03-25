@@ -14,6 +14,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { motion, AnimatePresence } from "framer-motion";
 import DOMPurify from "dompurify";
+import axios from "axios";
+
 
 const JobView = ({ job, handleBackToJobs }) => {
   const [showModal, setShowModal] = useState(false);
@@ -22,8 +24,41 @@ const JobView = ({ job, handleBackToJobs }) => {
     return { __html: DOMPurify.sanitize(htmlContent) };
   };
 
-  // Function to check if job link is an email or a URL
-  const isEmail = (link) => link.startsWith("mailto:");
+  const isEmail = (link) => {
+    return link.startsWith("mailto:") || link.includes("@");
+  };
+
+  const handleApplyNow = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobapplications/track`,
+        { jobId: job._id },
+        {
+          withCredentials: true, // ✅ Ensures cookies (session) are sent
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      if (response.status === 201) {
+        setShowModal(true); // Open the modal if the API call is successful
+      }
+    } catch (error) {
+      console.error("Error tracking application:", error);
+  
+      // Handle specific errors
+      if (error.response) {
+        if (error.response.status === 400 && error.response.data.message === "Already applied") {
+          setShowModal(true); // Open the modal if the user has already applied
+        } else {
+          alert("Failed to track application. Please try again.");
+        }
+      } else {
+        alert("An unexpected error occurred. Please try again.");
+      }
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -93,11 +128,11 @@ const JobView = ({ job, handleBackToJobs }) => {
 
             {/* Apply Now Button */}
             <button
-              onClick={() => setShowModal(true)}
-              className="mt-8 w-[140px] bg-blue-900 text-white py-2 rounded-full hover:bg-blue-600 transition duration-300"
-            >
-              Apply Now
-            </button>
+  onClick={handleApplyNow} // Call handleApplyNow function
+  className="mt-8 w-[140px] bg-blue-900 text-white py-2 rounded-full hover:bg-blue-600 transition duration-300"
+>
+  Apply Now
+</button>
           </div>
 
           {/* Apply Now Modal */}

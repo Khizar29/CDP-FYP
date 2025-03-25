@@ -73,7 +73,7 @@ const JobList = () => {
 
   // Filter out jobs older than 30 days
   const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 50);
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 300);
 
   filtered = filtered.filter((job) => new Date(job.posted_on) >= thirtyDaysAgo);
   
