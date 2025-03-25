@@ -60,7 +60,7 @@ const DashboardHome = () => {
         ] = await Promise.all([
           axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/count`, { withCredentials: true }),
           axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/job-postings-per-month`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/application-count`, { withCredentials: true }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/applications-per-job`, { withCredentials: true }),
           axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/most-sought-jobs`, { withCredentials: true }),
           axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/applications-per-month`, { withCredentials: true }),
           axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/job-postings-vs-applications-over-time`, { withCredentials: true }),

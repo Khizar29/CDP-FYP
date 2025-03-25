@@ -20,6 +20,7 @@ const router = express.Router();
 // router.get("/trending-niches", verifyJWT, verifyAdmin, getTrendingJobNiches);
 router.get("/most-sought-jobs", verifyJWT, verifyAdmin, getMostSoughtJobs);
 router.get("/applications-per-month", verifyJWT, verifyAdmin, getMonthlyApplications);
+router.get("/applications-per-job", verifyJWT, verifyAdmin, getJobApplicationsCount);
 router.get("/applications-per-job-type", verifyJWT, verifyAdmin, getApplicationsPerJobType);
 router.get("/job-postings-by-qualification", verifyJWT, verifyAdmin, getJobPostingsByQualification);
 router.get("/job-postings-vs-applications-over-time", verifyJWT, verifyAdmin, getJobPostingsVsApplicationsOverTime);
