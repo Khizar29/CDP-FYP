@@ -9,7 +9,6 @@ const {
   getJobCount,
   getRecruiterJobs,
   approveJob,
-  getJobApplicationCount,
 
 } = require("../controllers/job.controller.js");
 const { verifyJWT, verifyAdmin, verifyRole } = require("../middlewares/auth.middleware.js");
