@@ -48,6 +48,27 @@ const jobSchema = new Schema(
         message: "Invalid job link or email address",
       },
     },
+    application_methods: [{
+      type: {
+        type: String,
+        enum: ["email", "website", "form"],
+        required: true
+      },
+      value: {
+        type: String,
+        required: true,
+        validate: {
+          validator: function(v) {
+            if (this.type === "email") {
+              return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+            }
+            return /^https?:\/\/.+\..+/.test(v);
+          },
+          message: props => `Invalid ${props.type} format`
+        }
+      },
+      instructions: String
+    }],
     posted_on: {
       type: Date,
       default: Date.now,

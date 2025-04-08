@@ -5,6 +5,7 @@ const ApiResponse  = require('../utils/ApiResponse.js');
 const nodemailer = require('nodemailer');
 const Application = require("../models/jobapplication.model");
 
+
 const createJob = asyncHandler(async (req, res) => {
   let { 
     title, 
@@ -14,6 +15,7 @@ const createJob = asyncHandler(async (req, res) => {
     job_description, 
     responsibilities, 
     job_link,
+    application_methods,
     toEmails, 
     ccEmails, 
     bccEmails
@@ -25,10 +27,21 @@ const createJob = asyncHandler(async (req, res) => {
 
   const status = req.user.role === "admin" ? "approved" : "pending";
 
+  // Normalize email arrays
   toEmails = Array.isArray(toEmails) ? toEmails : (toEmails ? [toEmails] : []);
   ccEmails = Array.isArray(ccEmails) ? ccEmails : (ccEmails ? [ccEmails] : []);
   bccEmails = Array.isArray(bccEmails) ? bccEmails : (bccEmails ? [bccEmails] : []);
 
+  // Validate and normalize application methods
+  application_methods = Array.isArray(application_methods) 
+    ? application_methods.map(method => ({
+        type: ['email', 'website', 'form'].includes(method.type) ? method.type : 'website',
+        value: method.value || '',
+        instructions: method.instructions || ''
+      }))
+    : [];
+
+  // Create job with all fields
   const job = new Job({
     title,
     company_name, 
@@ -36,7 +49,8 @@ const createJob = asyncHandler(async (req, res) => {
     qualification_req,
     job_description,
     responsibilities,
-    job_link,
+    job_link, // Keeping for backward compatibility
+    application_methods,
     postedBy: req.user.id,
     status 
   });
@@ -51,60 +65,82 @@ const createJob = asyncHandler(async (req, res) => {
     },
   });
 
-  if (status === "approved" && toEmails.length > 0) {
-    const subject = `Exciting Career Opportunity: ${title}`;
-    const html = `
-      <p>Dear Students,</p>
-      <p>We are excited to share an excellent career opportunity with you. Below are the details:</p>
-      <h3>Company: ${company_name}</h3>
-      <h3>Job Title: ${title}</h3>
-      <h3>Job Type: ${job_type}</h3>
-      <p>${job_description}</p>
-      <h3>Qualifications</h3>
-      <p>${qualification_req}</p>
-      <h3>Responsibilities</h3>
-      <p>${responsibilities}</p>
-      <p>Apply here: <a href="${job_link}">${job_link}</a></p>
-      <p>Best Regards, Career Services</p>
-    `;
+  // Email sending logic for approved jobs
+  if (status === "approved") {
+    // Get all email application methods
+    const applicationEmails = application_methods
+      .filter(m => m.type === 'email')
+      .map(m => m.value);
 
-    try {
-      await transporter.sendMail({
-        from: `"Career Services" <${process.env.GMAIL}>`,
-        to: toEmails.join(","), 
-        cc: ccEmails.length ? ccEmails.join(",") : undefined,
-        bcc: bccEmails.length ? bccEmails.join(",") : undefined,
-        subject,
-        html,
-      });
+    // Combine with manual email lists (toEmails, etc.)
+    const allRecipients = [...new Set([
+      ...toEmails,
+      ...applicationEmails
+    ])];
 
-      return res.status(201).json(new ApiResponse(201, job, "Job created successfully and emails sent"));
-    } catch (emailError) {
-      console.error("📧 Email Error:", emailError);
-      return res.status(201).json(new ApiResponse(201, job, "Job created successfully but email failed to send"));
+    if (allRecipients.length > 0) {
+      const subject = `Exciting Career Opportunity: ${title}`;
+      
+      // Generate application links HTML
+      const applicationLinks = application_methods.map(method => {
+        if (method.type === 'email') {
+          return `<li>Email: <a href="mailto:${method.value}${method.instructions ? `?subject=${encodeURIComponent(method.instructions)}` : ''}">${method.value}</a>${method.instructions ? ` (${method.instructions})` : ''}</li>`;
+        }
+        return `<li>Website: <a href="${method.value}">${method.value}</a></li>`;
+      }).join('');
+
+      const html = `
+        <p>Dear Students,</p>
+        <p>We are excited to share an excellent career opportunity with you:</p>
+        <h3>${title} at ${company_name}</h3>
+        <p><strong>Job Type:</strong> ${job_type}</p>
+        ${job_description ? `<div>${job_description}</div>` : ''}
+        
+        ${qualification_req ? `<h4>Qualifications:</h4><div>${qualification_req}</div>` : ''}
+        ${responsibilities ? `<h4>Responsibilities:</h4><div>${responsibilities}</div>` : ''}
+
+        <h4>How to Apply:</h4>
+        <ul>${applicationLinks}</ul>
+        
+        <p style="font-size: medium; color: black;">
+        <b>Best Regards,</b><br>
+        Industrial Liaison/Career Services Office<br>
+        021 111 128 128 ext. 184
+      `;
+
+      try {
+        await transporter.sendMail({
+          from: `"Career Services and IL Office Karachi" <${process.env.GMAIL}>`,
+          to: allRecipients.join(","), 
+          cc: ccEmails.length ? ccEmails.join(",") : undefined,
+          bcc: bccEmails.length ? bccEmails.join(",") : undefined,
+          subject,
+          html,
+        });
+      } catch (emailError) {
+        console.error("📧 Email Error:", emailError);
+      }
     }
   }
 
+  // Admin notification for pending jobs
   if (status === "pending") {
     const adminEmail = "s.khizarali03@gmail.com";
-    const adminSubject = `New Job Pending Approval: ${title}`;
-    const adminHtml = `
-      <p>Hello Admin,</p>
-      <p>A recruiter has posted a job that requires your approval:</p>
-      <h3>Company: ${company_name}</h3>
-      <h3>Job Title: ${title}</h3>
-      <h3>Job Type: ${job_type}</h3>
-      <p>${job_description}</p>
-      <p>Please review and approve the job in the admin dashboard.</p>
-      <p>Best Regards, System</p>
-    `;
-
     try {
       await transporter.sendMail({
         from: `"Job Approval System" <${process.env.GMAIL}>`,
         to: adminEmail,
-        subject: adminSubject,
-        html: adminHtml,
+        subject: `New Job Pending Approval: ${title}`,
+        html: `
+          <p>Hello Admin,</p>
+          <p>A new job posting requires your approval:</p>
+          <h3>${title} at ${company_name}</h3>
+          <p><strong>Application Methods:</strong></p>
+          <ul>
+            ${application_methods.map(m => `<li>${m.type}: ${m.value}${m.instructions ? ` (${m.instructions})` : ''}</li>`).join('')}
+          </ul>
+          <p>Please review in the admin dashboard.</p>
+        `
       });
     } catch (emailError) {
       console.error("📧 Admin Email Error:", emailError);
@@ -114,35 +150,51 @@ const createJob = asyncHandler(async (req, res) => {
   return res.status(201).json(new ApiResponse(201, job, "Job posted successfully"));
 });
 
-// Update a job (Admin only)
 const updateJob = asyncHandler(async (req, res) => {
   const { jobId } = req.params;
-  const { title, company_name, job_type, no_of_openings, qualification_req, job_description, responsibilities, job_link } = req.body;
+  const { 
+    title, 
+    company_name, 
+    job_type, 
+    qualification_req, 
+    job_description, 
+    responsibilities, 
+    job_link,
+    application_methods
+  } = req.body;
 
   if (!req.user || req.user.role !== 'admin') {
     throw new ApiError(403, 'Forbidden: Admins only');
   }
 
   const job = await Job.findById(jobId);
+  if (!job) throw new ApiError(404, 'Job not found');
 
-  if (!job) {
-    throw new ApiError(404, 'Job not found');
-  }
-
+  // Update all fields
   job.title = title || job.title;
-  job.company_name = company_name || job.company_name; 
+  job.company_name = company_name || job.company_name;
   job.job_type = job_type || job.job_type;
-  job.no_of_openings = no_of_openings || job.no_of_openings;
   job.qualification_req = qualification_req || job.qualification_req;
   job.job_description = job_description || job.job_description;
   job.responsibilities = responsibilities || job.responsibilities;
-  job.job_link = job_link || job.job_link;
-  job.updated_on = Date.now();
+  job.job_link = job_link || job.job_link; // Backward compatibility
+  
+  // Update application methods if provided
+  if (Array.isArray(application_methods)) {
+    job.application_methods = application_methods.map(method => ({
+      type: ['email', 'website', 'form'].includes(method.type) ? method.type : 'website',
+      value: method.value || '',
+      instructions: method.instructions || ''
+    }));
+  }
 
+  job.updated_on = Date.now();
   await job.save();
 
   return res.status(200).json(new ApiResponse(200, job, 'Job updated successfully'));
 });
+
+
 
 // Delete a job (Admin only)
 const deleteJob = asyncHandler(async (req, res) => {

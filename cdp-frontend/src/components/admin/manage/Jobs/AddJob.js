@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Modal from 'react-modal';
@@ -23,6 +23,7 @@ const AddJob = () => {
         job_description: job?.job_description || '',
         responsibilities: job?.responsibilities || '',
         job_link: job?.job_link || '',
+        application_methods: job?.application_methods || [],
         toEmails: [],
         ccEmails: [],
         bccEmails: [],
@@ -64,6 +65,7 @@ const AddJob = () => {
         'batch2024mscy.khi@nu.edu.pk',
         'batch2024msds.khi@nu.edu.pk',
         'batch2024msse.khi@nu.edu.pk',
+        'muhammad.taha@nu.edu.pk',
         'batch2024msspm.khi@nu.edu.pk'
     ];
 
@@ -75,16 +77,18 @@ const AddJob = () => {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleEmailChange = (field, emails) => {
+    const handleEmailChange = useCallback((field, emails) => {
         setFormData(prev => ({ ...prev, [field]: emails }));
-    };
+    }, []);
 
     const handleExtractInfo = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.post('http://localhost:5001/api/v1/jobs/extract', {
-                job_ad_text: jobAdText,
-            });
+            const response = await axios.post(
+              `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/extract`, 
+              { job_ad_text: jobAdText },
+              { withCredentials: true }
+            );
 
             const extractedInfo = response.data;
             setFormData((prevFormData) => ({
@@ -96,6 +100,7 @@ const AddJob = () => {
                 qualification_req: extractedInfo.qualification_req || prevFormData.qualification_req,
                 job_description: extractedInfo.job_description || prevFormData.job_description,
                 responsibilities: extractedInfo.responsibilities || prevFormData.responsibilities,
+                application_methods: extractedInfo.application_methods || prevFormData.application_methods
             }));
         } catch (error) {
             console.error('Error extracting job info:', error);
@@ -107,12 +112,12 @@ const AddJob = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-           
+
             const config = {
                 withCredentials: true,
             };
             const payload = { ...formData };
-            console.log('Payload being sent:', payload);
+
 
             if (job) {
                 await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${job._id}`, payload, config);
@@ -127,9 +132,28 @@ const AddJob = () => {
         }
     };
 
+    // Add new method handler
+const handleAddApplicationMethod = (type, value, instructions = '') => {
+    setFormData(prev => ({
+      ...prev,
+      application_methods: [
+        ...prev.application_methods,
+        { type, value, instructions }
+      ]
+    }));
+  };
+  
+  // Remove method handler
+  const handleRemoveMethod = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      application_methods: prev.application_methods.filter((_, i) => i !== index)
+    }));
+  };
+
     const toolbarOptions = [
-        [{ 'header': '1'}, { 'header': '2'}, { 'font': [] }],
-        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
         ['bold', 'italic', 'underline', 'strike'],
         ['link', 'image', 'video'],
         [{ 'align': [] }],
@@ -141,7 +165,7 @@ const AddJob = () => {
         <div className="container mx-auto p-8">
             <form onSubmit={handleSubmit} className="bg-white p-10 rounded-lg shadow-lg max-w-2xl mx-auto">
                 <h2 className="text-2xl font-bold mb-6 text-center text-blue-900">Add / Edit Job</h2>
-                
+
                 <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="job_ad_text">
                         Paste Job Ad
@@ -264,12 +288,98 @@ const AddJob = () => {
                 </div>
 
                 <div className="mb-6">
+  <label className="block text-gray-700 text-sm font-bold mb-2">
+    Application Methods
+  </label>
+  
+  {formData.application_methods.map((method, index) => (
+    <div key={index} className="mb-2 p-2 border rounded">
+      <div className="flex justify-between">
+        <span className="font-medium capitalize">{method.type}:</span>
+        <button 
+          onClick={() => handleRemoveMethod(index)}
+          className="text-red-500 hover:text-red-700"
+        >
+          ×
+        </button>
+      </div>
+      
+      {method.type === 'email' ? (
+        <a href={`mailto:${method.value}`} className="text-blue-600">
+          {method.value}
+        </a>
+      ) : (
+        <a 
+          href={method.value} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-blue-600"
+        >
+          {method.value}
+        </a>
+      )}
+      
+      {method.instructions && (
+        <div className="text-sm text-gray-600 mt-1">
+          {method.instructions}
+        </div>
+      )}
+    </div>
+  ))}
+
+  <div className="mt-4 space-y-3">
+    <div className="flex gap-2">
+      <input
+        type="text"
+        placeholder="Email address"
+        className="flex-1 border rounded px-3 py-2"
+        onBlur={(e) => {
+          if (e.target.value.includes('@')) {
+            handleAddApplicationMethod('email', e.target.value.trim());
+            e.target.value = '';
+          }
+        }}
+      />
+    </div>
+    
+    <div className="flex gap-2">
+      <input
+        type="text"
+        placeholder="Website URL (https://...)"
+        className="flex-1 border rounded px-3 py-2"
+        onBlur={(e) => {
+          if (e.target.value.startsWith('http')) {
+            handleAddApplicationMethod('website', e.target.value.trim());
+            e.target.value = '';
+          }
+        }}
+      />
+    </div>
+    
+    <div className="flex gap-2">
+      <input
+        type="text"
+        placeholder="Form URL"
+        className="flex-1 border rounded px-3 py-2"
+        onBlur={(e) => {
+          if (e.target.value.startsWith('http')) {
+            handleAddApplicationMethod('form', e.target.value.trim());
+            e.target.value = '';
+          }
+        }}
+      />
+    </div>
+  </div>
+</div>
+
+                <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2">
                         To
                     </label>
                     <EmailInput
+                        key="toEmails"  // Add key to help React
                         value={formData.toEmails}
-                        onChange={(emails) => handleEmailChange('toEmails', emails)}
+                        onChange={useCallback((emails) => handleEmailChange('toEmails', emails), [handleEmailChange])}
                         placeholder="Enter email addresses"
                         suggestions={emailSuggestions}
                     />
@@ -280,8 +390,9 @@ const AddJob = () => {
                         CC
                     </label>
                     <EmailInput
+                        key="ccEmails" 
                         value={formData.ccEmails}
-                        onChange={(emails) => handleEmailChange('ccEmails', emails)}
+                        onChange={useCallback((emails) => handleEmailChange('ccEmails', emails), [handleEmailChange])}
                         placeholder="Enter CC email addresses"
                         suggestions={emailSuggestions}
                     />
@@ -292,8 +403,9 @@ const AddJob = () => {
                         BCC
                     </label>
                     <EmailInput
+                        key="bcEmails" 
                         value={formData.bccEmails}
-                        onChange={(emails) => handleEmailChange('bccEmails', emails)}
+                        onChange={useCallback((emails) => handleEmailChange('bccEmails', emails), [handleEmailChange])}
                         placeholder="Enter BCC email addresses"
                         suggestions={emailSuggestions}
                     />
