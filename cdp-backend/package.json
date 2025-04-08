@@ -23,6 +23,7 @@
     "express": "^4.19.2",
     "googleapi": "^1.0.2",
     "googleapis": "^144.0.0",
+    "groq-sdk": "^0.19.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
     "mongoose-aggregate-paginate-v2": "^1.1.2",
