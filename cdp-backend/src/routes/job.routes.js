@@ -71,8 +71,10 @@ router.post('/extract', verifyAdmin, async (req, res) => {
                 "value": "https://careers.company.com"
               }
             ]
-          }`
-        },
+          }
+          Additionally:
+          - If the text contains 'Location', do **NOT** consider it as job_type. job_type should be about work arrangements like "Onsite", "Remote", "Hybrid", or "Internship", not the geographical location.
+        `},
         {
           role: "user",
           content: job_ad_text
