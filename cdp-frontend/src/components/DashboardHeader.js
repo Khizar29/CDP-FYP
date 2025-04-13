@@ -17,7 +17,6 @@ const DashboardHeader = ({ role, onToggleSidebar }) => {
     const dropdownRef = useRef(null);
 
     useEffect(() => {
-        console.log("Role in DashboardHeader: ", role);
     }, [role]);
     
     useEffect(() => {
