@@ -30,7 +30,9 @@ router.get('/recruiter', verifyRole(['recruiter']), getRecruiterJobs);
 
 router.post('/extract', verifyAdmin, async (req, res) => {
   try {
-    const { job_ad_text } = req.body;
+    let { job_ad_text } = req.body;
+
+    job_ad_text = job_ad_text.replace(/Location:.*\n/g, "");
     
     const completion = await groq.chat.completions.create({
       messages: [
@@ -88,7 +90,7 @@ router.post('/extract', verifyAdmin, async (req, res) => {
       ],
       model: "llama-3.3-70b-versatile",
       response_format: { type: "json_object" },
-      temperature: 0.3
+      temperature: 0.1
     });
 
     let extractedInfo = JSON.parse(completion.choices[0]?.message?.content || "{}");
