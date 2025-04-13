@@ -7,14 +7,9 @@ const graduateSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      unique: true, // Ensuring nuId is unique
+      unique: true,
     },
-    firstName: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    lastName: {
+    fullName: {
       type: String,
       required: true,
       trim: true,
@@ -23,11 +18,10 @@ const graduateSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      unique: true, // Ensuring nuEmail is unique
+      unique: true,
     },
     personalEmail: {
       type: String,
-      required: false,
       trim: true,
     },
     discipline: {
@@ -43,33 +37,31 @@ const graduateSchema = new Schema(
       type: Number,
       required: true,
     },
+    skills: {
+      type: [String], // ✅ Added skills as an array of strings
+      default: [],
+    },
     profilePic: {
       type: String,
-      required: false,
     },
     contact: {
       type: String,
-      required: false,
       trim: true,
     },
     tagline: {
       type: String,
-      required: false,
       trim: true,
     },
     personalExperience: {
       type: String,
-      required: false,
       trim: true,
     },
     certificate: {
       type: String,
-      required: false,
       trim: true,
     },
     fyp: {
       type: String,
-      required: false,
       trim: true,
     },
   },
@@ -78,4 +70,5 @@ const graduateSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model("Graduate", graduateSchema);
+const Graduate = mongoose.model("Graduate", graduateSchema);
+module.exports = Graduate;

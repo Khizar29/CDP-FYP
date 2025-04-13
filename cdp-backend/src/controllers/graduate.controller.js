@@ -26,8 +26,6 @@ const importGraduates = asyncHandler(async (req, res) => {
 
     const validGraduates = [];
     const errors = [];
-    const duplicateNuIds = [];
-    const duplicateNuEmails = [];
 
     for (let i = 0; i < graduatesData.length; i++) {
       let graduate = graduatesData[i];
@@ -35,10 +33,13 @@ const importGraduates = asyncHandler(async (req, res) => {
       graduate.nuId = graduate.nuId ? graduate.nuId.toLowerCase().trim() : null;
       graduate.nuEmail = graduate.nuEmail ? graduate.nuEmail.toLowerCase().trim() : null;
 
-      if (!graduate.nuId || !graduate.firstName || !graduate.lastName || !graduate.nuEmail || !graduate.discipline || !graduate.yearOfGraduation || !graduate.cgpa) {
+      if (!graduate.nuId || !graduate.fullName || !graduate.nuEmail || !graduate.discipline || !graduate.yearOfGraduation || !graduate.cgpa) {
         errors.push(`Row ${i + 1}: Missing required field(s).`);
         continue;
       }
+
+      // ✅ Just store skills as they appear in the Excel sheet
+      graduate.skills = graduate.skills ? [graduate.skills] : [];  
 
       validGraduates.push(graduate);
     }
@@ -53,23 +54,11 @@ const importGraduates = asyncHandler(async (req, res) => {
     for (let i = 0; i < validGraduates.length; i += BATCH_SIZE) {
       const batch = validGraduates.slice(i, i + BATCH_SIZE);
       try {
-        const result = await Graduate.insertMany(batch, { ordered: false }); // Continue on error
+        const result = await Graduate.insertMany(batch, { ordered: false });
         totalInserted += result.length;
       } catch (error) {
-        if (error.code === 11000) {
-          const dupKeyError = error.writeErrors || [];
-          dupKeyError.forEach(err => {
-            const { keyValue } = err.err || {};
-            if (keyValue && keyValue.nuEmail) {
-              duplicateNuEmails.push(keyValue.nuEmail);
-            } else if (keyValue && keyValue.nuId) {
-              duplicateNuIds.push(keyValue.nuId);
-            }
-          });
-          totalFailed += error.writeErrors.length;
-        } else {
-          console.error('Error inserting batch:', error);
-        }
+        console.error('Error inserting batch:', error);
+        totalFailed += error.writeErrors ? error.writeErrors.length : 0;
       }
     }
 
@@ -79,7 +68,7 @@ const importGraduates = asyncHandler(async (req, res) => {
       new ApiResponse(
         201,
         { totalInserted, totalFailed },
-        `Successfully imported ${totalInserted} graduates. ${totalFailed} records failed. Duplicates: nuId(s): ${duplicateNuIds.join(', ')}. nuEmail(s): ${duplicateNuEmails.join(', ')}.`
+        `Successfully imported ${totalInserted} graduates. ${totalFailed} records failed.`
       )
     );
   } catch (error) {
@@ -87,6 +76,8 @@ const importGraduates = asyncHandler(async (req, res) => {
     return res.status(500).json(new ApiError(500, 'Failed to import graduates', error.message));
   }
 });
+
+
 
 const updateGraduate = asyncHandler(async (req, res) => {
   const { nuId } = req.params;
@@ -164,7 +155,7 @@ const fetchGraduates = asyncHandler(async (req, res) => {
   const criteria = {};
   if (searchTerm) {
     const regex = new RegExp(searchTerm, 'i');
-    criteria.$or = [{ firstName: regex }, { lastName: regex }, { nuId: regex }];
+    criteria.$or = [{ fullName: regex }, { nuId: regex }];
   }
   if (filterYear) {
     criteria.yearOfGraduation = filterYear;

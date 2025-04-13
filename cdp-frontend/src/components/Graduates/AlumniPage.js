@@ -128,7 +128,7 @@ const AlumniPage = () => {
         {alumniData.map((alumni) => (
           <Grid item key={alumni.nuId} xs={12} sm={6} md={4} lg={3}>
             <AlumniCard
-              name={`${alumni.firstName} ${alumni.lastName}`}
+              name={`${alumni.fullName}`}
               title={alumni.discipline}
               image={
                 alumni.profilePic
