@@ -36,8 +36,15 @@ router.post('/extract', verifyAdmin, async (req, res) => {
       messages: [
         {
           role: "system",
-          content: `Extract job info and return JSON with:
-          -  company_name (string)
+          content: `Extract job info and return JSON with these rules:
+
+          KEY RULES:
+          1. job_type MUST be one of: "Onsite", "Remote", "Hybrid", "Internship"
+          2. Location names (like Karachi, Lahore) should NEVER be considered as job_type
+          3. If no clear job type is found, default to "Onsite"
+
+          FIELDS TO EXTRACT:
+          - company_name (string)
           - title (string)
           - job_type (one of: "Onsite", "Remote", "Hybrid", "Internship")
           - qualification_req (string with bullet points)
@@ -72,8 +79,7 @@ router.post('/extract', verifyAdmin, async (req, res) => {
               }
             ]
           }
-          Additionally:
-          - If the text contains 'Location', do **NOT** consider it as job_type. job_type should be about work arrangements like "Onsite", "Remote", "Hybrid", or "Internship", not the geographical location.
+         
         `},
         {
           role: "user",
