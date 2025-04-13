@@ -8,7 +8,7 @@ const jobSchema = new Schema(
       required: true,
       trim: true,
     },
-    company_name: { 
+    company_name: {
       type: String,
       required: true,
       trim: true,
@@ -33,21 +33,6 @@ const jobSchema = new Schema(
       required: true,
       trim: true,
     },
-    job_link: { 
-      type: String,
-      required: false, 
-      trim: true,
-      validate: {
-        validator: function (value) {
-          // Allow valid URLs or email addresses
-          return (
-            /^((https?:\/\/)?[a-zA-Z0-9-_.]+\.[a-zA-Z]+(\/.*)?)$/.test(value) || 
-            /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
-          );
-        },
-        message: "Invalid job link or email address",
-      },
-    },
     application_methods: [{
       type: {
         type: String,
@@ -58,7 +43,7 @@ const jobSchema = new Schema(
         type: String,
         required: true,
         validate: {
-          validator: function(v) {
+          validator: function (v) {
             if (this.type === "email") {
               return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
             }
@@ -76,14 +61,14 @@ const jobSchema = new Schema(
     updated_on: {
       type: Date,
     },
-    postedBy: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: 'User' 
+    postedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
     },
     status: {
       type: String,
-      enum: ["pending", "approved", "rejected"], 
-      default: "pending" 
+      enum: ["pending", "approved", "rejected"],
+      default: "pending"
     },
 
     // New field to store the number of applications for this job

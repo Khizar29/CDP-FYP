@@ -1,23 +1,22 @@
 const Job = require('../models/job.model.js');
-const  asyncHandler  = require('../utils/asyncHandler.js');
-const ApiError  = require('../utils/ApiError.js');
-const ApiResponse  = require('../utils/ApiResponse.js');
+const asyncHandler = require('../utils/asyncHandler.js');
+const ApiError = require('../utils/ApiError.js');
+const ApiResponse = require('../utils/ApiResponse.js');
 const nodemailer = require('nodemailer');
 const Application = require("../models/jobapplication.model");
 
 
 const createJob = asyncHandler(async (req, res) => {
-  let { 
-    title, 
-    company_name, 
-    job_type,  
-    qualification_req, 
-    job_description, 
-    responsibilities, 
-    job_link,
+  let {
+    title,
+    company_name,
+    job_type,
+    qualification_req,
+    job_description,
+    responsibilities,
     application_methods,
-    toEmails, 
-    ccEmails, 
+    toEmails,
+    ccEmails,
     bccEmails
   } = req.body;
 
@@ -33,26 +32,25 @@ const createJob = asyncHandler(async (req, res) => {
   bccEmails = Array.isArray(bccEmails) ? bccEmails : (bccEmails ? [bccEmails] : []);
 
   // Validate and normalize application methods
-  application_methods = Array.isArray(application_methods) 
+  application_methods = Array.isArray(application_methods)
     ? application_methods.map(method => ({
-        type: ['email', 'website', 'form'].includes(method.type) ? method.type : 'website',
-        value: method.value || '',
-        instructions: method.instructions || ''
-      }))
+      type: ['email', 'website', 'form'].includes(method.type) ? method.type : 'website',
+      value: method.value || '',
+      instructions: method.instructions || ''
+    }))
     : [];
 
   // Create job with all fields
   const job = new Job({
     title,
-    company_name, 
+    company_name,
     job_type,
     qualification_req,
     job_description,
     responsibilities,
-    job_link, // Keeping for backward compatibility
     application_methods,
     postedBy: req.user.id,
-    status 
+    status
   });
 
   await job.save();
@@ -60,27 +58,19 @@ const createJob = asyncHandler(async (req, res) => {
   const transporter = nodemailer.createTransport({
     service: "Gmail",
     auth: {
-      user: process.env.GMAIL, 
+      user: process.env.GMAIL,
       pass: process.env.GMAIL_PASSWORD,
     },
   });
 
   // Email sending logic for approved jobs
   if (status === "approved") {
-    // Get all email application methods
-    const applicationEmails = application_methods
-      .filter(m => m.type === 'email')
-      .map(m => m.value);
-
-    // Combine with manual email lists (toEmails, etc.)
-    const allRecipients = [...new Set([
-      ...toEmails,
-      ...applicationEmails
-    ])];
+    // Only use toEmails field for recipients
+    const allRecipients = [...new Set(toEmails)];
 
     if (allRecipients.length > 0) {
       const subject = `Exciting Career Opportunity: ${title}`;
-      
+
       // Generate application links HTML
       const applicationLinks = application_methods.map(method => {
         if (method.type === 'email') {
@@ -111,7 +101,7 @@ const createJob = asyncHandler(async (req, res) => {
       try {
         await transporter.sendMail({
           from: `"Career Services and IL Office Karachi" <${process.env.GMAIL}>`,
-          to: allRecipients.join(","), 
+          to: allRecipients.join(","),
           cc: ccEmails.length ? ccEmails.join(",") : undefined,
           bcc: bccEmails.length ? bccEmails.join(",") : undefined,
           subject,
@@ -152,14 +142,13 @@ const createJob = asyncHandler(async (req, res) => {
 
 const updateJob = asyncHandler(async (req, res) => {
   const { jobId } = req.params;
-  const { 
-    title, 
-    company_name, 
-    job_type, 
-    qualification_req, 
-    job_description, 
-    responsibilities, 
-    job_link,
+  const {
+    title,
+    company_name,
+    job_type,
+    qualification_req,
+    job_description,
+    responsibilities,
     application_methods
   } = req.body;
 
@@ -177,8 +166,7 @@ const updateJob = asyncHandler(async (req, res) => {
   job.qualification_req = qualification_req || job.qualification_req;
   job.job_description = job_description || job.job_description;
   job.responsibilities = responsibilities || job.responsibilities;
-  job.job_link = job_link || job.job_link; // Backward compatibility
-  
+
   // Update application methods if provided
   if (Array.isArray(application_methods)) {
     job.application_methods = application_methods.map(method => ({
