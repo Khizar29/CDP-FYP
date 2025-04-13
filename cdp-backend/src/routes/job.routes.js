@@ -31,9 +31,16 @@ router.get('/recruiter', verifyRole(['recruiter']), getRecruiterJobs);
 router.post('/extract', verifyAdmin, async (req, res) => {
   try {
     let { job_ad_text } = req.body;
+    console.log("Job Ad Text Received in Backend:", job_ad_text);
 
-    job_ad_text = job_ad_text.replace(/Location:.*\n/g, "");
+        // URL decode job_ad_text before processing
+        job_ad_text = decodeURIComponent(job_ad_text);
     
+        // Remove the Location line if present
+        job_ad_text = job_ad_text.replace(/Location:.*\n/g, "");
+
+        console.log("Final text sent to model after decoding and removing line:", job_ad_text);
+
     const completion = await groq.chat.completions.create({
       messages: [
         {
