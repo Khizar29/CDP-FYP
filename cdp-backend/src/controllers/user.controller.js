@@ -102,7 +102,10 @@ const registerUser = asyncHandler(async (req, res) => {
            <p><strong>NU ID:</strong> ${nuId}</p>
            <p><strong>Password:</strong> ${generatedPassword}</p>
            <p>We recommend changing your password after logging in.</p>
-           <p>Best Regards,<br>NU Administration</p>`,
+           <p style="font-size: medium; color: black;">
+           <b>Best Regards,</b><br>
+           Industrial Liaison/Career Services Office<br>
+           021 111 128 128 ext. 184`,
   };
 
   try {
@@ -180,7 +183,7 @@ const registerGraduateAsUser = asyncHandler(async (req, res) => {
 
   // Create the user in the database
   const user = await User.create({
-    fullName: `${graduate.firstName} ${graduate.lastName}`,
+    fullName: `${graduate.fullName}`,
     email: personalEmail,
     nuId: graduate.nuId,
     password: generatedPassword,
@@ -197,14 +200,17 @@ const registerGraduateAsUser = asyncHandler(async (req, res) => {
   });
 
   const mailOptions = {
-    from: process.env.GMAIL,
+    from:`"Career Services and IL Office Karachi" <${process.env.GMAIL}>`,
     to: personalEmail,
     subject: 'Your New Account Password',
-    html: `<p>Hello ${graduate.firstName},</p>
+    html: `<p>Hello ${graduate.fullName},</p>
            <p>Thank you for registering on our platform. Here is your login password:</p>
            <p><strong>Password:</strong> ${generatedPassword}</p>
            <p>We recommend changing your password after the first login.</p>
-           <p>Best regards,<br>Your Company</p>`,
+           <p style="font-size: medium; color: black;">
+           <b>Best Regards,</b><br>
+           Industrial Liaison/Career Services Office<br>
+           021 111 128 128 ext. 184`,
   };
 
   transporter.sendMail(mailOptions, (error, info) => {
