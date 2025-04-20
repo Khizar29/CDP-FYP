@@ -22,7 +22,7 @@ const GraduateRow = ({ index, graduate, onDelete }) => {
     return (
         <tr>
             <td className="py-2 px-4 border-b text-center">{index}</td>
-            <td className="py-2 px-4 border-b">{graduate.firstName} {graduate.lastName}</td>
+            <td className="py-2 px-4 border-b">{graduate.fullName}</td>
             <td className="py-2 px-4 border-b">{graduate.nuId}</td>
             <td className="py-2 px-4 border-b">{graduate.discipline}</td>
             <td className="py-2 px-4 border-b text-center">{graduate.yearOfGraduation}</td>

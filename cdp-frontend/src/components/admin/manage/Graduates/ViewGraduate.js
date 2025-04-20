@@ -37,7 +37,7 @@ const ViewGraduate = () => {
       {graduate ? (
         <div className="bg-white p-6 rounded shadow-lg">
           <div className="mb-4">
-            <h3 className="text-xl font-semibold">{graduate.firstName} {graduate.lastName}</h3>
+            <h3 className="text-xl font-semibold">{graduate.fullName}</h3>
             <p className="text-gray-600">{graduate.discipline}</p>
           </div>
           <p><strong>NU ID:</strong> {graduate.nuId}</p>

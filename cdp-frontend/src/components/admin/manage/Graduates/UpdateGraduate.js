@@ -63,27 +63,17 @@ const UpdateGraduate = () => {
         <form onSubmit={handleFormSubmit} className="bg-white p-6 rounded shadow-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block mb-1">First Name</label>
+              <label className="block mb-1">Full Name</label>
               <input
                 type="text"
                 name="firstName"
-                value={formData.firstName}
+                value={formData.fullName}
                 onChange={handleInputChange}
                 className="w-full p-2 border rounded"
                 required
               />
             </div>
-            <div>
-              <label className="block mb-1">Last Name</label>
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded"
-                required
-              />
-            </div>
+
             <div>
               <label className="block mb-1">NU ID</label>
               <input
