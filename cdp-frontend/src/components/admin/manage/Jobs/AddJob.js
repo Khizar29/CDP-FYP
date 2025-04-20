@@ -10,7 +10,7 @@ import { UserContext } from '../../../../contexts/UserContext';
 Modal.setAppElement('#root');
 
 const AddJob = () => {
-  
+
   const { user, loading } = useContext(UserContext); // Get user and loading from context
   const location = useLocation();
   const job = location.state?.data;
@@ -71,7 +71,16 @@ const AddJob = () => {
 
   const [jobAdText, setJobAdText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [file, setFile] = useState(null);
   const navigate = useNavigate();
+
+  const handleFileChange = (event) => {
+    const selectedFile = event.target.files[0];  // Get the first file
+    if (selectedFile) {
+      setFile(selectedFile);  // Set the selected file to state
+    }
+  };
+
 
   const handleQuillChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -85,44 +94,81 @@ const AddJob = () => {
     // Remove any non-breaking spaces and trim extra spaces
     return text.replace(/\u00A0/g, ' ').replace(/\s+/g, ' ').trim();
   };
+
+  // Function to handle the extraction of job information
   const handleExtractInfo = async () => {
     setIsLoading(true);
-    const sanitizedJobAdText = sanitizeText(jobAdText);
-    console.log("Sanitized Job Ad Text Sent to Backend:", sanitizedJobAdText);
 
-    try {
+    // If a file is selected, upload the file instead of using job_ad_text
+    if (file) {
+      const formData = new FormData();
+      formData.append("job_ad_file", file);  // Add the selected file to FormData
+
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/extract-from-image`,
+          formData,
+          {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'multipart/form-data',  // Set the content type to multipart/form-data
+            }
+          }
+        );
+
+        const extractedInfo = response.data;
+        console.log("Extracted Info:", extractedInfo);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          company_name: extractedInfo.company_name || prevFormData.company_name,
+          title: extractedInfo.title || prevFormData.title,
+          job_type: extractedInfo.job_type || prevFormData.job_type,
+          qualification_req: extractedInfo.qualification_req || prevFormData.qualification_req,
+          job_description: extractedInfo.job_description || prevFormData.job_description,
+          responsibilities: extractedInfo.responsibilities || prevFormData.responsibilities,
+          application_methods: extractedInfo.application_methods || prevFormData.application_methods
+        }));
+
+      } catch (error) {
+        console.error('Error extracting job info:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      // If no file, proceed with the text extraction logic
+      const sanitizedJobAdText = sanitizeText(jobAdText);
       const encodedJobAdText = encodeURIComponent(sanitizedJobAdText);
 
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/extract`,
-        { job_ad_text: encodedJobAdText },
-        {
-          withCredentials: true,
-          headers: {
-            'Content-Type': 'application/json', // Tells the server the request body is JSON
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/extract`,
+          { job_ad_text: encodedJobAdText },
+          {
+            withCredentials: true,
+            headers: {
+              'Content-Type': 'application/json', // Tells the server the request body is JSON
+            }
           }
+        );
 
-        }
-      );
+        const extractedInfo = response.data;
+        console.log("Extracted Info:", extractedInfo);
+        setFormData((prevFormData) => ({
+          ...prevFormData,
+          company_name: extractedInfo.company_name || prevFormData.company_name,
+          title: extractedInfo.title || prevFormData.title,
+          job_type: extractedInfo.job_type || prevFormData.job_type,
+          qualification_req: extractedInfo.qualification_req || prevFormData.qualification_req,
+          job_description: extractedInfo.job_description || prevFormData.job_description,
+          responsibilities: extractedInfo.responsibilities || prevFormData.responsibilities,
+          application_methods: extractedInfo.application_methods || prevFormData.application_methods
+        }));
 
-      const extractedInfo = response.data;
-      console.log("Extracted Info:", extractedInfo);
-      setFormData((prevFormData) => ({
-        ...prevFormData,
-        company_name: extractedInfo.company_name || prevFormData.company_name,
-        title: extractedInfo.title || prevFormData.title,
-        job_type: extractedInfo.job_type || prevFormData.job_type,
-        qualification_req: extractedInfo.qualification_req || prevFormData.qualification_req,
-        job_description: extractedInfo.job_description || prevFormData.job_description,
-        responsibilities: extractedInfo.responsibilities || prevFormData.responsibilities,
-        application_methods: extractedInfo.application_methods || prevFormData.application_methods
-      }));
-
-
-    } catch (error) {
-      console.error('Error extracting job info:', error);
-    } finally {
-      setIsLoading(false);
+      } catch (error) {
+        console.error('Error extracting job info:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -203,6 +249,28 @@ const AddJob = () => {
             Extract Info
           </button>
         </div>
+
+        <div className="mb-6">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="job_ad_file">
+            Upload Job Ad (Image/PDF)
+          </label>
+          <input
+            type="file"
+            id="job_ad_file"
+            name="job_ad_file"
+            accept="image/*,application/pdf"  // Accepts images and PDFs
+            onChange={handleFileChange}      // Trigger file upload handler
+            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
+          />
+          <button
+            type="button"
+            onClick={handleExtractInfo}
+            className="mt-4 bg-green-500 text-white py-2 px-4 rounded-lg font-bold hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 transition duration-200"
+          >
+            Extract Info
+          </button>
+        </div>
+
 
         <div className="mb-6">
           <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="company_name">
