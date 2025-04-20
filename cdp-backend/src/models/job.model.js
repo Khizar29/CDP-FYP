@@ -20,17 +20,17 @@ const jobSchema = new Schema(
     },
     qualification_req: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     job_description: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     responsibilities: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     application_methods: [{
