@@ -132,7 +132,7 @@ const AlumniPage = () => {
               title={alumni.discipline}
               image={
                 alumni.profilePic
-                  ? `https://drive.google.com/thumbnail?id=${alumni.profilePic.split('/d/')[1]?.split('/')[0]}&sz=s4000`
+                  ? alumni.profilePic
                   : `${placeholder}`
               }
               classOf={alumni.yearOfGraduation}

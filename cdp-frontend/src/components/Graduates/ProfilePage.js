@@ -54,10 +54,8 @@ const ProfilePage = () => {
 
   // Generate the correct Google Drive thumbnail link format
   const profileImageUrl = alumni.profilePic
-    ? `https://drive.google.com/thumbnail?id=${alumni.profilePic
-        .split("/d/")[1]
-        ?.split("/")[0]}&sz=s4000`
-    : `${placeholder}`;
+                          ? alumni.profilePic
+                          : `${placeholder}`;
 
   // Sanitize rich text fields using DOMPurify
   const sanitizeHtml = (htmlContent) => {
