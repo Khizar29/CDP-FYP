@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faTimes, faHome, faInfoCircle, faChalkboardTeacher, faGraduationCap, faCalendar, faUser, faPhone, faBullhorn, faBriefcase, faKey, faRightFromBracket, faUserShield } from '@fortawesome/free-solid-svg-icons';
-import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons'; // Import the arrow icons
+import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 
 import logo from '../Images/logo-FAST-NU.png';
 import { UserContext } from '../contexts/UserContext';
@@ -18,15 +18,12 @@ const Header = ({ scrollToSection }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
   const { user, logout } = useContext(UserContext);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-
-
-
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -36,8 +33,6 @@ const Header = ({ scrollToSection }) => {
       console.error("Error during logout", error);
     }
   };
-
-
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -59,24 +54,9 @@ const Header = ({ scrollToSection }) => {
     };
   }, [isDropdownOpen]);
 
-
   const toggleDropdown = () => {
-    setDropdownOpen(!dropdownOpen);
+    setIsDropdownOpen(!isDropdownOpen);
   };
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
 
   return (
     <header className="bg-gradient-to-r from-blue-100 to-sky-600 text-white py-2 md:py-4">
@@ -96,10 +76,10 @@ const Header = ({ scrollToSection }) => {
               <FontAwesomeIcon icon={faBullhorn} /> <span>Announcement</span>
             </Link>
           )}
-          <Link to="/jobs" id="jobs" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
+          <Link to="/jobs" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faBriefcase} /> <span>Jobs</span>
           </Link>
-          <Link to="/alumni" id="alumni" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
+          <Link to="/alumni" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
             <FontAwesomeIcon icon={faGraduationCap} /> <span>Alumni</span>
           </Link>
           <Link to="/news" className="text-white no-underline font-semibold flex items-center hover:text-yellow-400 space-x-1 cursor-pointer">
@@ -115,11 +95,11 @@ const Header = ({ scrollToSection }) => {
                 <span className="text-white md:hidden">
                   <BsThreeDotsVertical />
                 </span>
-                <span className={`transform transition-transform ${dropdownOpen ? "rotate-180" : ""} hidden md:inline-block`}>
+                <span className={`transform transition-transform ${isDropdownOpen ? "rotate-180" : ""} hidden md:inline-block`}>
                   ▼
                 </span>
               </button>
-              {dropdownOpen && (
+              {isDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50">
                   <div className="px-4 py-2 text-gray-800">{user.fullName}</div>
                   <hr className="border-gray-300" />
@@ -133,7 +113,6 @@ const Header = ({ scrollToSection }) => {
                       Admin Panel
                     </Link>
                   )}
-                  {/* Faculty Panel Link */}
                   {user.role === 'faculty' && (
                     <Link to="/faculty" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                       <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" /> Faculty Panel
@@ -211,10 +190,12 @@ const Header = ({ scrollToSection }) => {
                   {isDropdownOpen && (
                     <div ref={dropdownRef} className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
                       <Link to="/change-password" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                      <FontAwesomeIcon icon={faKey} className="mr-2 text-blue-600" /> {/* Key Icon for Password */}
                         Change Password
                       </Link>
                       {user.role === 'admin' && (
                         <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                          <FontAwesomeIcon icon={faUserShield} className="mr-2 text-purple-600" /> {/* Admin Panel icon */}
                           Admin Panel
                         </Link>
                       )}
@@ -225,6 +206,7 @@ const Header = ({ scrollToSection }) => {
                         </Link>
                       )}
                       <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
+                      <FontAwesomeIcon icon={faRightFromBracket} className="mr-2 text-red-600" /> {/* Logout icon */}
                         Logout
                       </div>
                     </div>
@@ -235,7 +217,6 @@ const Header = ({ scrollToSection }) => {
                   <FontAwesomeIcon icon={faUser} /> <span>Login</span>
                 </Link>
               )}
-
             </nav>
           </>
         )}
