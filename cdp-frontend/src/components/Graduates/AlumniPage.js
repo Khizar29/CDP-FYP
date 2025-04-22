@@ -6,6 +6,7 @@ import AlumniCard from './AlumniCard';
 import Pagination from './Pagination';
 import SearchBar from './SearchBar';
 import placeholder from '../../Images/placeholder.png';
+import GradPic from '../../Images/SK__1166.JPG';
 
 const AlumniPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,7 +91,7 @@ const AlumniPage = () => {
       <Box
         sx={{
           position: 'relative',
-          backgroundImage: 'url(https://via.placeholder.com/1500x500)',
+          backgroundImage: `url(${GradPic})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           height: { xs: 200, sm: 250, md: 300 }, // Responsive height
