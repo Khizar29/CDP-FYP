@@ -202,6 +202,36 @@ const getGraduateCount = async (req, res) => {
   }
 };
 
+// Get neighboring graduates (previous and next)
+const getGraduateNeighbors = asyncHandler(async (req, res) => {
+  const { nuId } = req.params;
+  
+  try {
+    // Find the current graduate by nuId
+    const current = await Graduate.findOne({ nuId });
+    if (!current) {
+      throw new ApiError(404, 'Graduate not found');
+    }
+
+    // Find previous graduate
+    const prev = await Graduate.findOne({ 
+      fullName: { $lt: current.fullName } 
+    }).sort({ fullName: -1 }).limit(1).select('nuId');
+
+    // Find next graduate
+    const next = await Graduate.findOne({ 
+      fullName: { $gt: current.fullName } 
+    }).sort({ fullName: 1 }).limit(1).select('nuId');
+
+    res.status(200).json(new ApiResponse(200, {
+      prev: prev ? prev.nuId : null,
+      next: next ? next.nuId : null
+    }, "Neighbors fetched successfully"));
+  } catch (error) {
+    throw new ApiError(500, "Error fetching neighboring graduates", error.message);
+  }
+});
+
 // Export all functions using CommonJS syntax
 module.exports = {
   importGraduates,
@@ -210,4 +240,5 @@ module.exports = {
   fetchGraduates,
   getGraduateById,
   getGraduateCount,
+  getGraduateNeighbors,
 };

@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import DOMPurify from "dompurify"; // Import DOMPurify for sanitization
+import DOMPurify from "dompurify";
 import placeholder from "../../Images/placeholder.png";
 import axios from "axios";
-import Header from "../Header"; // Adjust the import path as needed
-import Footer from "../Footer"; // Adjust the import path as needed
+import Header from "../Header";
+import Footer from "../Footer";
 import EmailIcon from "@mui/icons-material/Email";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import ShareIcon from "@mui/icons-material/Share";
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const ProfilePage = () => {
-  const { id } = useParams(); // Get the ID from the URL
-  const navigate = useNavigate(); // useNavigate for navigation
+  const { id } = useParams();
+  const navigate = useNavigate();
   const [alumni, setAlumni] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [shareMenuOpen, setShareMenuOpen] = useState(false); // State to toggle share menu
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const [neighbors, setNeighbors] = useState({ prev: null, next: null });
 
   useEffect(() => {
     const fetchAlumniDetails = async () => {
@@ -26,6 +29,12 @@ const ProfilePage = () => {
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${id}`
         );
         setAlumni(response.data.data);
+
+        // Fetch neighboring alumni for navigation
+        const neighborsResponse = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${id}/neighbors`
+        );
+        setNeighbors(neighborsResponse.data.data);
       } catch (error) {
         setError(error.message || "Error fetching alumni details");
       } finally {
@@ -41,23 +50,21 @@ const ProfilePage = () => {
 
   const shareOptions = [
     {
-      icon: <EmailIcon />, // Material UI Email Icon
+      icon: <EmailIcon />,
       label: "Email",
       url: `mailto:?subject=Check out this profile&body=Check out the profile of ${alumni.fullName}: http://111.68.108.227:3000/profile/${id}`,
     },
     {
-      icon: <WhatsAppIcon />, // Material UI WhatsApp Icon
+      icon: <WhatsAppIcon />,
       label: "WhatsApp",
       url: `https://api.whatsapp.com/send?text=Check out the profile of ${alumni.fullName}: http://111.68.108.227:3000/profile/${id}`,
     },
   ];
 
-  // Generate the correct Google Drive thumbnail link format
   const profileImageUrl = alumni.profilePic
-                          ? alumni.profilePic
-                          : `${placeholder}`;
+    ? alumni.profilePic
+    : `${placeholder}`;
 
-  // Sanitize rich text fields using DOMPurify
   const sanitizeHtml = (htmlContent) => {
     return { __html: DOMPurify.sanitize(htmlContent) };
   };
@@ -67,8 +74,36 @@ const ProfilePage = () => {
       {/* Header */}
       <Header />
 
+      {/* Navigation Controls - Top (for mobile) */}
+      <div className="md:hidden flex justify-between items-center p-4 bg-[#5c2d91] text-white">
+        <button
+          onClick={() => {
+            navigate(`/profile/${neighbors.prev}`);
+          }}
+          disabled={!neighbors.prev}
+          className={`flex items-center px-3 py-2 rounded ${neighbors.prev ? 'bg-[#f4e1ce] text-[#5c2d91] hover:bg-[#e3cbb9]' : 'bg-gray-300 cursor-not-allowed'}`}
+        >
+          <ArrowBackIosIcon fontSize="small" />
+          <span className="ml-1">Previous</span>
+        </button>
+        <button
+          onClick={() => navigate("/alumni")}
+          className="px-4 py-2 rounded-full bg-[#f4e1ce] text-[#5c2d91] hover:bg-[#e3cbb9] text-sm"
+        >
+          Back to list
+        </button>
+        <button
+          onClick={() => navigate(`/profile/${neighbors.next}`)}
+          disabled={!neighbors.next}
+          className={`flex items-center px-3 py-2 rounded ${neighbors.next ? 'bg-[#f4e1ce] text-[#5c2d91] hover:bg-[#e3cbb9]' : 'bg-gray-300 cursor-not-allowed'}`}
+        >
+          <span className="mr-1">Next</span>
+          <ArrowForwardIosIcon fontSize="small" />
+        </button>
+      </div>
+
       {/* Social Media and Share Section */}
-      <header className="flex justify-between items-center p-6 relative">
+      <header className="hidden md:flex justify-between items-center p-6 relative">
         <div className="flex space-x-4 text-[#5c2d91] text-xl"></div>
         <div className="flex items-center space-x-4 relative">
           {shareMenuOpen && (
@@ -94,7 +129,7 @@ const ProfilePage = () => {
           </button>
 
           <button
-            onClick={() => navigate("/alumni")} // Navigate to the alumni list
+            onClick={() => navigate("/alumni")}
             className="text-[#5c2d91] px-4 py-2 rounded-full bg-[#f4e1ce] hover:bg-[#e3cbb9] text-sm"
           >
             Back to list
@@ -103,8 +138,44 @@ const ProfilePage = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto bg-white shadow-lg rounded-lg overflow-hidden flex flex-col md:flex-row p-8 mb-12">
-        {/* Left Section - Profile Image and Basic Info in a shadow box */}
+      <main className="container mx-auto bg-white shadow-lg rounded-lg flex flex-col md:flex-row px-12 py-8 mb-12 relative">
+        {/* Left arrow - now fully visible */}
+        <div className="hidden md:flex flex-col justify-center absolute left-4 top-1/2 transform -translate-y-1/2 z-10">
+          <button
+            onClick={() => navigate(`/profile/${neighbors.prev}`)}
+            disabled={!neighbors.prev}
+            className={`
+      p-0 w-12 h-12 rounded-full shadow-lg flex items-center justify-center
+      ${neighbors.prev ? 'bg-yellow-500 text-white hover:bg-yellow-700' : 'bg-gray-300 cursor-not-allowed'}
+    `}
+            aria-label="Previous profile"
+          >
+            <ArrowBackIosIcon
+              fontSize="medium"
+              className="relative left-[2px]" // Slight adjustment for perfect centering
+            />
+          </button>
+        </div>
+
+        {/* Right arrow - perfectly centered */}
+        <div className="hidden md:flex flex-col justify-center absolute right-4 top-1/2 transform -translate-y-1/2 z-10">
+          <button
+            onClick={() => navigate(`/profile/${neighbors.next}`)}
+            disabled={!neighbors.next}
+            className={`
+      p-0 w-12 h-12 rounded-full shadow-lg flex items-center justify-center
+      ${neighbors.next ? 'bg-yellow-500 text-white hover:bg-yellow-700' : 'bg-gray-300 cursor-not-allowed'}
+    `}
+            aria-label="Next profile"
+          >
+            <ArrowForwardIosIcon
+              fontSize="medium"
+              className="relative right-[2px]" 
+            />
+          </button>
+        </div>
+
+        {/* Left Section - Profile Image and Basic Info */}
         <div className="w-full flex flex-col items-center bg-[#C1E4FB] p-6 rounded-lg shadow-md mb-8 max-w-sm mx-auto">
           <img
             src={profileImageUrl || `${placeholder}`}
@@ -173,6 +244,32 @@ const ProfilePage = () => {
           </div>
         </div>
       </main>
+
+      {/* Navigation Controls - Bottom (for mobile) */}
+      <div className="md:hidden flex justify-between items-center p-4 bg-[#5c2d91] text-white">
+        <button
+          onClick={() => navigate(`/profile/${neighbors.prev}`)}
+          disabled={!neighbors.prev}
+          className={`flex items-center px-3 py-2 rounded ${neighbors.prev ? 'bg-[#f4e1ce] text-[#5c2d91] hover:bg-[#e3cbb9]' : 'bg-gray-300 cursor-not-allowed'}`}
+        >
+          <ArrowBackIosIcon fontSize="small" />
+          <span className="ml-1">Previous</span>
+        </button>
+        <button
+          onClick={() => navigate("/alumni")}
+          className="px-4 py-2 rounded-full bg-[#f4e1ce] text-[#5c2d91] hover:bg-[#e3cbb9] text-sm"
+        >
+          Back to list
+        </button>
+        <button
+          onClick={() => navigate(`/profile/${neighbors.next}`)}
+          disabled={!neighbors.next}
+          className={`flex items-center px-3 py-2 rounded ${neighbors.next ? 'bg-[#f4e1ce] text-[#5c2d91] hover:bg-[#e3cbb9]' : 'bg-gray-300 cursor-not-allowed'}`}
+        >
+          <span className="mr-1">Next</span>
+          <ArrowForwardIosIcon fontSize="small" />
+        </button>
+      </div>
 
       {/* Footer */}
       <Footer />
