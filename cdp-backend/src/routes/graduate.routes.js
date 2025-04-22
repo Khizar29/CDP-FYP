@@ -5,7 +5,8 @@ const {
     deleteGraduate,
     fetchGraduates,
     getGraduateById,
-    getGraduateCount
+    getGraduateCount,
+    getGraduateNeighbors
 } = require("../controllers/graduate.controller.js");
 const { verifyJWT, verifyAdmin } = require("../middlewares/auth.middleware.js");
 const { upload } = require("../middlewares/multer.middleware.js"); 
@@ -14,6 +15,7 @@ const { authorizeGraduate } = require("../middlewares/authgraduates.middleware.j
 const router = express.Router();
 
 // Public routes
+router.get('/:nuId/neighbors', getGraduateNeighbors);
 router.get('/count', getGraduateCount); // Fetch the count of graduates
 router.get('/', fetchGraduates); // Fetch all graduate profiles
 router.get('/:nuId', getGraduateById); // Fetch a single graduate by ID

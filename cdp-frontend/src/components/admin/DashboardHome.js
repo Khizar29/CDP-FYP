@@ -47,6 +47,8 @@ const DashboardHome = () => {
     const fetchDashboardData = async () => {
       try {
         const [
+          graduateCountRes,
+          newsfeedCountRes,
           jobCountRes,
           jobsPerMonthRes,
           applicationsPerJobRes,
@@ -58,6 +60,8 @@ const DashboardHome = () => {
           jobApplicationsPerCompanyRes,
           sortedJobsbyApplicationsRes
         ] = await Promise.all([
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/count`, { withCredentials: true }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/count`, { withCredentials: true }),
           axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/count`, { withCredentials: true }),
           axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/job-postings-per-month`, { withCredentials: true }),
           axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/applications-per-job`, { withCredentials: true }),
@@ -72,8 +76,8 @@ const DashboardHome = () => {
 
         setStats({
           jobCount: jobCountRes.data.data.count,
-          alumniCount: 150, // Placeholder
-          eventsCount: 25,  // Placeholder
+          alumniCount: graduateCountRes.data.data.count, // Placeholder
+          eventsCount: newsfeedCountRes.data.data.count,  // Placeholder
           forumCount: 45    // Placeholder
         });
 

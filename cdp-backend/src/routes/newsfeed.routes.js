@@ -4,7 +4,8 @@ const {
   fetchNewsFeeds,
   fetchNewsFeedById,
   updateNewsFeed,
-  deleteNewsFeed
+  deleteNewsFeed,
+  getNewsfeedCount,
 } = require("../controllers/newsfeed.controller.js");
 const { verifyJWT, verifyRole } = require("../middlewares/auth.middleware.js");
 const { upload } = require("../middlewares/multer.middleware.js");
@@ -13,6 +14,7 @@ const router = express.Router();
 
 // Public route to fetch news and events
 router.get('/', verifyJWT.optional, fetchNewsFeeds); // Fetch public news and events
+router.get('/count', getNewsfeedCount);
 router.get('/:id', fetchNewsFeedById); // Fetch a single news feed by ID
 
 // Apply JWT verification for all routes below this point

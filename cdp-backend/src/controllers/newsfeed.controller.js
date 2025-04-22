@@ -153,11 +153,22 @@ const deleteNewsFeed = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, null, "NewsFeed deleted successfully"));
 });
 
+const getNewsfeedCount = async (req, res) => {
+  try {
+    const count = await NewsFeed.countDocuments();
+    return res.status(200).json(new ApiResponse(200, { count }, 'Newsfeed count retrieved successfully'));
+  } catch (error) {
+    console.error('Error counting Newsfeed:', error);
+    return res.status(500).json(new ApiError(500, 'Error counting Newsfeed', error.message));
+  }
+};
+
 // Export functions using CommonJS syntax
 module.exports = {
   createNewsFeed,
   fetchNewsFeeds,
   fetchNewsFeedById,
   updateNewsFeed,
-  deleteNewsFeed
+  deleteNewsFeed,
+  getNewsfeedCount,
 };
