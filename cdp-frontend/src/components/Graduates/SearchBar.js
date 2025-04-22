@@ -46,11 +46,12 @@ const SearchBar = ({ onSearch }) => {
               onChange={(e) => setFilterYear(e.target.value)}
             >
               <option value="">All Classes</option>
-              <option value="2020">2020</option>
+              {/* <option value="2020">2020</option>
               <option value="2021">2021</option>
               <option value="2022">2022</option>
-              <option value="2023">2023</option>
+              <option value="2023">2023</option> */}
               <option value="2024">2024</option>
+              <option value="2025">2025</option>
             </select>
           </div>
 
@@ -62,13 +63,14 @@ const SearchBar = ({ onSearch }) => {
               onChange={(e) => setFilterDiscipline(e.target.value)}
             >
               <option value="">All Programs</option>
-              <option value="Business Analytics">Business Analytics</option>
-              <option value="Computer Science">Computer Science</option>
-              <option value="Artificial Intelligence">Artificial Intelligence</option>
-              <option value="Data Science">Data Science</option>
-              <option value="Software Engineering">Software Engineering</option>
-              <option value="Cyber Security">Cyber Security</option>
-              <option value="Financial Technology">Financial Technology</option>
+              <option value="BS(CS)">Computer Science</option>
+              <option value="BS(AI and Data Science)">Artificial Intelligence</option>
+              <option value="BS(AI and Data Science)">Data Science</option>
+              <option value="BS(SE)">Software Engineering</option>
+              <option value="BS(CY)">Cyber Security</option>
+              <option value="BS(EE)">Electrical Engineering</option>
+              {/* <option value="Business Analytics">Business Analytics</option>
+              <option value="Financial Technology">Financial Technology</option> */}
             </select>
           </div>
 
@@ -153,9 +155,12 @@ const SearchBar = ({ onSearch }) => {
                 className="p-3 mt-1 border rounded-md"
               >
                 <option value="">All Classes</option>
-                <option value="2020">2020</option>
-                <option value="2021">2021</option>
-                <option value="2022">2022</option>
+              {/* <option value="2020">2020</option>
+              <option value="2021">2021</option>
+              <option value="2022">2022</option>
+              <option value="2023">2023</option> */}
+              <option value="2024">2024</option>
+              <option value="2025">2025</option>
               </select>
             </div>
             <div className="flex flex-col">
@@ -166,13 +171,14 @@ const SearchBar = ({ onSearch }) => {
                 className="p-3 mt-1 border rounded-md"
               >
                 <option value="">All Programs</option>
-                <option value="Business Analytics">Business Analytics</option>
-                <option value="Computer Science">Computer Science</option>
-                <option value="Artificial Intelligence">Artificial Intelligence</option>
-                <option value="Data Science">Data Science</option>
-                <option value="Software Engineering">Software Engineering</option>
-                <option value="Cyber Security">Cyber Security</option>
-                <option value="Financial Technology">Financial Technology</option>
+                <option value="BS(CS)">Computer Science</option>
+              <option value="BS(AI and Data Science)">Artificial Intelligence</option>
+              <option value="BS(AI and Data Science)">Data Science</option>
+              <option value="BS(SE)">Software Engineering</option>
+              <option value="BS(CY)">Cyber Security</option>
+              <option value="BS(EE)">Electrical Engineering</option>
+              {/* <option value="Business Analytics">Business Analytics</option>
+              <option value="Financial Technology">Financial Technology</option> */}
               </select>
             </div>
             <button
