@@ -5,9 +5,6 @@ const ApiResponse = require('../utils/ApiResponse.js');
 const nodemailer = require('nodemailer');
 const { Groq } = require('groq-sdk');
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const { PDFDocument } = require('pdf-lib');
-const sharp = require('sharp');
-const Tesseract = require('tesseract.js');
 const fs = require('fs');
 const path = require('path');
 const Application = require("../models/jobapplication.model"); 
@@ -380,83 +377,6 @@ const convertPdfToImage = async (pdfPath, outputPath) => {
   return outputPath; // Return the path where the image was saved
 };
 
-// Controller function to handle OCR, PDF conversion, and field extraction
-const extractJobInfofromFile = asyncHandler(async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
-    }
-
-    const filePath = req.file.path;
-    console.log(filePath);
-    
-    const fileType = req.file.mimetype;
-    let extractedText = '';
-
-    if (fileType === 'application/pdf') {
-      // Define output path for the converted image
-      const outputDirectory = path.dirname(filePath);
-      const outputPath = path.join(outputDirectory, 'output_image.png');
-      console.log("Output Path:", outputPath);
-      
-
-      try {
-        // Convert PDF to image
-        const imagePath = await convertPdfToImage(filePath, outputPath);
-        console.log("PDF page converted to image at:", imagePath);
-
-        // Perform OCR on the converted image
-        const { data: { text } } = await Tesseract.recognize(
-          imagePath,
-          'eng',
-          { logger: m => console.log(m) }
-        );
-
-        extractedText = text;
-        console.log("EXTRACTED TEXT: ", extractedText);
-
-        // Clean up the temporary image file
-        // fs.unlinkSync(imagePath);
-
-      } catch (error) {
-        console.error('Error during PDF to image conversion or OCR:', error);
-        return res.status(500).json({ error: 'Failed to process PDF' });
-      }
-    } else if (fileType.startsWith('image/')) {
-      // Direct OCR for image files
-      try {
-        const { data: { text } } = await Tesseract.recognize(
-          filePath,
-          'eng',
-          { logger: m => console.log(m) }
-        );
-        extractedText = text;
-      } catch (error) {
-        console.error('Error during OCR:', error);
-        return res.status(500).json({ error: 'Failed to perform OCR on image' });
-      }
-    } else {
-      return res.status(400).json({ error: 'Unsupported file type' });
-    }
-
-    // Clean up the uploaded file after processing
-    fs.unlinkSync(filePath);
-
-    // Now pass the extracted text to your existing text processing function
-    console.log("EXTRACTED TEXT: ", extractedText);
-    
-    const jobAdText = { job_ad_text: extractedText };
-
-    // Here, you can pass `req` and `res` to the `extractJobInfofromText` function
-    req.body = jobAdText;  // Add job_ad_text to the request body
-    return extractJobInfofromText(req, res);  // Call the text extraction function
-
-  } catch (error) {
-    console.error('Error processing file:', error);
-    res.status(500).json({ error: 'Failed to process the file' });
-  }
-});
-
 const extractJobInfofromText = asyncHandler(async (req, res) => {
   try {
     let { job_ad_text } = req.body;
@@ -646,7 +566,6 @@ module.exports = {
   getJobCount,
   getRecruiterJobs,
   approveJob,
-  extractJobInfofromFile,
   extractJobInfofromText,
   extractJobInfoFromImageWithGroq,
 };
