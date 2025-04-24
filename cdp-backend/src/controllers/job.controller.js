@@ -3,8 +3,15 @@ const asyncHandler = require('../utils/asyncHandler.js');
 const ApiError = require('../utils/ApiError.js');
 const ApiResponse = require('../utils/ApiResponse.js');
 const nodemailer = require('nodemailer');
-const Application = require("../models/jobapplication.model");
-
+const { Groq } = require('groq-sdk');
+const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+const { PDFDocument } = require('pdf-lib');
+const sharp = require('sharp');
+const Tesseract = require('tesseract.js');
+const fs = require('fs');
+const path = require('path');
+const Application = require("../models/jobapplication.model"); 
+const axios = require('axios');
 
 const createJob = asyncHandler(async (req, res) => {
   let {
@@ -350,6 +357,285 @@ const approveJob = asyncHandler(async (req, res) => {
   return res.status(200).json(new ApiResponse(200, job, `Job has been ${status}`));
 });
 
+const convertPdfToImage = async (pdfPath, outputPath) => {
+  const pdfBytes = fs.readFileSync(pdfPath);
+  const pdfDoc = await PDFDocument.load(pdfBytes);
+
+  // Extract the first page from the PDF (we're assuming single-page PDFs for simplicity)
+  const firstPage = pdfDoc.getPages()[0];
+  const { width, height } = firstPage.getSize();
+
+  // Create an image from the PDF's first page using sharp
+  await sharp({
+    create: {
+      width: Math.floor(width),
+      height: Math.floor(height),
+      channels: 3,  // RGB channels
+      background: { r: 255, g: 255, b: 255 },  // white background
+    },
+  })
+    .png()
+    .toFile(outputPath);  // Save as PNG
+
+  return outputPath; // Return the path where the image was saved
+};
+
+// Controller function to handle OCR, PDF conversion, and field extraction
+const extractJobInfofromFile = asyncHandler(async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const filePath = req.file.path;
+    console.log(filePath);
+    
+    const fileType = req.file.mimetype;
+    let extractedText = '';
+
+    if (fileType === 'application/pdf') {
+      // Define output path for the converted image
+      const outputDirectory = path.dirname(filePath);
+      const outputPath = path.join(outputDirectory, 'output_image.png');
+      console.log("Output Path:", outputPath);
+      
+
+      try {
+        // Convert PDF to image
+        const imagePath = await convertPdfToImage(filePath, outputPath);
+        console.log("PDF page converted to image at:", imagePath);
+
+        // Perform OCR on the converted image
+        const { data: { text } } = await Tesseract.recognize(
+          imagePath,
+          'eng',
+          { logger: m => console.log(m) }
+        );
+
+        extractedText = text;
+        console.log("EXTRACTED TEXT: ", extractedText);
+
+        // Clean up the temporary image file
+        // fs.unlinkSync(imagePath);
+
+      } catch (error) {
+        console.error('Error during PDF to image conversion or OCR:', error);
+        return res.status(500).json({ error: 'Failed to process PDF' });
+      }
+    } else if (fileType.startsWith('image/')) {
+      // Direct OCR for image files
+      try {
+        const { data: { text } } = await Tesseract.recognize(
+          filePath,
+          'eng',
+          { logger: m => console.log(m) }
+        );
+        extractedText = text;
+      } catch (error) {
+        console.error('Error during OCR:', error);
+        return res.status(500).json({ error: 'Failed to perform OCR on image' });
+      }
+    } else {
+      return res.status(400).json({ error: 'Unsupported file type' });
+    }
+
+    // Clean up the uploaded file after processing
+    fs.unlinkSync(filePath);
+
+    // Now pass the extracted text to your existing text processing function
+    console.log("EXTRACTED TEXT: ", extractedText);
+    
+    const jobAdText = { job_ad_text: extractedText };
+
+    // Here, you can pass `req` and `res` to the `extractJobInfofromText` function
+    req.body = jobAdText;  // Add job_ad_text to the request body
+    return extractJobInfofromText(req, res);  // Call the text extraction function
+
+  } catch (error) {
+    console.error('Error processing file:', error);
+    res.status(500).json({ error: 'Failed to process the file' });
+  }
+});
+
+const extractJobInfofromText = asyncHandler(async (req, res) => {
+  try {
+    let { job_ad_text } = req.body;
+    console.log("Job Ad Text Received in Backend:", job_ad_text);
+
+        // URL decode job_ad_text before processing
+        job_ad_text = decodeURIComponent(job_ad_text);
+    
+        // Remove the Location line if present
+        job_ad_text = job_ad_text.replace(/Location:.*\n/g, "");
+
+        console.log("Final text sent to model after decoding and removing line:", job_ad_text);
+
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: `Extract job info and return JSON with these rules:
+
+          KEY RULES:
+          1. job_type MUST be one of: "Onsite", "Remote", "Hybrid", "Internship"
+          2. Location names (like Karachi, Lahore) should NEVER be considered as job_type
+          3. If no clear job type is found, default to "Onsite"
+
+          FIELDS TO EXTRACT:
+          - company_name (string)
+          - title (string)
+          - job_type (one of: "Onsite", "Remote", "Hybrid", "Internship")
+          - qualification_req (string with bullet points)
+          - job_description (string)
+          - responsibilities (string with bullet points)
+          - application_methods: array of {type, value, instructions}
+          
+          Rules for application_methods:
+          1. Find ALL application methods in the text
+          2. Types can be:
+             - email (for email addresses)
+             - website (for general URLs)
+             - form (for application forms)
+          3. Include any special instructions with each method
+          4. Format emails as just the address (no mailto:)
+          5. Phone numbers should be excluded from application methods
+          5. For websites, ensure full URLs (add https:// if missing)
+          
+          Example input:
+          "Apply to: jobs@company.com (Subject: DEV-123) or visit careers.company.com"
+          
+          Example output:
+          {
+            "application_methods": [
+              {
+                "type": "email",
+                "value": "jobs@company.com",
+                "instructions": "Subject: DEV-123"
+              },
+              {
+                "type": "website",
+                "value": "https://careers.company.com"
+              }
+            ]
+          }
+         
+        `},
+        {
+          role: "user",
+          content: job_ad_text
+        }
+      ],
+      model: "llama-3.3-70b-versatile",
+      response_format: { type: "json_object" },
+      temperature: 0.1
+    });
+
+    let extractedInfo = JSON.parse(completion.choices[0]?.message?.content || "{}");
+    
+    // Post-processing to clean up the data
+    if (extractedInfo.application_methods) {
+      extractedInfo.application_methods = extractedInfo.application_methods.map(method => {
+        // Clean email values
+        if (method.type === 'email' && method.value.includes('mailto:')) {
+          method.value = method.value.replace('mailto:', '');
+        }
+        // Ensure website URLs have protocol
+        if ((method.type === 'website' || method.type === 'form') && 
+            !method.value.startsWith('http')) {
+          method.value = `https://${method.value}`;
+        }
+        return method;
+      });
+    }
+    
+    res.json(extractedInfo);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Failed to extract job information' });
+  }
+});
+
+// Function to convert image to base64
+const encodeImageToBase64 = (imagePath) => {
+  const image = fs.readFileSync(imagePath);
+  return image.toString('base64');
+};
+
+// Controller function to handle OCR using Groq Vision API and then extract job info
+const extractJobInfoFromImageWithGroq = asyncHandler(async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const filePath = req.file.path;
+    const fileType = req.file.mimetype;
+    let extractedText = '';
+
+    if (fileType.startsWith('image/')) {
+      // Convert image to base64
+      const base64Image = encodeImageToBase64(filePath);
+      
+      // Prepare the API request to Groq Vision API
+      const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+      const apiKey = process.env.GROQ_API_KEY;  // Assuming you're storing your API key in an environment variable
+
+      // Setup the message payload
+      const payload = {
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: "What's in this image?" },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:image/jpeg;base64,${base64Image}`
+                }
+              }
+            ]
+          }
+        ],
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct'  // Using Groq Vision model
+      };
+
+      // Make the API request to Groq Vision
+      const response = await axios.post(apiUrl, payload, {
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      // Extract the text from the Groq response
+      extractedText = response.data.choices[0]?.message?.content || '';
+
+      if (!extractedText) {
+        return res.status(500).json({ error: 'Failed to extract text from image' });
+      }
+
+      console.log('Extracted Text from Image:', extractedText);
+
+      // Clean up the uploaded file after processing
+      fs.unlinkSync(filePath);
+
+      // Now pass the extracted text to the existing extractJobInfofromText function
+      const jobAdText = { job_ad_text: extractedText };
+
+      // Here, you can pass `req` and `res` to the `extractJobInfofromText` function
+      req.body = jobAdText;  // Add job_ad_text to the request body
+      return extractJobInfofromText(req, res);  // Call the text extraction function
+
+    } else {
+      return res.status(400).json({ error: 'Only image files are supported for OCR' });
+    }
+
+  } catch (error) {
+    console.error('Error processing image with Groq Vision API:', error);
+    res.status(500).json({ error: 'Failed to process image' });
+  }
+});
+
 // Export functions
 module.exports = {
   createJob,
@@ -360,4 +646,7 @@ module.exports = {
   getJobCount,
   getRecruiterJobs,
   approveJob,
+  extractJobInfofromFile,
+  extractJobInfofromText,
+  extractJobInfoFromImageWithGroq,
 };

@@ -93,7 +93,7 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   const mailOptions = {
-    from: process.env.GMAIL,
+    from: `"Career Services and IL Office Karachi" <${process.env.GMAIL}>`,
     to: email,
     subject: "Your NU Student Account Password",
     html: `<p>Hello ${fullName},</p>
@@ -425,9 +425,8 @@ const forgetPassword = asyncHandler(async (req, res) => {
 
   const secret = process.env.JWT_FORGET_TOKEN + user.password;
   const token = jwt.sign({ email: user.email, id: user._id }, secret, { expiresIn: '10m' });
-  console.log("Token generated:", token);
   
-  const link = `${process.env.REACT_APP_BACKEND_URL}/reset-password/${user._id}/${token}`;
+  const link = `${process.env.REACT_APP_FRONTEND_URL}/reset-password/${user._id}/${token}`;
 
   const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -438,7 +437,7 @@ const forgetPassword = asyncHandler(async (req, res) => {
   });
 
   const mailOptions = {
-    from: process.env.GMAIL,
+    from: `"Career Services and IL Office Karachi" <${process.env.GMAIL}>`,
     to: user.email,
     subject: 'Reset Password Request',
     html: `<!DOCTYPE html>
@@ -505,18 +504,17 @@ const forgetPassword = asyncHandler(async (req, res) => {
                   <a href="#">Career Service Office</a>
               </div>
               <div class="content">
-                  <p style="font-size: 1.1em;">Hi,</p>
+                  <p style="font-size: large; color: #00466a;">Hi, ${user.fullName}</p>
                   <p>We received a request to reset your password. Click the link below to choose a new password. The link will expire in 30 minutes.</p>
                   <a href="${link}" style="display: inline-block; padding: 10px 20px; margin: 20px 0; font-size: 1.1em; color: #fff; background-color: #00466a; text-decoration: none; border-radius: 4px;">Reset Password</a>
                   <p style="font-size: 0.9em;">If you did not request this password reset, please ignore this email.</p>
-                  <p style="font-size: 0.9em;">Regards,<br>Career Service Office</p>
-                  <hr style="border:none;border-top:1px solid #eee" />
+                  <p style="font-size: medium; color: black;">
+                  <b>Best Regards,</b><br>
+                  Industrial Liaison/Career Services Office<br>
+                  021 111 128 128 ext. 184
+                  </p>
               </div>
-              <div class="footer">
-                  <p>Career Service Office</p>
-                  <p>FAST</p>
-                  <p>Karachi</p>
-              </div>
+              
           </div>
       </body>
       </html>`,
@@ -548,8 +546,7 @@ const resetPassword = asyncHandler(async (req, res) => {
   }
 
   const secret = process.env.JWT_FORGET_TOKEN + user.password;
-  console.log("Secret used for verifying token:", secret);
-  console.log("Token received:", token);
+
 
   try {
     const verify = jwt.verify(token, secret);
@@ -569,7 +566,7 @@ const resetPassword = asyncHandler(async (req, res) => {
 // Serve the Reset Password Page
 const serveResetPasswordPage = (req, res) => {
   const __dirname = path.resolve();
-  res.sendFile(path.join(__dirname, '../cdp-frontend', 'build', 'index.html'));
+  res.sendFile(path.join(__dirname, '.../cdp-frontend', 'build', 'index.html'));
 };
 
 module.exports = {
