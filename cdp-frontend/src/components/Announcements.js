@@ -1,9 +1,8 @@
-
-
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBullhorn } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios"; // Import axios
+import axios from "axios";
+import AnnouncementView from "./AnnouncementView";
 
 const Announcement = () => {
   const [fadeIn, setFadeIn] = useState(false);
@@ -12,38 +11,37 @@ const Announcement = () => {
   const [facultyList, setFacultyList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
 
   useEffect(() => {
     setFadeIn(true);
-    fetchFacultyNames(); // Fetch faculty names for the filter
-    fetchAnnouncements(); // Fetch announcements on component mount
+    fetchFacultyNames();
+    fetchAnnouncements();
   }, []);
 
-  // Fetch faculty names from the backend
   const fetchFacultyNames = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/announcements/faculty-names`);
-      setFacultyList(response.data.data); // Set faculty names for the filter dropdown
+      setFacultyList(response.data.data);
     } catch (err) {
       console.error("Error fetching faculty names:", err);
       setError("Error fetching faculty names");
     }
   };
 
-  // Fetch announcements from the backend
   const fetchAnnouncements = async (facultyName = "") => {
     try {
       setLoading(true);
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/announcements`, {
         withCredentials: true,
         params: {
-          facultyName: facultyName, // Send faculty name as a filter
+          facultyName: facultyName,
           page: 1,
           limit: 10,
           facultyOnly: false,
         },
       });
-      setFilteredAnnouncements(response.data.data); // Set announcements data
+      setFilteredAnnouncements(response.data.data);
     } catch (err) {
       console.error("Error fetching announcements:", err);
       setError(`Error fetching announcements: ${err.response ? err.response.data.message : err.message}`);
@@ -52,24 +50,22 @@ const Announcement = () => {
     }
   };
 
-  // Handle faculty filter change
   const handleFacultyChange = (facultyName) => {
-    setSelectedFaculty(facultyName); // Update selected faculty
-    fetchAnnouncements(facultyName); // Fetch announcements based on selected faculty
+    setSelectedFaculty(facultyName);
+    fetchAnnouncements(facultyName);
   };
 
-  // Format date to "Month Day, Year" format
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
   if (loading) {
-    return <div>Loading...</div>; // You can replace this with a loading spinner
+    return <div>Loading...</div>;
   }
 
   if (error) {
@@ -77,18 +73,20 @@ const Announcement = () => {
   }
 
   return (
-    <div className="bg-gradient-to-r from-lightblue-400 to-lightblue-100 min-h-screen py-10">
+    <div className="bg-gradient-to-r from-lightblue-400 to-lightblue-100 min-h-screen py-8 px-4 sm:px-6">
       <div
-        className={`transition-opacity duration-1000 ease-in-out ${fadeIn ? "opacity-100" : "opacity-0"} max-w-7xl mx-auto px-6`}
+        className={`transition-opacity duration-1000 ease-in-out ${
+          fadeIn ? "opacity-100" : "opacity-0"
+        } max-w-7xl mx-auto`}
       >
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
           <div className="flex items-center space-x-3">
-            <FontAwesomeIcon icon={faBullhorn} className="text-darkblue text-4xl" />
-            <h2 className="text-4xl font-bold text-darkblue">Announcements</h2>
+            <FontAwesomeIcon icon={faBullhorn} className="text-darkblue text-3xl sm:text-4xl" />
+            <h2 className="text-3xl sm:text-4xl font-bold text-darkblue">Announcements</h2>
           </div>
 
           {/* Faculty Filter Dropdown */}
-          <div className="w-1/5 ml-auto">
+          <div className="w-full sm:w-1/5">
             <select
               className="p-3 bg-white border border-gray-300 rounded-md text-darkblue font-medium w-full text-sm"
               value={selectedFaculty}
@@ -104,36 +102,59 @@ const Announcement = () => {
           </div>
         </div>
 
-        {/* Grid layout with filtered announcements */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8">
+        {/* Announcements Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
           {filteredAnnouncements.map((announcement, index) => (
             <div
               key={index}
-              className="bg-blue-100 p-6 rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+              className="bg-blue-100 p-5 rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl flex flex-col h-full"
             >
-              {/* Card Header */}
-              <div className="flex justify-between mb-4">
-                <h3 className="text-2xl font-bold text-blue-900 mb-2">{announcement.heading}</h3>
-                <span className="text-yellow-500 font-bold">{announcement.type}</span>
+              <div className="flex flex-col flex-grow">
+                <div className="flex justify-between mb-3">
+                  <h3 className="text-lg sm:text-2xl font-bold text-blue-900 mb-2">
+                    {announcement.heading}
+                  </h3>
+                  <span className="text-yellow-500 font-bold text-sm sm:text-base">
+                    {announcement.type}
+                  </span>
+                </div>
+
+                <p className="text-gray-700 mb-4 text-sm sm:text-base line-clamp-1">
+                  {announcement.text}
+                </p>
+
+                <div className="flex justify-between text-gray-500 text-xs sm:text-sm mb-2">
+                  <span className="text-yellow-500">{formatDate(announcement.postedOn)}</span>
+                </div>
+
+                <div className="text-gray-500 text-xs italic mb-6">
+                  Posted by:{" "}
+                  <span className="font-medium text-darkblue">
+                    {announcement.postedBy?.fullName}
+                  </span>
+                </div>
               </div>
 
-              {/* Card Content */}
-              <p className="text-gray-700 mb-4">{announcement.text}</p>
-              <div className="flex justify-between text-gray-500 text-sm mb-1">
-               <span className="text-yellow-500">{formatDate(announcement.postedOn)}</span> {/* Format posted date */}
+              {/* View More Button at Bottom Left */}
+              <div className="flex justify-start mt-auto">
+                <button
+                  onClick={() => setSelectedAnnouncement(announcement)}
+                  className="py-2 px-6 bg-blue-900 text-white rounded-md hover:bg-blue-600 transition duration-300 text-sm"
+                >
+                  View More
+                </button>
               </div>
-
-              {/* Display Faculty Name */}
-              <div className="text-gray-500 text-xs italic mb-4">
-                Posted by: <span className="font-medium text-darkblue">{announcement.postedBy?.fullName}</span>
-              </div>
-
-              <button className="py-2 px-4 bg-blue-900 text-white rounded-md hover:bg-blue-600 transition duration-300">
-                View More
-              </button>
             </div>
           ))}
         </div>
+
+        {/* Modal (rendered once) */}
+        {selectedAnnouncement && (
+          <AnnouncementView
+            announcement={selectedAnnouncement}
+            onClose={() => setSelectedAnnouncement(null)}
+          />
+        )}
       </div>
     </div>
   );
