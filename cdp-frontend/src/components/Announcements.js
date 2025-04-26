@@ -7,11 +7,14 @@ import AnnouncementView from "./AnnouncementView";
 const Announcement = () => {
   const [fadeIn, setFadeIn] = useState(false);
   const [selectedFaculty, setSelectedFaculty] = useState("");
-  const [filteredAnnouncements, setFilteredAnnouncements] = useState([]);
+  const [allAnnouncements, setAllAnnouncements] = useState([]); // All announcements
   const [facultyList, setFacultyList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const announcementsPerPage = 9; // 9 announcements per page
 
   useEffect(() => {
     setFadeIn(true);
@@ -36,12 +39,11 @@ const Announcement = () => {
         withCredentials: true,
         params: {
           facultyName: facultyName,
-          page: 1,
-          limit: 10,
           facultyOnly: false,
         },
       });
-      setFilteredAnnouncements(response.data.data);
+      setAllAnnouncements(response.data.data); // Fetch all announcements at once
+      setCurrentPage(1); // Reset to page 1 after fetching
     } catch (err) {
       console.error("Error fetching announcements:", err);
       setError(`Error fetching announcements: ${err.response ? err.response.data.message : err.message}`);
@@ -55,6 +57,10 @@ const Announcement = () => {
     fetchAnnouncements(facultyName);
   };
 
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -63,6 +69,11 @@ const Announcement = () => {
       day: "numeric",
     });
   };
+
+  const indexOfLastAnnouncement = currentPage * announcementsPerPage;
+  const indexOfFirstAnnouncement = indexOfLastAnnouncement - announcementsPerPage;
+  const currentAnnouncements = allAnnouncements.slice(indexOfFirstAnnouncement, indexOfLastAnnouncement);
+  const totalPages = Math.ceil(allAnnouncements.length / announcementsPerPage);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -81,8 +92,8 @@ const Announcement = () => {
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
           <div className="flex items-center space-x-3">
-            <FontAwesomeIcon icon={faBullhorn} className="text-darkblue text-3xl sm:text-4xl" />
-            <h2 className="text-3xl sm:text-4xl font-bold text-darkblue">Announcements</h2>
+            <FontAwesomeIcon icon={faBullhorn} className="text-blue-900 text-3xl sm:text-4xl" />
+            <h2 className="text-3xl sm:text-4xl font-bold text-blue-900">Announcements</h2>
           </div>
 
           {/* Faculty Filter Dropdown */}
@@ -104,7 +115,7 @@ const Announcement = () => {
 
         {/* Announcements Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
-          {filteredAnnouncements.map((announcement, index) => (
+          {currentAnnouncements.map((announcement, index) => (
             <div
               key={index}
               className="bg-blue-100 p-5 rounded-lg shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl flex flex-col h-full"
@@ -135,7 +146,7 @@ const Announcement = () => {
                 </div>
               </div>
 
-              {/* View More Button at Bottom Left */}
+              {/* View More Button */}
               <div className="flex justify-start mt-auto">
                 <button
                   onClick={() => setSelectedAnnouncement(announcement)}
@@ -148,7 +159,28 @@ const Announcement = () => {
           ))}
         </div>
 
-        {/* Modal (rendered once) */}
+        {/* Pagination Controls */}
+        <div className="flex justify-center items-center gap-4 mt-10">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="py-2 px-4 bg-blue-800 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Previous
+          </button>
+          <span className="text-blue-900 font-semibold">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="py-2 px-4 bg-blue-800 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next
+          </button>
+        </div>
+
+        {/* Modal */}
         {selectedAnnouncement && (
           <AnnouncementView
             announcement={selectedAnnouncement}
