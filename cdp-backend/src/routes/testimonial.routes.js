@@ -21,7 +21,7 @@ router.use(verifyAdmin);
 
 // Admin routes
 router.post('/', upload.single('image'), createTestimonial);
-router.put('/:testimonialId', updateTestimonial);
+router.put('/:testimonialId', upload.single('image'), updateTestimonial);
 router.delete('/:testimonialId', deleteTestimonial);
 
 module.exports = router;
