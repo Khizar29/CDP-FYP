@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -19,16 +20,14 @@ const AlumniPage = () => {
     filterYear: '',
     filterDiscipline: '',
   });
-  const alumniPerPage = 12; // Set to 12 for user view
+  const alumniPerPage = 12;
   const navigate = useNavigate();
 
-  // Fetch graduates from the server based on filters and pagination
   const fetchAlumniData = async () => {
     try {
       setError(null);
       setLoading(true);
 
-      // Make API call to fetch graduates with search, discipline, and year filters
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates`, {
         params: {
           page: currentPage,
@@ -39,8 +38,8 @@ const AlumniPage = () => {
         },
       });
 
-      setAlumniData(response.data.data); // Populate alumni data
-      setTotalPages(response.data.totalPages); // Set total pages
+      setAlumniData(response.data.data);
+      setTotalPages(response.data.totalPages);
     } catch (error) {
       setError(error.message || 'Error fetching alumni data');
     } finally {
@@ -48,23 +47,22 @@ const AlumniPage = () => {
     }
   };
 
-  // Trigger data fetch when filters or pagination change
   useEffect(() => {
     fetchAlumniData();
   }, [currentPage, searchFilters]);
 
-  // Handle page change
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Handle card click
+  // 👉 Now passing alumniData
   const handleCardClick = (nuId) => {
-    navigate(`/profile/${nuId}`); // Navigate to profile page
+    navigate(`/profile/${nuId}`, {
+      state: { alumniList: alumniData, nuId },
+    });
   };
 
-  // Handle search input and filter changes from SearchBar
   const handleSearch = (filters) => {
     setSearchFilters(filters);
-    setCurrentPage(1); // Reset to page 1 when searching or filtering
+    setCurrentPage(1);
   };
 
   if (loading) {
@@ -87,15 +85,14 @@ const AlumniPage = () => {
 
   return (
     <Box sx={{ width: '100%', padding: 0, margin: 0, overflowX: 'hidden' }}>
-      {/* Banner Section */}
+      {/* Banner */}
       <Box
         sx={{
           position: 'relative',
           backgroundImage: `url(${GradPic})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          height: { xs: 200, sm: 250, md: 300 }, // Responsive height
-          borderRadius: 0,
+          height: { xs: 200, sm: 250, md: 300 },
           mb: 4,
           display: 'flex',
           alignItems: 'center',
@@ -114,28 +111,24 @@ const AlumniPage = () => {
           },
         }}
       >
-        <Typography variant="h3" align="center" sx={{ position: 'relative', zIndex: 2, fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' } }}>
+        <Typography variant="h3" align="center" sx={{ position: 'relative', zIndex: 2 }}>
           Graduates Directory
         </Typography>
       </Box>
 
-      {/* Search Bar and Filters */}
+      {/* Search Bar */}
       <Box sx={{ maxWidth: '100%', px: { xs: 2, sm: 3, md: 4 }, mb: 4 }}>
         <SearchBar onSearch={handleSearch} />
       </Box>
 
-      {/* Alumni Cards Grid */}
+      {/* Alumni Cards */}
       <Grid container spacing={4} mt={2} sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
         {alumniData.map((alumni) => (
           <Grid item key={alumni.nuId} xs={12} sm={6} md={4} lg={3}>
             <AlumniCard
               name={`${alumni.fullName}`}
               title={alumni.discipline}
-              image={
-                alumni.profilePic
-                  ? alumni.profilePic
-                  : `${placeholder}`
-              }
+              image={alumni.profilePic ? alumni.profilePic : `${placeholder}`}
               classOf={alumni.yearOfGraduation}
               onClick={() => handleCardClick(alumni.nuId)}
             />
@@ -143,7 +136,7 @@ const AlumniPage = () => {
         ))}
       </Grid>
 
-      {/* Pagination Component */}
+      {/* Pagination */}
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4, mb: 4 }}>
         <Pagination
           currentPage={currentPage}
