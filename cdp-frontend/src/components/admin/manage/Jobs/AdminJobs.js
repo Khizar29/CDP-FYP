@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { FaPlus } from "react-icons/fa";
@@ -9,7 +10,6 @@ import { UserContext } from "../../../../contexts/UserContext";
 const AdminJobs = () => {
   const [jobs, setJobs] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [filterStatus, setFilterStatus] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -19,6 +19,8 @@ const AdminJobs = () => {
 
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
+
+  const [selectedJobs, setSelectedJobs] = useState([]);
 
   const fetchJobs = async (page = 1) => {
     try {
@@ -46,14 +48,39 @@ const AdminJobs = () => {
   }, [currentPage, searchTerm, filterDate, filterStatus, user, navigate]);
 
   const handleDelete = async (id) => {
+    const confirmed = window.confirm("Are you sure you want to delete this job?");
+    if (!confirmed) return; // If user cancels, do nothing
+  
     try {
-      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`, { withCredentials: true });
-      fetchJobs(currentPage);
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`, {
+        withCredentials: true,
+      });
       setJobs(jobs.filter((job) => job._id !== id));
       alert("Job Deleted Successfully");
     } catch (error) {
       console.error("Error:", error);
       if (error.response?.status === 401) navigate("/signin");
+    }
+  };
+  
+
+  const handleBulkDelete = async () => {
+    if (window.confirm("Are you sure you want to delete selected jobs?")) {
+      try {
+        await Promise.all(
+          selectedJobs.map((id) =>
+            axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`, {
+              withCredentials: true,
+            })
+          )
+        );
+        setJobs(jobs.filter((job) => !selectedJobs.includes(job._id)));
+        setSelectedJobs([]);
+        alert("Selected jobs deleted successfully.");
+      } catch (err) {
+        console.error("Error deleting jobs:", err);
+        alert("Something went wrong. Try again.");
+      }
     }
   };
 
@@ -74,22 +101,13 @@ const AdminJobs = () => {
     }
   };
 
-const handlePageChange = (pageNumber) => {
+  const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-};
+  };
 
-const handleBackToJobs = () => {
+  const handleBackToJobs = () => {
     setSelectedJob(null);
-};
-
-const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-};
-
-const handleDateChange = (e) => {
-    setFilterDate(e.target.value);
-};
-
+  };
 
   return (
     <>
@@ -98,7 +116,7 @@ const handleDateChange = (e) => {
           {/* Header Section */}
           <div className="flex flex-col md:flex-row md:justify-between items-center mb-4">
             <h2 className="text-2xl font-bold text-blue-900 mb-4 md:mb-0">Jobs List</h2>
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4 items-center">
               <input
                 type="text"
                 placeholder="Search by Company or Title"
@@ -122,6 +140,17 @@ const handleDateChange = (e) => {
                 <option value="pending">Pending</option>
                 <option value="rejected">Rejected</option>
               </select>
+
+              {/* Delete button (inline) */}
+              {selectedJobs.length > 0 && (
+                <button
+                  onClick={handleBulkDelete}
+                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
+                >
+                  Delete Selected
+                </button>
+              )}
+
               <Link
                 to="/admin/jobs/manage"
                 className="inline-flex items-center bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
@@ -136,6 +165,7 @@ const handleDateChange = (e) => {
             <table className="w-full table-auto bg-white rounded-lg shadow-md mb-6">
               <thead>
                 <tr>
+                  <th className="py-2 px-2 text-center bg-blue-100 border-b"></th>
                   <th className="py-2 px-2 text-center bg-blue-100 border-b">#</th>
                   <th className="py-2 px-2 text-left bg-blue-100 border-b">Company</th>
                   <th className="py-2 px-2 text-left bg-blue-100 border-b">Job Title</th>
@@ -149,6 +179,19 @@ const handleDateChange = (e) => {
                 {jobs.length > 0 ? (
                   jobs.map((job, index) => (
                     <tr key={index} className="border-b hover:bg-gray-100 transition duration-300">
+                      <td className="py-2 px-2 text-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedJobs.includes(job._id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedJobs([...selectedJobs, job._id]);
+                            } else {
+                              setSelectedJobs(selectedJobs.filter((id) => id !== job._id));
+                            }
+                          }}
+                        />
+                      </td>
                       <td className="py-2 px-2 text-center">{index + 1}</td>
                       <td className="py-2 px-2 truncate max-w-[120px]">{job.company_name}</td>
                       <td className="py-2 px-2 truncate max-w-[150px]">{job.title}</td>
@@ -188,7 +231,7 @@ const handleDateChange = (e) => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="7" className="py-4 text-center text-gray-500">No Jobs Available</td>
+                    <td colSpan="8" className="py-4 text-center text-gray-500">No Jobs Available</td>
                   </tr>
                 )}
               </tbody>

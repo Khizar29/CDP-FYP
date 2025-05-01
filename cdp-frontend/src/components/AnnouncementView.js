@@ -1,48 +1,62 @@
-import React from "react";
-import { X } from "lucide-react";
+import React, { useEffect } from "react";
 
 const AnnouncementView = ({ announcement, onClose }) => {
-  // Ensure the announcement exists
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
+
   if (!announcement) return null;
 
-  // Ensure date is valid
   const postedDate = new Date(announcement.postedOn || announcement.date);
   const isValidDate = !isNaN(postedDate.getTime());
 
+  const handleBackgroundClick = (e) => {
+    if (e.target.id === "modal-overlay") {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white w-[90%] md:w-1/2 lg:w-1/3 rounded-2xl shadow-lg p-6 relative">
-        {/* Close Button */}
-        <button
-          onClick={onClose} // ✅ Closes only when clicking the close button
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-        >
-          <X size={24} />
-        </button>
+    <div
+      id="modal-overlay"
+      onClick={handleBackgroundClick}
+      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm z-50"
+    >
+      <div className="bg-gradient-to-br from-blue-50 via-white to-blue-100 w-[95%] max-w-3xl rounded-2xl shadow-2xl p-6 sm:p-10 flex flex-col max-h-[90vh]">
+        
+        {/* Scrollable content area */}
+        <div className="overflow-y-auto pr-2 flex-1">
+          <h2 className="text-2xl sm:text-3xl font-bold text-blue-900 mb-4">
+            {announcement.heading || announcement.title}
+          </h2>
 
-        {/* Announcement Title */}
-        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          {announcement.heading || announcement.title}
-        </h2>
+          <p className="text-gray-700 text-sm sm:text-base leading-relaxed whitespace-pre-line">
+            {announcement.text || announcement.content}
+          </p>
 
-        {/* Announcement Content */}
-        <p className="text-gray-600 text-sm md:text-base">{announcement.text || announcement.content}</p>
-
-        {/* Posted By */}
-        <div className="mt-4 text-gray-500 text-xs md:text-sm">
-          Posted by: {announcement.postedBy?.fullName || "Unknown"}
+          <div className="flex flex-col sm:flex-row justify-between text-gray-500 text-xs sm:text-sm mt-6 border-t pt-4">
+            <div>
+              <span className="font-semibold">Posted by:</span>{" "}
+              {announcement.postedBy?.fullName || "Unknown"}
+            </div>
+            <div>
+              <span className="font-semibold">Posted on:</span>{" "}
+              {isValidDate ? postedDate.toLocaleDateString() : "Invalid Date"}
+            </div>
+          </div>
         </div>
 
-        {/* Date */}
-        <div className="mt-4 text-gray-500 text-xs md:text-sm">
-          Posted on: {isValidDate ? postedDate.toLocaleDateString() : "Invalid Date"}
-        </div>
-
-        {/* Footer */}
-        <div className="mt-6 flex justify-end">
+        {/* Always visible Close button */}
+        <div className="flex justify-end pt-4">
           <button
-            onClick={onClose} // ✅ Closes only when clicking this button
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+            onClick={onClose}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-300"
           >
             Close
           </button>
