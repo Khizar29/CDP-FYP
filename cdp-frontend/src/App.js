@@ -37,6 +37,7 @@ import ViewNews from './components/admin/manage/Newsfeeds/ViewNews';
 import EditNews from './components/admin/manage/Newsfeeds/EditNews';
 import AdminTestimonials from './components/admin/manage/Testimonials/AdminTestimonials';
 import AddEditTestimonial from './components/admin/manage/Testimonials/Add-EditTestimonials';
+import ViewTestimonials from './components/admin/manage/Testimonials/ViewTestimonials';
 import RecruiterManageJobs from './components/Recruiter/PostedJobs';
 import RecruiterLayout from './components/Recruiter/RecruiterLayout';
 import AddJobRecruiter from './components/Recruiter/AddJobRecruiter';
@@ -120,6 +121,7 @@ function App() {
             <Route path="testimonials" element={<AdminTestimonials />} />
             <Route path="testimonials/add" element={<AddEditTestimonial />} />
             <Route path="testimonials/edit/:id" element={<AddEditTestimonial />} />
+            <Route path="testimonials/view/:id" element={<ViewTestimonials />} />
             <Route path="recruiters" element={<AdminRecruiters />} />
             <Route path="faculty" element={<AdminFaculty />} />
           </Route>
