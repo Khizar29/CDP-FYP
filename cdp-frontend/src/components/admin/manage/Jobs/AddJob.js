@@ -323,18 +323,6 @@ const AddJob = () => {
         </div>
 
         <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2">Qualification Requirements</label>
-          <ReactQuill
-            value={formData.qualification_req}
-            onChange={(value) => handleQuillChange('qualification_req', value)}
-            modules={{ toolbar: toolbarOptions }}
-            className="bg-white mb-4"
-            id="qualification_req"
-            theme="snow"
-          />
-        </div>
-
-        <div className="mb-6">
           <label className="block text-gray-700 text-sm font-bold mb-2">Job Description</label>
           <ReactQuill
             value={formData.job_description}
@@ -342,6 +330,18 @@ const AddJob = () => {
             modules={{ toolbar: toolbarOptions }}
             className="bg-white mb-4"
             id="job_description"
+            theme="snow"
+          />
+        </div>
+
+        <div className="mb-6">
+          <label className="block text-gray-700 text-sm font-bold mb-2">Qualification Requirements</label>
+          <ReactQuill
+            value={formData.qualification_req}
+            onChange={(value) => handleQuillChange('qualification_req', value)}
+            modules={{ toolbar: toolbarOptions }}
+            className="bg-white mb-4"
+            id="qualification_req"
             theme="snow"
           />
         </div>
