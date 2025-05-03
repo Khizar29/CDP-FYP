@@ -44,10 +44,13 @@ const PaginatedNewsFeed = () => {
 
   return (
     <Box
+
       sx={{
+        width: '100%',
         minHeight: '100vh',
         padding: '4rem 2rem',
-        background: 'linear-gradient(135deg, #e0f7fa 0%, #f1f9ff 100%)',
+        background: 'linear-gradient(135deg, #cfe9f9, #f1f9ff)',
+        borderRadius: '20px',
       }}
     >
       {/* Heading */}
@@ -98,11 +101,15 @@ const PaginatedNewsFeed = () => {
                 onClick={() => navigate(`/news/${newsItem._id}`)}
               >
                 <CardMedia
-                  component="img"
-                  height="220"
-                  image={newsItem.image}
-                  alt={newsItem.title}
-                  sx={{ objectFit: 'cover' }}
+                    component="img"
+                    image={newsItem.image}
+                    alt={newsItem.title}
+                    sx={{
+                      width: '100%',
+                      height: 220,
+                      objectFit: 'cover',
+                      borderBottom: '1px solid #eee',
+                    }}
                 />
                 <CardContent sx={{ p: 3 }}>
                   {/* Category Chip */}
