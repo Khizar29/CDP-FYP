@@ -26,20 +26,26 @@ const graduateSchema = new Schema(
     },
     discipline: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
     },
     yearOfGraduation: {
       type: Number,
-      required: true,
+      required: false,
     },
     cgpa: {
       type: Number,
-      required: true,
+      required: false,
     },
     skills: {
-      type: [String], // ✅ Added skills as an array of strings
+      type: [String],
       default: [],
+      validate: {
+        validator: function(skills) {
+          return skills.every(skill => typeof skill === 'string' && skill.trim().length > 0);
+        },
+        message: 'Each skill must be a non-empty string'
+      }
     },
     profilePic: {
       type: String,
@@ -64,6 +70,14 @@ const graduateSchema = new Schema(
       type: String,
       trim: true,
     },
+    isGraduate: { //only for validation purpose
+      type: Boolean, 
+      default: true 
+    },
+    graduationDate: {
+      type: Date,
+    }
+    
   },
   {
     timestamps: true, // Automatically manage createdAt and updatedAt fields
