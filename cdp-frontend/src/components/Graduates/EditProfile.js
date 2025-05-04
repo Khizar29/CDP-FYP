@@ -23,10 +23,20 @@ const EditGraduateProfile = () => {
   const [zoom, setZoom] = useState(1);
   const [croppedImage, setCroppedImage] = useState(null);
 
+
+  const [showGradToggle, setShowGradToggle] = useState(false);
+  const [markingAsGraduate, setMarkingAsGraduate] = useState(false);
+  const [graduationYearInput, setGraduationYearInput] = useState("");
+  const [skillsInput, setSkillsInput] = useState("");
+
   const allowedFields = [
+    "cgpa",
+    "discipline",
+    "skills",
     "personalEmail",
     "contact",
     "tagline",
+    "yearOfGraduation",
     "personalExperience",
     "certificate",
     "fyp",
@@ -51,9 +61,18 @@ const EditGraduateProfile = () => {
     const fetchGraduate = async () => {
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/edit/${nuId}`,
+          { withCredentials: true }
         );
-        setGraduate(response.data.data);
+        const grad = response.data.data;
+        setGraduate(grad);
+
+        // Check eligibility for showing the toggle
+        const enrolledYear = 2000 + parseInt(nuId.substring(0, 2));
+        const currentYear = new Date().getFullYear();
+        if (!grad.isGraduate && currentYear - enrolledYear >= 4) {
+          setShowGradToggle(true);
+        }
       } catch (err) {
         setError("Error fetching graduate data");
       } finally {
@@ -68,9 +87,15 @@ const EditGraduateProfile = () => {
     const { name, value } = e.target;
     setGraduate((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: name === "skills" ? value.split(",").map(s => s.trim()) : value,
     }));
   };
+
+  useEffect(() => {
+    if (graduate.skills) {
+      setSkillsInput(graduate.skills.join(", "));
+    }
+  }, [graduate.skills]);
 
   const handleQuillChange = (field, value) => {
     setGraduate((prev) => ({
@@ -113,46 +138,72 @@ const EditGraduateProfile = () => {
     }
   }, [image, croppedAreaPixels]);
 
+
+  const handleMarkAsGraduate = async () => {
+    try {
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/markAsGraduated/${nuId}`,
+        {},
+        { withCredentials: true }
+      );
+      alert("Successfully marked as graduate!");
+      setGraduate(response.data.data);
+      setShowGradToggle(false);
+      setMarkingAsGraduate(false);
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+        "You are not eligible to mark yourself as graduate yet."
+      );
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        setLoading(true);
+      setLoading(true);
 
-        const formData = new FormData();
+      const formData = new FormData();
 
-        // Append allowed fields
-        allowedFields.forEach((field) => {
-            if (graduate[field] !== undefined) {
-                formData.append(field, graduate[field]);
-            }
-        });
+      // Process skills to ensure proper format
+      const processedSkills = graduate.skills
+        ? graduate.skills.filter(skill => typeof skill === 'string' && skill.trim().length > 0)
+        : [];
 
-        // Append cropped image if available and valid
-        if (graduate.profilePic instanceof Blob || graduate.profilePic instanceof File) {
-            formData.append("profilePic", graduate.profilePic, "cropped-image.jpg");
+      // Append all fields including properly formatted skills
+      allowedFields.forEach((field) => {
+        if (field === 'skills') {
+          formData.append(field, JSON.stringify(processedSkills));
+        } else if (graduate[field] !== undefined) {
+          formData.append(field, graduate[field]);
         }
+      });
 
-        await axios.put(
-          `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`,
-          formData,
-          {
-              headers: {
-                  "Content-Type": "multipart/form-data",
-              },
-              withCredentials: true, // Include cookies in the request
-          }
+      // Handle image upload if exists
+      if (graduate.profilePic instanceof Blob) {
+        formData.append("profilePic", graduate.profilePic, "profile.jpg");
+      }
+
+      await axios.put(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          withCredentials: true,
+        }
       );
 
-        alert("Profile updated successfully!");
-        navigate(`/profile/${nuId}`);
+      alert("Profile updated successfully!");
+      navigate(`/profile/${nuId}?type=${graduate.isGraduate ? "graduate" : "student"}`);
     } catch (err) {
-        console.error("Error updating profile:", err);
-        setError(err.response?.data?.message || "Error updating profile");
+      console.error("Error updating profile:", err);
+      setError(err.response?.data?.message || "Error updating profile");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-};
-
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -198,8 +249,55 @@ const EditGraduateProfile = () => {
             </div>
           )}
 
+          {/* Mark as Graduate Toggle */}
+          {showGradToggle && (
+            <div className="mb-6">
+              <label className="text-gray-700 font-bold mr-4">
+                Mark yourself as graduated?
+              </label>
+              <input
+                type="checkbox"
+                checked={markingAsGraduate}
+                onChange={(e) => setMarkingAsGraduate(e.target.checked)}
+              />
+              {markingAsGraduate && (
+                <div className="mt-4">
+                  <label className="block text-gray-700 font-bold">
+                    Year of Graduation
+                  </label>
+                  <input
+                    type="number"
+                    name="yearOfGraduation"
+                    value={graduationYearInput}
+                    onChange={(e) => setGraduationYearInput(e.target.value)}
+                    className="w-full p-2 border rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    className="mt-2 bg-green-500 text-white py-2 px-4 rounded"
+                    onClick={handleMarkAsGraduate}
+                  >
+                    Confirm Graduation
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Editable Fields */}
           <div className="mt-6">
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">CGPA</label>
+              <input
+                type="number"
+                name="cgpa"
+                step="0.01"
+                value={graduate.cgpa || ""}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded-lg"
+              />
+            </div>
+
             <div className="mb-4">
               <label className="block text-gray-700 font-bold">Personal Email</label>
               <input
@@ -210,6 +308,19 @@ const EditGraduateProfile = () => {
                 className="w-full p-2 border rounded-lg"
               />
             </div>
+
+            <label className="block text-gray-700 font-bold">Discipline</label>
+            <select name="discipline" value={graduate.discipline || ""} onChange={handleInputChange} className="w-full p-2 border rounded-lg">
+              <option value="">Select Discipline</option>
+              <option value="BS(CS)">Computer Science</option>
+              <option value="BS(AI and Data Science)">Artificial Intelligence</option>
+              <option value="BS(AI and Data Science)">Data Science</option>
+              <option value="BS(SE)">Software Engineering</option>
+              <option value="BS(CY)">Cyber Security</option>
+              <option value="BS(EE)">Electrical Engineering</option>
+              <option value="BS (Business Analytics)">Business Analytics</option>
+              <option value="BS(FinTech)">Financial Technology</option>
+            </select>
 
             <div className="mb-4">
               <label className="block text-gray-700 font-bold">Contact</label>
@@ -231,6 +342,72 @@ const EditGraduateProfile = () => {
                 onChange={handleInputChange}
                 className="w-full p-2 border rounded-lg"
               />
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-gray-700 font-bold">Skills</label>
+              <input
+                type="text"
+                value={skillsInput}
+                onChange={(e) => {
+                  setSkillsInput(e.target.value);
+                }}
+                onBlur={() => {
+                  // When input loses focus, update the graduate skills
+                  const skillsArray = skillsInput
+                    .split(',')
+                    .map(skill => skill.trim())
+                    .filter(skill => skill.length > 0);
+
+                  setGraduate(prev => ({
+                    ...prev,
+                    skills: skillsArray
+                  }));
+                }}
+                onKeyDown={(e) => {
+                  // Also update when Enter is pressed
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const skillsArray = skillsInput
+                      .split(',')
+                      .map(skill => skill.trim())
+                      .filter(skill => skill.length > 0);
+
+                    setGraduate(prev => ({
+                      ...prev,
+                      skills: skillsArray
+                    }));
+                  }
+                }}
+                placeholder="Type skills separated by commas (e.g., JavaScript, Python, React)"
+                className="w-full p-2 border rounded-lg"
+              />
+              <div className="mt-2">
+                <p className="text-sm text-gray-500 mb-1">
+                  Separate skills with commas. Press Enter or click outside to save.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {graduate.skills?.map((skill, index) => (
+                    <span
+                      key={index}
+                      className="bg-sky-700 text-white px-3 py-1 rounded-full text-sm"
+                    >
+                      {skill}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newSkills = graduate.skills.filter((_, i) => i !== index);
+                          setGraduate(prev => ({ ...prev, skills: newSkills }));
+                          setSkillsInput(newSkills.join(", "));
+                        }}
+                        className="ml-2 text-xs"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="mb-4">

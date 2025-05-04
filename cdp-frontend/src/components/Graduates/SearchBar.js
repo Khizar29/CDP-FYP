@@ -69,8 +69,8 @@ const SearchBar = ({ onSearch }) => {
               <option value="BS(SE)">Software Engineering</option>
               <option value="BS(CY)">Cyber Security</option>
               <option value="BS(EE)">Electrical Engineering</option>
-              {/* <option value="Business Analytics">Business Analytics</option>
-              <option value="Financial Technology">Financial Technology</option> */}
+              {/* <option value="BS (Business Analytics)">Business Analytics</option>
+              <option value="BS(FinTech)">Financial Technology</option> */}
             </select>
           </div>
 

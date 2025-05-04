@@ -35,6 +35,7 @@ const AlumniPage = () => {
           searchTerm: searchFilters.searchTerm,
           filterYear: searchFilters.filterYear,
           filterDiscipline: searchFilters.filterDiscipline,
+          type: "graduate",
         },
       });
 
@@ -55,7 +56,7 @@ const AlumniPage = () => {
 
   // 👉 Now passing alumniData
   const handleCardClick = (nuId) => {
-    navigate(`/profile/${nuId}`, {
+    navigate(`/profile/${nuId}?type=graduate`, {
       state: { alumniList: alumniData, nuId },
     });
   };
