@@ -57,6 +57,7 @@ const JobList = () => {
         params: {
           page,
           limit: 10,
+          filterStatus: 'approved',
         },
       });
 
