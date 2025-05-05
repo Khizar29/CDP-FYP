@@ -17,13 +17,33 @@ const AddJobRecruiter = () => {
         qualification_req: '',
         job_description: '',
         responsibilities: '',
-        job_link: '',
+        application_methods: [],
+        // job_link: '',
     });
 
     const [isLoading, setIsLoading] = useState(false);
 
     const handleQuillChange = (name, value) => {
         setFormData((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // Add new method handler
+    const handleAddApplicationMethod = (type, value, instructions = '') => {
+        setFormData(prev => ({
+            ...prev,
+            application_methods: [
+                ...prev.application_methods,
+                { type, value, instructions }
+            ]
+        }));
+    };
+
+    // Remove method handler
+    const handleRemoveMethod = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            application_methods: prev.application_methods.filter((_, i) => i !== index)
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -125,7 +145,129 @@ const AddJobRecruiter = () => {
                     />
                 </div>
 
-                {/* ✅ Job Link */}
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">
+                        Application Methods
+                    </label>
+
+                    {formData.application_methods.map((method, index) => (
+                        <div key={index} className="mb-2 p-2 border rounded">
+                            <div className="flex justify-between">
+                                <span className="font-medium capitalize">{method.type}:</span>
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveMethod(index)}
+                                    className="text-red-500 hover:text-red-700"
+                                >
+                                    ×
+                                </button>
+                            </div>
+
+                            {method.type === 'email' ? (
+                                <a href={`mailto:${method.value}`} className="text-blue-600">
+                                    {method.value}
+                                </a>
+                            ) : (
+                                <a
+                                    href={method.value}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-blue-600"
+                                >
+                                    {method.value}
+                                </a>
+                            )}
+
+                            {method.instructions && (
+                                <div className="text-sm text-gray-600 mt-1">
+                                    {method.instructions}
+                                </div>
+                            )}
+                        </div>
+                    ))}
+
+                    <div className="mt-4 space-y-3">
+                        {/* Email Input */}
+                        <input
+                            type="text"
+                            placeholder="Email address"
+                            className="w-full border rounded px-3 py-2"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    const value = e.target.value.trim();
+                                    if (value.includes('@')) {
+                                        const instructions = window.prompt("Any instructions for this email? (optional)");
+                                        handleAddApplicationMethod('email', value, instructions || '');
+                                        e.target.value = '';
+                                    }
+                                }
+                            }}
+                            onBlur={(e) => {
+                                const value = e.target.value.trim();
+                                if (value.includes('@')) {
+                                    const instructions = window.prompt("Any instructions for this email? (optional)");
+                                    handleAddApplicationMethod('email', value, instructions || '');
+                                    e.target.value = '';
+                                }
+                            }}
+                        />
+
+                        {/* Website URL */}
+                        <input
+                            type="text"
+                            placeholder="Website URL (https://...)"
+                            className="w-full border rounded px-3 py-2"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    const value = e.target.value.trim();
+                                    if (value.startsWith('http')) {
+                                        const instructions = window.prompt("Any instructions for this website? (optional)");
+                                        handleAddApplicationMethod('website', value, instructions || '');
+                                        e.target.value = '';
+                                    }
+                                }
+                            }}
+                            onBlur={(e) => {
+                                const value = e.target.value.trim();
+                                if (value.startsWith('http')) {
+                                    const instructions = window.prompt("Any instructions for this website? (optional)");
+                                    handleAddApplicationMethod('website', value, instructions || '');
+                                    e.target.value = '';
+                                }
+                            }}
+                        />
+
+                        {/* Form URL */}
+                        <input
+                            type="text"
+                            placeholder="Form URL"
+                            className="w-full border rounded px-3 py-2"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    const value = e.target.value.trim();
+                                    if (value.startsWith('http')) {
+                                        const instructions = window.prompt("Any instructions for this form? (optional)");
+                                        handleAddApplicationMethod('form', value, instructions || '');
+                                        e.target.value = '';
+                                    }
+                                }
+                            }}
+                            onBlur={(e) => {
+                                const value = e.target.value.trim();
+                                if (value.startsWith('http')) {
+                                    const instructions = window.prompt("Any instructions for this form? (optional)");
+                                    handleAddApplicationMethod('form', value, instructions || '');
+                                    e.target.value = '';
+                                }
+                            }}
+                        />
+                    </div>
+                </div>
+
+                {/* ✅ Job Link
                 <div className="mb-6">
                     <label className="block text-gray-700 text-sm font-bold mb-2">Job Link</label>
                     <input
@@ -134,7 +276,7 @@ const AddJobRecruiter = () => {
                         onChange={(e) => setFormData({ ...formData, job_link: e.target.value })}
                         className="shadow border rounded w-full py-3 px-4 text-gray-700 focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900"
                     />
-                </div>
+                </div> */}
 
                 {/* ✅ Submit Button */}
                 <div className="flex items-center justify-between">
