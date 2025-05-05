@@ -137,7 +137,7 @@ const RecruiterManageJobs = () => {
                         >
                           View
                         </button>
-                        <Link
+                        {/* <Link
                           to="/recruiter/jobs/manage"
                           state={{ action: "edit", data: job }}
                         >
@@ -147,7 +147,7 @@ const RecruiterManageJobs = () => {
                           >
                             Edit
                           </button>
-                        </Link>
+                        </Link> */}
                       </td>
                     </tr>
                   ))
@@ -185,13 +185,13 @@ const RecruiterManageJobs = () => {
                     >
                       View
                     </button>
-                    <Link
+                    {/* <Link
                       to="/recruiter/jobs/manage"
                       state={{ action: "edit", data: job }}
                       className="bg-yellow-500 text-white py-1 px-2 rounded"
                     >
                       Edit
-                    </Link>
+                    </Link> */}
                   </div>
                 </div>
               ))
