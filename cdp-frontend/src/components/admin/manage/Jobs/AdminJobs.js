@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { FaPlus } from "react-icons/fa";
@@ -15,12 +14,11 @@ const AdminJobs = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDate, setFilterDate] = useState("");
+  const [selectedJobs, setSelectedJobs] = useState([]);
   const jobsPerPage = 10;
 
   const { user } = useContext(UserContext);
   const navigate = useNavigate();
-
-  const [selectedJobs, setSelectedJobs] = useState([]);
 
   const fetchJobs = async (page = 1) => {
     try {
@@ -48,9 +46,7 @@ const AdminJobs = () => {
   }, [currentPage, searchTerm, filterDate, filterStatus, user, navigate]);
 
   const handleDelete = async (id) => {
-    const confirmed = window.confirm("Are you sure you want to delete this job?");
-    if (!confirmed) return; // If user cancels, do nothing
-  
+    if (!window.confirm("Are you sure you want to delete this job?")) return;
     try {
       await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`, {
         withCredentials: true,
@@ -62,7 +58,6 @@ const AdminJobs = () => {
       if (error.response?.status === 401) navigate("/signin");
     }
   };
-  
 
   const handleBulkDelete = async () => {
     if (window.confirm("Are you sure you want to delete selected jobs?")) {
@@ -79,6 +74,32 @@ const AdminJobs = () => {
         alert("Selected jobs deleted successfully.");
       } catch (err) {
         console.error("Error deleting jobs:", err);
+        alert("Something went wrong. Try again.");
+      }
+    }
+  };
+
+  const handleBulkApprove = async () => {
+    if (window.confirm("Are you sure you want to approve selected jobs?")) {
+      try {
+        await Promise.all(
+          selectedJobs.map((id) =>
+            axios.patch(
+              `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}/approve`,
+              { status: "approved" },
+              { withCredentials: true }
+            )
+          )
+        );
+        setJobs((prevJobs) =>
+          prevJobs.map((job) =>
+            selectedJobs.includes(job._id) ? { ...job, status: "approved" } : job
+          )
+        );
+        setSelectedJobs([]);
+        alert("Selected jobs approved successfully.");
+      } catch (err) {
+        console.error("Error approving jobs:", err);
         alert("Something went wrong. Try again.");
       }
     }
@@ -112,60 +133,65 @@ const AdminJobs = () => {
   return (
     <>
       <div className="container mx-auto p-4">
-        <div className="w-full max-w-5xl mx-auto">
-          {/* Header Section */}
-          <div className="flex flex-col md:flex-row md:justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold text-blue-900 mb-4 md:mb-0">Jobs List</h2>
-            <div className="flex flex-wrap gap-4 items-center">
+        <div className="w-full max-w-6xl mx-auto">
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold text-blue-900 mb-2">Jobs List</h2>
+            <div className="flex flex-wrap md:flex-nowrap items-center gap-2 md:gap-4">
               <input
                 type="text"
                 placeholder="Search by Company or Title"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                className="flex-1 min-w-[160px] py-2 px-4 rounded border border-gray-300"
               />
               <input
                 type="date"
                 value={filterDate}
                 onChange={(e) => setFilterDate(e.target.value)}
-                className="py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                className="py-2 px-4 rounded border border-gray-300"
               />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-900"
+                className="py-2 px-4 rounded border border-gray-300"
               >
                 <option value="all">All</option>
                 <option value="approved">Approved</option>
                 <option value="pending">Pending</option>
                 <option value="rejected">Rejected</option>
               </select>
-
-              {/* Delete button (inline) */}
               {selectedJobs.length > 0 && (
-                <button
-                  onClick={handleBulkDelete}
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition"
-                >
-                  Delete Selected
-                </button>
+                <>
+                  <button onClick={handleBulkApprove} className="bg-green-600 text-white px-4 py-2 rounded">
+                    Approve Selected
+                  </button>
+                  <button onClick={handleBulkDelete} className="bg-red-600 text-white px-4 py-2 rounded">
+                    Delete Selected
+                  </button>
+                </>
               )}
-
-              <Link
-                to="/admin/jobs/manage"
-                className="inline-flex items-center bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300"
-              >
+              <Link to="/admin/jobs/manage" className="bg-blue-900 text-white px-4 py-2 rounded flex items-center">
                 <FaPlus className="mr-2" /> New
               </Link>
             </div>
           </div>
-
-          {/* Jobs Table */}
           <div className="overflow-x-auto">
             <table className="w-full table-auto bg-white rounded-lg shadow-md mb-6">
               <thead>
                 <tr>
-                  <th className="py-2 px-2 text-center bg-blue-100 border-b"></th>
+                  <th className="py-2 px-2 text-center bg-blue-100 border-b w-8">
+                    <input
+                      type="checkbox"
+                      checked={selectedJobs.length === jobs.length && jobs.length > 0}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedJobs(jobs.map((job) => job._id));
+                        } else {
+                          setSelectedJobs([]);
+                        }
+                      }}
+                    />
+                  </th>
                   <th className="py-2 px-2 text-center bg-blue-100 border-b">#</th>
                   <th className="py-2 px-2 text-left bg-blue-100 border-b">Company</th>
                   <th className="py-2 px-2 text-left bg-blue-100 border-b">Job Title</th>
@@ -178,8 +204,8 @@ const AdminJobs = () => {
               <tbody>
                 {jobs.length > 0 ? (
                   jobs.map((job, index) => (
-                    <tr key={index} className="border-b hover:bg-gray-100 transition duration-300">
-                      <td className="py-2 px-2 text-center">
+                    <tr key={index} className="border-b hover:bg-gray-100">
+                      <td className="py-2 px-2 text-center w-8 min-w-[2rem]">
                         <input
                           type="checkbox"
                           checked={selectedJobs.includes(job._id)}
@@ -202,18 +228,17 @@ const AdminJobs = () => {
                         <div className="flex gap-1">
                           {job.status === "pending" && (
                             <>
-                              <button className=" text-white text-sm px-2 rounded hover:bg-green-600"
-                                onClick={() => handleJobApproval(job._id, "approved")}>
-                                ✅
-                              </button>
-                              <button className=" text-white text-sm px-2 rounded hover:bg-red-600"
-                                onClick={() => handleJobApproval(job._id, "rejected")}>
-                                ❌
-                              </button>
+                              <button
+                                className="text-white text-sm px-2 rounded bg-green-600 hover:bg-green-700"
+                                onClick={() => handleJobApproval(job._id, "approved")}
+                              >✅</button>
+                              <button
+                                className="text-white text-sm px-2 rounded bg-red-600 hover:bg-red-700"
+                                onClick={() => handleJobApproval(job._id, "rejected")}
+                              >❌</button>
                             </>
                           )}
-                          <button className="bg-blue-500 text-white text-sm px-2 rounded hover:bg-blue-600"
-                            onClick={() => setSelectedJob(job)}>
+                          <button className="bg-blue-500 text-white text-sm px-2 rounded hover:bg-blue-600" onClick={() => setSelectedJob(job)}>
                             View
                           </button>
                           <Link to="/admin/jobs/manage" state={{ action: "edit", data: job }}>
@@ -221,8 +246,7 @@ const AdminJobs = () => {
                               Edit
                             </button>
                           </Link>
-                          <button className="bg-red-500 text-white text-sm px-2 rounded hover:bg-red-600"
-                            onClick={() => handleDelete(job._id)}>
+                          <button className="bg-red-500 text-white text-sm px-2 rounded hover:bg-red-600" onClick={() => handleDelete(job._id)}>
                             Delete
                           </button>
                         </div>
@@ -231,13 +255,14 @@ const AdminJobs = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="8" className="py-4 text-center text-gray-500">No Jobs Available</td>
+                    <td colSpan="8" className="py-4 text-center text-gray-500">
+                      No Jobs Available
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
-
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         </div>
       </div>
