@@ -351,6 +351,65 @@ const approveJob = asyncHandler(async (req, res) => {
   job.updated_on = Date.now();
   await job.save();
 
+  const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: process.env.GMAIL,
+      pass: process.env.GMAIL_PASSWORD,
+    },
+  });
+  // Email sending logic for approved jobs
+  if (job.status === "approved") {
+    // Only use toEmails field for recipients
+    // const allRecipients = [...new Set(toEmails)];
+
+    // if (allRecipients.length > 0) {
+      const subject = `Exciting Career Opportunity: ${job.title}`;
+
+      // Generate application links HTML
+      const applicationLinks = job.application_methods.map(method => {
+        if (method.type === 'email') {
+          return `<li>Email: <a href="mailto:${method.value}${method.instructions ? `?subject=${encodeURIComponent(method.instructions)}` : ''}">${method.value}</a>${method.instructions ? ` (${method.instructions})` : ''}</li>`;
+        }
+        return `<li>Website: <a href="${method.value}">${method.value}</a></li>`;
+      }).join('');
+
+      const html = `
+        <p>Dear Students,</p>
+        <p>We are excited to share an excellent career opportunity with you:</p>
+        <h3>${job.title} at ${job.company_name}</h3>
+        <p><strong>Job Type:</strong> ${job.job_type}</p>
+        ${job.job_description ? `<div>${job.job_description}</div>` : ''}
+        
+        ${job.qualification_req ? `<h4>Qualifications:</h4><div>${job.qualification_req}</div>` : ''}
+        ${job.responsibilities ? `<h4>Responsibilities:</h4><div>${job.responsibilities}</div>` : ''}
+
+        <h4>How to Apply:</h4>
+        <ul>${applicationLinks}</ul>
+        
+        <p style="font-size: medium; color: black;">
+        <b>Best Regards,</b><br>
+        Industrial Liaison/Career Services Office<br>
+        021 111 128 128 ext. 184
+      `;
+
+      try {
+        await transporter.sendMail({
+          from: `"Career Services and IL Office Karachi" <${process.env.GMAIL}>`,
+          to: "allstudents.khi@nu.edu.pk",
+          cc: job.postedBy.email,
+          // cc: ccEmails.length ? ccEmails.join(",") : undefined,
+          // bcc: bccEmails.length ? bccEmails.join(",") : undefined,
+          subject,
+          html,
+        });
+      } catch (emailError) {
+        console.error("📧 Email Error:", emailError);
+      }
+    }
+  // }
+
+
   return res.status(200).json(new ApiResponse(200, job, `Job has been ${status}`));
 });
 
