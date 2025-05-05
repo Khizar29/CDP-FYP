@@ -118,6 +118,11 @@ const Header = ({ scrollToSection }) => {
                       <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" /> Faculty Panel
                     </Link>
                   )}
+                  {user.role === 'recruiter' && (
+                    <Link to="/recruiter" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                      <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" /> Recruiter Panel
+                    </Link>
+                  )}
                   {(user.role === "user" && (
                     <Link to={`/edit-profile/${user.nuId}`} className="flex items-center px-4 py-2 text-gray-800 hover:bg-gray-100">
                       <FontAwesomeIcon icon={faUser} className="mr-2 text-green-600" /> {/* User Icon for Profile */}
@@ -190,7 +195,7 @@ const Header = ({ scrollToSection }) => {
                   {isDropdownOpen && (
                     <div ref={dropdownRef} className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
                       <Link to="/change-password" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                      <FontAwesomeIcon icon={faKey} className="mr-2 text-blue-600" /> {/* Key Icon for Password */}
+                        <FontAwesomeIcon icon={faKey} className="mr-2 text-blue-600" /> {/* Key Icon for Password */}
                         Change Password
                       </Link>
                       {user.role === 'admin' && (
@@ -205,8 +210,13 @@ const Header = ({ scrollToSection }) => {
                           <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" /> Faculty Panel
                         </Link>
                       )}
+                      {user.role === 'recruiter' && (
+                        <Link to="/recruiter" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                          <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" /> Recruiter Panel
+                        </Link>
+                      )}
                       <div onClick={handleLogout} className="block px-4 py-2 text-gray-800 hover:bg-gray-200 cursor-pointer">
-                      <FontAwesomeIcon icon={faRightFromBracket} className="mr-2 text-red-600" /> {/* Logout icon */}
+                        <FontAwesomeIcon icon={faRightFromBracket} className="mr-2 text-red-600" /> {/* Logout icon */}
                         Logout
                       </div>
                     </div>
