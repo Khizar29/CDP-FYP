@@ -1,5 +1,5 @@
 const Graduate = require('../models/graduate.model.js');
-const { ApiError } = require('../utils/ApiError.js');
+const  ApiError  = require('../utils/ApiError.js');
 
 const authorizeGraduate = async (req, res, next) => {
   const { nuId, role } = req.user; // Get nuId and role from the logged-in user's token

@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation  } from "react-router-dom";
 import DOMPurify from "dompurify";
 import placeholder from "../../Images/placeholder.png";
 import axios from "axios";
@@ -21,18 +20,26 @@ const ProfilePage = () => {
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [neighbors, setNeighbors] = useState({ prev: null, next: null });
 
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const type = queryParams.get("type") || (alumni?.isGraduate ? "graduate" : "student");
+
+
   useEffect(() => {
     const fetchAlumniDetails = async () => {
       try {
         setError(null);
         setLoading(true);
         const response = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${id}`
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${id}`,
+          {
+            withCredentials: true // needed to send cookies!
+          }
         );
         setAlumni(response.data.data);
 
         const neighborsResponse = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${id}/neighbors`
+          `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${id}/neighbors?type=${type}`
         );
         setNeighbors(neighborsResponse.data.data);
       } catch (error) {
@@ -43,6 +50,23 @@ const ProfilePage = () => {
     };
     fetchAlumniDetails();
   }, [id]);
+
+  // Function to parse skills from the data
+  const parseSkills = (skills) => {
+    if (!skills) return [];
+    if (Array.isArray(skills)) {
+      // If it's an array with a single comma-separated string
+      if (skills.length === 1 && typeof skills[0] === 'string') {
+        return skills[0].split(',').map(s => s.trim()).filter(s => s.length > 0);
+      }
+      // If it's already an array of individual skills
+      return skills.map(s => s.trim()).filter(s => s.length > 0);
+    }
+    if (typeof skills === 'string') {
+      return skills.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    }
+    return [];
+  };
 
   if (loading)
     return (
@@ -71,6 +95,8 @@ const ProfilePage = () => {
   const sanitizeHtml = (htmlContent) => ({
     __html: DOMPurify.sanitize(htmlContent),
   });
+
+  const skillsArray = parseSkills(alumni.skills);
 
   return (
     <div className="min-h-screen bg-[#d39fed] flex flex-col relative">
@@ -138,19 +164,37 @@ const ProfilePage = () => {
 
         {/* Right Info */}
         <div className="w-full md:w-2/3 mt-8 md:mt-0 md:ml-8">
-          <div className="bg-[#C1E4FB] p-6 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-bold text-yellow-500">Certifications</h2>
-            <div
-              className="text-md text-sky-600 mt-2"
-              dangerouslySetInnerHTML={sanitizeHtml(alumni.certificate || "No certifications listed")}
-            ></div>
-          </div>
+
+          {/* Skills Section */}
+          {skillsArray.length > 0 && (
+            <div className="bg-[#C1E4FB] p-6 rounded-lg shadow-md mb-8">
+              <h2 className="text-xl font-bold text-yellow-500 mb-4">Skills</h2>
+              <div className="flex flex-wrap gap-2">
+                {skillsArray.map((skill, index) => (
+                  <span
+                    key={index}
+                    className="bg-sky-600 text-white px-3 py-1 rounded-full text-sm font-medium shadow-sm"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="bg-[#C1E4FB] p-6 rounded-lg shadow-md mb-8">
             <h2 className="text-xl font-bold text-yellow-500">Professional Experience</h2>
             <div
               className="text-md text-sky-600 mt-2"
               dangerouslySetInnerHTML={sanitizeHtml(alumni.personalExperience || "No professional experience")}
+            ></div>
+          </div>
+
+          <div className="bg-[#C1E4FB] p-6 rounded-lg shadow-md mb-8">
+            <h2 className="text-xl font-bold text-yellow-500">Certifications</h2>
+            <div
+              className="text-md text-sky-600 mt-2"
+              dangerouslySetInnerHTML={sanitizeHtml(alumni.certificate || "No certifications listed")}
             ></div>
           </div>
 
@@ -164,17 +208,16 @@ const ProfilePage = () => {
         </div>
       </main>
 
-      {/* ✨ Final Beautiful Floating Navigation */}
+      {/* Floating Navigation */}
       <div className="fixed bottom-6 right-6 flex flex-col items-end gap-3 z-50">
         {/* Previous */}
         <button
           onClick={() => navigate(`/profile/${neighbors.prev}`)}
           disabled={!neighbors.prev}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-xl backdrop-blur-md bg-[#f4e1ce]/70 text-sm font-medium transition transform hover:-translate-y-1 hover:scale-105 ${
-            neighbors.prev
-              ? 'text-[#5c2d91] hover:bg-[#f4e1ce]'
-              : 'text-gray-400 bg-gray-300 cursor-not-allowed'
-          }`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-xl backdrop-blur-md bg-[#f4e1ce]/70 text-sm font-medium transition transform hover:-translate-y-1 hover:scale-105 ${neighbors.prev
+            ? 'text-[#5c2d91] hover:bg-[#f4e1ce]'
+            : 'text-gray-400 bg-gray-300 cursor-not-allowed'
+            }`}
         >
           <ArrowBackIosIcon fontSize="small" />
           Previous Graduate
@@ -184,11 +227,10 @@ const ProfilePage = () => {
         <button
           onClick={() => navigate(`/profile/${neighbors.next}`)}
           disabled={!neighbors.next}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-xl backdrop-blur-md bg-[#f4e1ce]/70 text-sm font-medium transition transform hover:-translate-y-1 hover:scale-105 ${
-            neighbors.next
-              ? 'text-[#5c2d91] hover:bg-[#f4e1ce]'
-              : 'text-gray-400 bg-gray-300 cursor-not-allowed'
-          }`}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-xl backdrop-blur-md bg-[#f4e1ce]/70 text-sm font-medium transition transform hover:-translate-y-1 hover:scale-105 ${neighbors.next
+            ? 'text-[#5c2d91] hover:bg-[#f4e1ce]'
+            : 'text-gray-400 bg-gray-300 cursor-not-allowed'
+            }`}
         >
           Next Graduate
           <ArrowForwardIosIcon fontSize="small" />
