@@ -2,9 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const ViewGraduate = () => {
   const { nuId } = useParams();
+  const navigate = useNavigate();
   const [graduate, setGraduate] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -34,6 +36,14 @@ const ViewGraduate = () => {
   return (
     <div className="container mx-auto p-6">
       <h2 className="text-2xl font-bold mb-4">Graduate Details</h2>
+  
+      <button
+        onClick={() => navigate(-1)}
+        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+      >
+        Go Back
+      </button>
+  
       {graduate ? (
         <div className="bg-white p-6 rounded shadow-lg">
           <div className="mb-4">
@@ -56,6 +66,7 @@ const ViewGraduate = () => {
       )}
     </div>
   );
+  
 };
 
 export default ViewGraduate;
