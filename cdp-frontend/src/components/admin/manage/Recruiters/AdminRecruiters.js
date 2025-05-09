@@ -214,7 +214,7 @@ const AdminRecruiters = () => {
                                 <td className="py-2 px-3">{rec.companyName}</td>
                                 <td className="py-2 px-3">{rec.companyEmail}</td>
                                 <td className="py-2 px-3 text-center">
-                                    {rec.isVerified ? "✅ Verified" : "❌ Pending"}
+                                    {rec.isVerified ? "✅Verified" : "❌Pending"}
                                 </td>
                                 <td className="py-2 px-3 flex justify-center gap-2">
                                     {!rec.isVerified ? (
