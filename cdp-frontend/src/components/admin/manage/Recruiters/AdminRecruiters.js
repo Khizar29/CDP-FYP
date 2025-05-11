@@ -19,8 +19,11 @@ const AdminRecruiters = () => {
 
     const fetchRecruiters = async (page = 1) => {
         try {
+            const token = localStorage.getItem("accessToken");
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/recruiters`, {
-                withCredentials: true,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
                 params: {
                     page,
                     limit,
@@ -42,7 +45,12 @@ const AdminRecruiters = () => {
 
     const handleVerify = async (id) => {
         try {
-            await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/recruiters/verify/${id}`, {}, { withCredentials: true });
+            const token = localStorage.getItem("accessToken");
+            await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/recruiters/verify/${id}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             fetchRecruiters(currentPage);
         } catch (error) {
             console.error("Error verifying recruiter:", error);
@@ -51,7 +59,12 @@ const AdminRecruiters = () => {
 
     const handleUnverify = async (id) => {
         try {
-            await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/recruiters/unverify/${id}`, {}, { withCredentials: true });
+            const token = localStorage.getItem("accessToken");
+            await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/recruiters/unverify/${id}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
             fetchRecruiters(currentPage);
         } catch (error) {
             console.error("Error unverifying recruiter:", error);
@@ -61,7 +74,12 @@ const AdminRecruiters = () => {
     const handleDelete = async (id) => {
         if (window.confirm("Are you sure you want to delete this recruiter?")) {
             try {
-                await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/recruiters/${id}`, { withCredentials: true });
+                const token = localStorage.getItem("accessToken");
+                await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/recruiters/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 fetchRecruiters(currentPage);
             } catch (error) {
                 console.error("Error deleting recruiter:", error);

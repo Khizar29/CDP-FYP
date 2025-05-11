@@ -34,11 +34,14 @@ const FacultyManageAnnouncements = () => {
     if (!user || user.role !== "faculty") return;
 
     try {
+      const token = localStorage.getItem("accessToken");
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/announcements`, 
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/announcements`,
         {
-          withCredentials: true,
-          params: { page, limit: announcementsPerPage, searchTerm, facultyOnly: true},
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: { page, limit: announcementsPerPage, searchTerm, facultyOnly: true },
         }
       );
       setAnnouncements(response.data.data);
@@ -54,12 +57,12 @@ const FacultyManageAnnouncements = () => {
   }, [currentPage, searchTerm, user]);
 
   // Ensure pagination buttons work properly
-    const handlePageChange = (pageNumber) => {
+  const handlePageChange = (pageNumber) => {
     if (pageNumber > 0 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
     }
   };
-  
+
 
   // Handle search input change
   const handleSearchChange = (e) => {
@@ -72,8 +75,11 @@ const FacultyManageAnnouncements = () => {
     if (!confirmDelete) return;
 
     try {
+      const token = localStorage.getItem("accessToken");
       await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/announcements/${announcementId}`, {
-        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       // Remove from UI after successful delete

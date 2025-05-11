@@ -12,7 +12,7 @@ const EditRecruiter = ({ recruiter, onClose, refresh }) => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -23,10 +23,15 @@ const EditRecruiter = ({ recruiter, onClose, refresh }) => {
         setError(null);
 
         try {
+            const token = localStorage.getItem("accessToken");
             await axios.put(
                 `${process.env.REACT_APP_BACKEND_URL}/api/v1/recruiters/${recruiter._id}`,
                 formData,
-                { withCredentials: true }
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
             );
             refresh(); // Refresh the recruiter list
             onClose(); // Close modal after update
