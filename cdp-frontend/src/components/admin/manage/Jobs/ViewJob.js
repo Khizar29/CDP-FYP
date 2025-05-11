@@ -31,23 +31,26 @@ const JobView = ({ job, handleBackToJobs }) => {
 
   const handleApplyNow = async () => {
     try {
+      const token = localStorage.getItem("accessToken");
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobapplications/track`,
         { jobId: job._id },
         {
-          withCredentials: true, // ✅ Ensures cookies (session) are sent
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
-  
+
       if (response.status === 201) {
         setShowModal(true); // Open the modal if the API call is successful
       }
     } catch (error) {
       console.error("Error tracking application:", error);
-  
+
       // Handle specific errors
       if (error.response) {
         if (error.response.status === 400 && error.response.data.message === "Already applied") {
@@ -108,7 +111,7 @@ const JobView = ({ job, handleBackToJobs }) => {
               <FontAwesomeIcon icon={faBriefcase} className="mr-2 text-blue-600" /> {job.job_type}
             </p>
             <p className="text-lg text-gray-700 mb-4 flex items-center">
-              <FontAwesomeIcon icon={faCalendarAlt} className="mr-2 text-blue-600" /> 
+              <FontAwesomeIcon icon={faCalendarAlt} className="mr-2 text-blue-600" />
               Posted on {new Date(job.posted_on).toLocaleDateString()}
             </p>
 
@@ -129,150 +132,150 @@ const JobView = ({ job, handleBackToJobs }) => {
 
             {/* Apply Now Button */}
             <button
-  onClick={handleApplyNow} // Call handleApplyNow function
-  className="mt-8 w-[140px] bg-blue-900 text-white py-2 rounded-full hover:bg-blue-600 transition duration-300"
->
-  Apply Now
-</button>
+              onClick={handleApplyNow} // Call handleApplyNow function
+              className="mt-8 w-[140px] bg-blue-900 text-white py-2 rounded-full hover:bg-blue-600 transition duration-300"
+            >
+              Apply Now
+            </button>
           </div>
 
           {/* Apply Now Modal */}
-{/* Apply Now Modal */}
-<AnimatePresence>
-  {showModal && (
-    <motion.div
-      className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
-        className="bg-white rounded-lg p-6 shadow-lg w-96 max-h-[80vh] overflow-y-auto relative"
-        initial={{ scale: 0.8 }}
-        animate={{ scale: 1 }}
-        exit={{ scale: 0.8 }}
-      >
-        {/* Close Button */}
-        <button
-          onClick={() => setShowModal(false)}
-          className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
-        >
-          <FontAwesomeIcon icon={faTimes} size="lg" />
-        </button>
+          {/* Apply Now Modal */}
+          <AnimatePresence>
+            {showModal && (
+              <motion.div
+                className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className="bg-white rounded-lg p-6 shadow-lg w-96 max-h-[80vh] overflow-y-auto relative"
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  exit={{ scale: 0.8 }}
+                >
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setShowModal(false)}
+                    className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
+                  >
+                    <FontAwesomeIcon icon={faTimes} size="lg" />
+                  </button>
 
-        <h2 className="text-2xl font-semibold text-blue-900 mb-4">Apply for {job.title}</h2>
+                  <h2 className="text-2xl font-semibold text-blue-900 mb-4">Apply for {job.title}</h2>
 
-        {/* Application Methods */}
-        <div className="space-y-4">
-          {/* Show application methods if they exist */}
-          {job.application_methods?.length > 0 ? (
-            job.application_methods.map((method, index) => (
-              <div key={index} className="p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-                {method.type === 'email' ? (
-                  <>
-                    <div className="flex items-center mb-1">
-                      <FontAwesomeIcon icon={faEnvelope} className="mr-2 text-blue-600" />
-                      <span className="font-medium">Email Application</span>
-                    </div>
-                    <div className="ml-6">
-                      <a 
-                        href={`mailto:${method.value}${method.instructions ? `?subject=${encodeURIComponent(method.instructions)}` : ''}`}
-                        className="text-blue-600 hover:underline break-all"
-                      >
-                        {method.value}
-                      </a>
-                      {method.instructions && (
-                        <p className="text-sm text-gray-600 mt-1">
-                          <span className="font-medium">Note:</span> {method.instructions}
-                        </p>
-                      )}
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="flex items-center mb-1">
-                      <FontAwesomeIcon 
-                        icon={method.type === 'form' ? faFileAlt : faExternalLinkAlt} 
-                        className="mr-2 text-blue-600" 
-                      />
-                      <span className="font-medium">
-                        {method.type === 'form' ? 'Application Form' : 'Website'}
-                      </span>
-                    </div>
-                    <div className="ml-6">
-                      <a 
-                        href={method.value} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline break-all"
-                      >
-                        {method.value}
-                      </a>
-                      {method.instructions && (
-                        <p className="text-sm text-gray-600 mt-1">
-                          <span className="font-medium">Note:</span> {method.instructions}
-                        </p>
-                      )}
-                    </div>
-                  </>
-                )}
-              </div>
-            ))
-          ) : job.job_link ? (
-            // Fallback to legacy job_link if no application methods exist
-            <div className="p-3 border rounded-lg hover:bg-gray-50 transition-colors">
-              {isEmail(job.job_link) ? (
-                <>
-                  <div className="flex items-center mb-1">
-                    <FontAwesomeIcon icon={faEnvelope} className="mr-2 text-blue-600" />
-                    <span className="font-medium">Email Application</span>
+                  {/* Application Methods */}
+                  <div className="space-y-4">
+                    {/* Show application methods if they exist */}
+                    {job.application_methods?.length > 0 ? (
+                      job.application_methods.map((method, index) => (
+                        <div key={index} className="p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                          {method.type === 'email' ? (
+                            <>
+                              <div className="flex items-center mb-1">
+                                <FontAwesomeIcon icon={faEnvelope} className="mr-2 text-blue-600" />
+                                <span className="font-medium">Email Application</span>
+                              </div>
+                              <div className="ml-6">
+                                <a
+                                  href={`mailto:${method.value}${method.instructions ? `?subject=${encodeURIComponent(method.instructions)}` : ''}`}
+                                  className="text-blue-600 hover:underline break-all"
+                                >
+                                  {method.value}
+                                </a>
+                                {method.instructions && (
+                                  <p className="text-sm text-gray-600 mt-1">
+                                    <span className="font-medium">Note:</span> {method.instructions}
+                                  </p>
+                                )}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex items-center mb-1">
+                                <FontAwesomeIcon
+                                  icon={method.type === 'form' ? faFileAlt : faExternalLinkAlt}
+                                  className="mr-2 text-blue-600"
+                                />
+                                <span className="font-medium">
+                                  {method.type === 'form' ? 'Application Form' : 'Website'}
+                                </span>
+                              </div>
+                              <div className="ml-6">
+                                <a
+                                  href={method.value}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-blue-600 hover:underline break-all"
+                                >
+                                  {method.value}
+                                </a>
+                                {method.instructions && (
+                                  <p className="text-sm text-gray-600 mt-1">
+                                    <span className="font-medium">Note:</span> {method.instructions}
+                                  </p>
+                                )}
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ))
+                    ) : job.job_link ? (
+                      // Fallback to legacy job_link if no application methods exist
+                      <div className="p-3 border rounded-lg hover:bg-gray-50 transition-colors">
+                        {isEmail(job.job_link) ? (
+                          <>
+                            <div className="flex items-center mb-1">
+                              <FontAwesomeIcon icon={faEnvelope} className="mr-2 text-blue-600" />
+                              <span className="font-medium">Email Application</span>
+                            </div>
+                            <div className="ml-6">
+                              <a
+                                href={job.job_link}
+                                className="text-blue-600 hover:underline break-all"
+                              >
+                                {job.job_link.replace("mailto:", "")}
+                              </a>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex items-center mb-1">
+                              <FontAwesomeIcon icon={faExternalLinkAlt} className="mr-2 text-blue-600" />
+                              <span className="font-medium">Website</span>
+                            </div>
+                            <div className="ml-6">
+                              <a
+                                href={job.job_link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline break-all"
+                              >
+                                {job.job_link}
+                              </a>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <p className="text-gray-600 p-3">No application methods available.</p>
+                    )}
                   </div>
-                  <div className="ml-6">
-                    <a 
-                      href={job.job_link} 
-                      className="text-blue-600 hover:underline break-all"
-                    >
-                      {job.job_link.replace("mailto:", "")}
-                    </a>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex items-center mb-1">
-                    <FontAwesomeIcon icon={faExternalLinkAlt} className="mr-2 text-blue-600" />
-                    <span className="font-medium">Website</span>
-                  </div>
-                  <div className="ml-6">
-                    <a 
-                      href={job.job_link} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline break-all"
-                    >
-                      {job.job_link}
-                    </a>
-                  </div>
-                </>
-              )}
-            </div>
-          ) : (
-            <p className="text-gray-600 p-3">No application methods available.</p>
-          )}
-        </div>
 
-        {/* Additional Instructions */}
-        <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
-          <h3 className="font-medium text-yellow-800 mb-1">Application Tips</h3>
-          <ul className="text-sm text-yellow-700 list-disc pl-5 space-y-1">
-            <li>Prepare your resume/CV before applying</li>
-            <li>Check all application requirements</li>
-            <li>Use a professional email address</li>
-          </ul>
-        </div>
-      </motion.div>
-    </motion.div>
-  )}
-</AnimatePresence>
+                  {/* Additional Instructions */}
+                  <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
+                    <h3 className="font-medium text-yellow-800 mb-1">Application Tips</h3>
+                    <ul className="text-sm text-yellow-700 list-disc pl-5 space-y-1">
+                      <li>Prepare your resume/CV before applying</li>
+                      <li>Check all application requirements</li>
+                      <li>Use a professional email address</li>
+                    </ul>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>

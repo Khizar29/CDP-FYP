@@ -22,17 +22,12 @@ const AdminJobs = () => {
 
   const fetchJobs = async (page = 1) => {
     try {
+      const token = localStorage.getItem("accessToken");
       const response = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`,
         {
           withCredentials: true,
-          params: {
-            page,
-            limit: jobsPerPage,
-            searchTerm,
-            filterDate,
-            filterStatus,
-          },
+          params: { page, limit: jobsPerPage, searchTerm, filterDate, filterStatus },
         }
       );
       setJobs(response.data.data);
@@ -52,14 +47,13 @@ const AdminJobs = () => {
   }, [currentPage, searchTerm, filterDate, filterStatus, user, navigate]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this job?")) return;
+    const confirmed = window.confirm("Are you sure you want to delete this job?");
+    if (!confirmed) return; // If user cancels, do nothing
+  
     try {
-      await axios.delete(
-        `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`,
-        {
-          withCredentials: true,
-        }
-      );
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`, {
+        withCredentials: true,
+      });
       setJobs(jobs.filter((job) => job._id !== id));
       alert("Job Deleted Successfully");
     } catch (error) {
@@ -67,18 +61,17 @@ const AdminJobs = () => {
       if (error.response?.status === 401) navigate("/signin");
     }
   };
+  
 
   const handleBulkDelete = async () => {
     if (window.confirm("Are you sure you want to delete selected jobs?")) {
       try {
+        const token = localStorage.getItem("accessToken");
         await Promise.all(
           selectedJobs.map((id) =>
-            axios.delete(
-              `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`,
-              {
-                withCredentials: true,
-              }
-            )
+            axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${id}`, {
+              withCredentials: true,
+            })
           )
         );
         setJobs(jobs.filter((job) => !selectedJobs.includes(job._id)));
@@ -121,10 +114,15 @@ const AdminJobs = () => {
 
   const handleJobApproval = async (jobId, status) => {
     try {
+      const token = localStorage.getItem("accessToken");
       await axios.patch(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${jobId}/approve`,
         { status },
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       setJobs((prevJobs) =>
         prevJobs.map((job) => (job._id === jobId ? { ...job, status } : job))

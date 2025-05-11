@@ -15,9 +15,14 @@ const UpdateGraduate = () => {
       try {
         setError(null);
         setLoading(true);
+        const token = localStorage.getItem("accessToken");
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`,
-          { withCredentials: true } // Use credentials for secure cookie-based authentication
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setGraduate(response.data.data);
         setFormData(response.data.data); // Populate the form data with fetched graduate
@@ -38,11 +43,16 @@ const UpdateGraduate = () => {
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem("accessToken");
       setLoading(true);
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`,
         formData,
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       alert('Graduate details updated successfully');
       navigate('/admin/graduates');

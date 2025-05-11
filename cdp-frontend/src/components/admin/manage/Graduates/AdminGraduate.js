@@ -22,8 +22,11 @@ const AdminGraduates = () => {
     const fetchGraduates = async (page = 1) => {
         setLoading(true);
         try {
+            const token = localStorage.getItem("accessToken");
             const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates`, {
-              withCredentials: true,
+                      headers: {
+          Authorization: `Bearer ${token}`,
+        },
                 params: {
                     page,
                     limit: graduatesPerPage,

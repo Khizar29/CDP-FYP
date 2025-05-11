@@ -14,12 +14,17 @@ const ViewGraduate = () => {
   useEffect(() => {
     const fetchGraduate = async () => {
       try {
+        const token = localStorage.getItem("accessToken");
         setError(null);
         setLoading(true);
-        
+
         const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${nuId}`,
-          { withCredentials: true }
-          );
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setGraduate(response.data.data);
       } catch (error) {
         setError(error.message || 'Error fetching graduate details');

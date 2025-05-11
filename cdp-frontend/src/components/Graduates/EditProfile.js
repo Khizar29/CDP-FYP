@@ -60,9 +60,14 @@ const EditGraduateProfile = () => {
   useEffect(() => {
     const fetchGraduate = async () => {
       try {
+        const token = localStorage.getItem("accessToken");
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/edit/${nuId}`,
-          { withCredentials: true }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         const grad = response.data.data;
         setGraduate(grad);
@@ -141,10 +146,15 @@ const EditGraduateProfile = () => {
 
   const handleMarkAsGraduate = async () => {
     try {
+      const token = localStorage.getItem("accessToken");
       const response = await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/markAsGraduated/${nuId}`,
         {},
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
       alert("Successfully marked as graduate!");
       setGraduate(response.data.data);
@@ -161,6 +171,7 @@ const EditGraduateProfile = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem("accessToken");
       setLoading(true);
 
       const formData = new FormData();
@@ -191,7 +202,9 @@ const EditGraduateProfile = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 

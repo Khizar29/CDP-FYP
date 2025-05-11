@@ -13,12 +13,15 @@ const AdminTestimonials = () => {
 
   const fetchTestimonials = async (page = 1) => {
     try {
+      const token = localStorage.getItem("accessToken");
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials`, {
         params: {
           page: page,
           limit: testimonialsPerPage
         },
-        withCredentials: true, // Include credentials with request
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       setTestimonials(response.data.data);
       setFilteredTestimonials(response.data.data);
@@ -37,8 +40,11 @@ const AdminTestimonials = () => {
     if (!confirmDelete) return;
 
     try {
+      const token = localStorage.getItem("accessToken");
       await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials/${id}`, {
-        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       fetchTestimonials(currentPage);
@@ -89,8 +95,8 @@ const AdminTestimonials = () => {
                     <td className="py-2 px-3">{testimonial.title}</td>
                     <td className="py-2 px-3 text-center flex flex-col md:flex-row justify-center items-center gap-2">
                       {/* View Button */}
-                      <Link 
-                        to={`/admin/testimonials/view/${testimonial._id}`} 
+                      <Link
+                        to={`/admin/testimonials/view/${testimonial._id}`}
                         state={{ data: testimonial }}
                       >
                         <button className="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-600 transition duration-300">
@@ -99,8 +105,8 @@ const AdminTestimonials = () => {
                       </Link>
 
                       {/* Edit Button */}
-                      <Link 
-                        to={`/admin/testimonials/edit/${testimonial._id}`} 
+                      <Link
+                        to={`/admin/testimonials/edit/${testimonial._id}`}
                         state={{ data: testimonial }}
                       >
                         <button className="bg-yellow-500 text-white py-1 px-3 rounded hover:bg-yellow-600 transition duration-300">

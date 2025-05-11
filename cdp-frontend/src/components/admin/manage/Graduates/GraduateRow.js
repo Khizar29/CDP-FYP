@@ -2,13 +2,16 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
-const GraduateRow = ({ index, graduate, onDelete }) => { 
+const GraduateRow = ({ index, graduate, onDelete }) => {
     const handleDelete = async () => {
         try {
+            const token = localStorage.getItem("accessToken");
             await axios.delete(
-                `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${graduate.nuId}`, 
+                `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${graduate.nuId}`,
                 {
-                    withCredentials: true, // Use cookie-based authentication
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
             );
             alert('Graduate deleted successfully');

@@ -46,6 +46,7 @@ const DashboardHome = () => {
 
     const fetchDashboardData = async () => {
       try {
+        const token = localStorage.getItem("accessToken");
         const [
           graduateCountRes,
           newsfeedCountRes,
@@ -60,18 +61,66 @@ const DashboardHome = () => {
           jobApplicationsPerCompanyRes,
           sortedJobsbyApplicationsRes
         ] = await Promise.all([
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/count`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/count`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/count`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/job-postings-per-month`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/applications-per-job`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/most-sought-jobs`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/applications-per-month`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/job-postings-vs-applications-over-time`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/applications-per-job-type`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/job-postings-by-recruiter`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/applications-per-company`, { withCredentials: true }),
-          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/jobs-by-applications`, { withCredentials: true }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/job-postings-per-month`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/applications-per-job`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/most-sought-jobs`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/applications-per-month`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/job-postings-vs-applications-over-time`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/applications-per-job-type`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/job-postings-by-recruiter`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/applications-per-company`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/jobs-by-applications`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
         ]);
 
         setStats({
