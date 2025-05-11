@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation  } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import DOMPurify from "dompurify";
 import placeholder from "../../Images/placeholder.png";
 import axios from "axios";
@@ -28,12 +28,15 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchAlumniDetails = async () => {
       try {
+        const token = localStorage.getItem("accessToken");
         setError(null);
         setLoading(true);
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/${id}`,
           {
-            withCredentials: true // needed to send cookies!
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
         );
         setAlumni(response.data.data);

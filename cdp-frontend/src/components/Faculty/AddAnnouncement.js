@@ -27,13 +27,18 @@ const AddAnnouncement = () => {
     }
 
     try {
+      const token = localStorage.getItem("accessToken");
       setLoading(true);
       await axios.post(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/announcements`,
         { heading, text },
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-      
+
       setSuccessMessage("Announcement created successfully!");
       setTimeout(() => navigate("/faculty/announcements"), 2000); // Redirect after success
     } catch (err) {

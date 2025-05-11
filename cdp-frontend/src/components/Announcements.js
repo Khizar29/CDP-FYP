@@ -34,9 +34,12 @@ const Announcement = () => {
 
   const fetchAnnouncements = async (facultyName = "") => {
     try {
+      const token = localStorage.getItem("accessToken");
       setLoading(true);
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/announcements`, {
-        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
         params: {
           facultyName: facultyName,
           facultyOnly: false,
@@ -86,9 +89,8 @@ const Announcement = () => {
   return (
     <div className="bg-gradient-to-r from-lightblue-400 to-lightblue-100 min-h-screen py-8 px-4 sm:px-6">
       <div
-        className={`transition-opacity duration-1000 ease-in-out ${
-          fadeIn ? "opacity-100" : "opacity-0"
-        } max-w-7xl mx-auto`}
+        className={`transition-opacity duration-1000 ease-in-out ${fadeIn ? "opacity-100" : "opacity-0"
+          } max-w-7xl mx-auto`}
       >
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
           <div className="flex items-center space-x-3">

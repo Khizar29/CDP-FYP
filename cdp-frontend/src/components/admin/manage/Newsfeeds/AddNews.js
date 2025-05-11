@@ -33,11 +33,14 @@ const AddNews = () => {
     setError('');
 
     try {
+      const token = localStorage.getItem("accessToken");
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        withCredentials: true, // Enable secure cookie-based authentication
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       };
 
       const data = new FormData();
@@ -55,8 +58,8 @@ const AddNews = () => {
   };
 
   const toolbarOptions = [
-    [{ 'header': '1'}, { 'header': '2'}, { 'font': [] }],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
     ['bold', 'italic', 'underline', 'strike'],
     ['link', 'image', 'video'],
     [{ 'align': [] }],

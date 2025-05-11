@@ -11,7 +11,7 @@ const EditFaculty = ({ faculty, onClose, refresh }) => {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    
+
     const handleChange = (e) => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
@@ -22,12 +22,17 @@ const EditFaculty = ({ faculty, onClose, refresh }) => {
         setError(null);
 
         try {
+            const token = localStorage.getItem("accessToken");
             const response = await axios.put(
                 `${process.env.REACT_APP_BACKEND_URL}/api/v1/faculty/${faculty._id}`,
                 formData,
-                { withCredentials: true }
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
             );
-            
+
             if (response.status === 200) {
                 refresh(); // Refresh the faculty list
                 onClose(); // Close modal after update
@@ -43,8 +48,8 @@ const EditFaculty = ({ faculty, onClose, refresh }) => {
     };
 
     return (
-        <div 
-            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity" 
+        <div
+            className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity"
             onClick={onClose} // Close modal on background click
         >
             <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md" onClick={(e) => e.stopPropagation()}> {/* Prevent closing when clicking inside */}

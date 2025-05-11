@@ -32,10 +32,13 @@ const RecruiterManageJobs = () => {
     if (!user || user.role !== "recruiter") return; // Ensure only recruiters can access
 
     try {
+      const token = localStorage.getItem("accessToken");
       const response = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/recruiter`,
         {
-          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
           params: {
             page: page,
             limit: jobsPerPage,

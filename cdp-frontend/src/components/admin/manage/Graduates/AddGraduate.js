@@ -17,12 +17,15 @@ const AddGraduate = ({ show, onClose, onErrors, onRefresh }) => {
         formData.append('file', file);
 
         try {
+            const token = localStorage.getItem("accessToken");
             const response = await axios.post(
-                `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/import`, 
-                formData, 
+                `${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/import`,
+                formData,
                 {
                     headers: { 'Content-Type': 'multipart/form-data' },
-                    withCredentials: true, // Include credentials for cookie-based auth
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
             );
 
@@ -44,7 +47,7 @@ const AddGraduate = ({ show, onClose, onErrors, onRefresh }) => {
             setLoading(false); // Set loading to false after the import process
         }
     };
-    
+
     return show ? (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white rounded-lg p-6 shadow-lg">

@@ -51,7 +51,12 @@ const AddJobRecruiter = () => {
         setIsLoading(true);
 
         try {
-            const config = { withCredentials: true };
+            const token = localStorage.getItem("accessToken");
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            };
 
             // ✅ Send only the necessary fields
             await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, formData, config);

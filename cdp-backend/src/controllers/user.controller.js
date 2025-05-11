@@ -257,26 +257,14 @@ const loginUser = asyncHandler(async (req, res) => {
 
   const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
 
-  // Secure cookie options
-  const options = {
-    httpOnly: true,
-    secure: true, // Ensures cookies are only sent over HTTPS
-    sameSite: "None", //  Allows cookies to be sent in cross-origin requests
-    path: "/", 
-  };
-  
-
+  // Instead of cookies, return tokens in response
   return res
     .status(200)
-    .cookie("accessToken", accessToken, options)
-    .cookie("refreshToken", refreshToken, options)
-    .json(
-      new ApiResponse(
-        200,
-        { user: user.toObject(), accessToken, refreshToken },
-        "User logged in successfully"
-      )
-    );
+    .json(new ApiResponse(
+      200,
+      { user: user.toObject(), accessToken, refreshToken },
+      "User logged in successfully"
+    ));
 });
 
 
@@ -310,52 +298,34 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 // Refresh Access Token
 const refreshAccessToken = asyncHandler(async (req, res) => {
-  const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+  const incomingRefreshToken = req.body.refreshToken;
 
   if (!incomingRefreshToken) {
     throw new ApiError(401, "Unauthorized request - No refresh token");
   }
 
   try {
-    // Verify refresh token
     const decodedToken = jwt.verify(incomingRefreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-    // Find user
     const user = await User.findById(decodedToken?._id);
-
     if (!user) {
       throw new ApiError(401, "Invalid refresh token - User not found");
     }
 
-    // Ensure refresh token matches
     if (incomingRefreshToken !== user.refreshToken) {
       throw new ApiError(401, "Refresh token is expired or used");
     }
 
-    // Generate new tokens
     const newAccessToken = user.generateAccessToken();
     const newRefreshToken = user.generateRefreshToken();
 
-    // Save new refresh token in database
     user.refreshToken = newRefreshToken;
     await user.save({ validateBeforeSave: false });
 
-    // Secure cookie options
-    const options = {
-      httpOnly: true,
-      secure: true, // Ensures cookies are only sent over HTTPS
-      sameSite: "None", //  Allows cookies to be sent in cross-origin requests
-      path: "/", 
-    };
-    
-
     return res
       .status(200)
-      .cookie("accessToken", newAccessToken, options)
-      .cookie("refreshToken", newRefreshToken, options)
       .json(new ApiResponse(200, { accessToken: newAccessToken, refreshToken: newRefreshToken }, "Access token refreshed"));
   } catch (error) {
-    console.error("Error refreshing token:", error.message);
     throw new ApiError(401, "Invalid or expired refresh token");
   }
 });

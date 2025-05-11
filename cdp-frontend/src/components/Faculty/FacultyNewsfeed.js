@@ -15,8 +15,11 @@ const FacultyNewsfeed = () => {
   }, [currentPage]);
 
   const fetchNews = () => {
+    const token = localStorage.getItem("accessToken");
     axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds?isPublic=true&page=${currentPage}&limit=${itemsPerPage}`, {
-      withCredentials: true, // Send cookies with the request
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then(response => {
         setNewsItems(response.data.data);
@@ -30,9 +33,12 @@ const FacultyNewsfeed = () => {
     if (!isConfirmed) return;
 
     try {
+      const token = localStorage.getItem("accessToken");
       // No need for token retrieval from localStorage, it's handled by cookies automatically
       await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/${id}`, {
-        withCredentials: true, // Send cookies with the request
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
       setNewsItems(newsItems.filter(news => news._id !== id));
       alert('News/Event Deleted Successfully');

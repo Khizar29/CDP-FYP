@@ -19,10 +19,15 @@ const EditAnnouncement = () => {
   useEffect(() => {
     const fetchAnnouncement = async () => {
       try {
+        const token = localStorage.getItem("accessToken");
         setLoading(true);
         const response = await axios.get(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/announcements/${announcementId}`,
-          { withCredentials: true }
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
         setHeading(response.data.data.heading);
         setText(response.data.data.text);
@@ -49,13 +54,18 @@ const EditAnnouncement = () => {
     }
 
     try {
+      const token = localStorage.getItem("accessToken");
       setLoading(true);
       await axios.put(
         `${process.env.REACT_APP_BACKEND_URL}/api/v1/announcements/${announcementId}`,
         { heading, text },
-        { withCredentials: true }
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
-      
+
       setSuccessMessage("Announcement updated successfully!");
       setTimeout(() => navigate("/faculty/announcements"), 2000); // Redirect after success
     } catch (err) {

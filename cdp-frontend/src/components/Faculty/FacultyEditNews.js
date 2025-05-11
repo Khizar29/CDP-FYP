@@ -17,7 +17,12 @@ const FacultyEditNews = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/${id}`, { withCredentials: true })
+    const token = localStorage.getItem("accessToken");
+    axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/newsfeeds/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then(response => {
         const { title, category, description, date } = response.data.data;
         setFormData({ title, category, description, date, image: null });
@@ -46,11 +51,14 @@ const FacultyEditNews = () => {
     setError('');
 
     try {
+      const token = localStorage.getItem("accessToken");
       const config = {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
-        withCredentials: true, // Ensure cookies are sent
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       };
 
       const data = new FormData();
@@ -69,8 +77,8 @@ const FacultyEditNews = () => {
   };
 
   const toolbarOptions = [
-    [{ 'header': '1'}, { 'header': '2'}, { 'font': [] }],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
     ['bold', 'italic', 'underline', 'strike'],
     ['link', 'image', 'video'],
     [{ 'align': [] }],

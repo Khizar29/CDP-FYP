@@ -105,11 +105,14 @@ const AddJob = () => {
       formData.append("job_ad_file", file);  // Add the selected file to FormData
 
       try {
+        const token = localStorage.getItem("accessToken");
         const response = await axios.post(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/extract-from-image`,
           formData,
           {
-            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
             headers: {
               'Content-Type': 'multipart/form-data',  // Set the content type to multipart/form-data
             }
@@ -140,11 +143,14 @@ const AddJob = () => {
       const encodedJobAdText = encodeURIComponent(sanitizedJobAdText);
 
       try {
+        const token = localStorage.getItem("accessToken");
         const response = await axios.post(
           `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/extract`,
           { job_ad_text: encodedJobAdText },
           {
-            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
             headers: {
               'Content-Type': 'application/json', // Tells the server the request body is JSON
             }
@@ -175,9 +181,11 @@ const AddJob = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-
+      const token = localStorage.getItem("accessToken");
       const config = {
-        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       };
       const payload = { ...formData };
 
