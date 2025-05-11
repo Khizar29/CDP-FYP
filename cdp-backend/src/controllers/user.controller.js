@@ -262,6 +262,7 @@ const loginUser = asyncHandler(async (req, res) => {
     httpOnly: true,
     secure: true, // Ensures cookies are only sent over HTTPS
     sameSite: "None", //  Allows cookies to be sent in cross-origin requests
+    path: "/", 
   };
   
 
@@ -344,6 +345,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
       httpOnly: true,
       secure: true, // Ensures cookies are only sent over HTTPS
       sameSite: "None", //  Allows cookies to be sent in cross-origin requests
+      path: "/", 
     };
     
 
