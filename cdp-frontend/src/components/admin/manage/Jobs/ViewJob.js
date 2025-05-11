@@ -37,10 +37,8 @@ const JobView = ({ job, handleBackToJobs }) => {
         { jobId: job._id },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          headers: {
             "Content-Type": "application/json",
+             Authorization: `Bearer ${token}`,
           },
         }
       );

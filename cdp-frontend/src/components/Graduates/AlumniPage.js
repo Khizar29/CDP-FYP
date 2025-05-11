@@ -7,7 +7,7 @@ import AlumniCard from './AlumniCard';
 import Pagination from './Pagination';
 import SearchBar from './SearchBar';
 import placeholder from '../../Images/placeholder.png';
-import GradPic from '../../Images/SK__1166.JPG';
+import GradPic from '../../Images/SK__1166.jpg';
 
 const AlumniPage = () => {
   const [currentPage, setCurrentPage] = useState(1);

@@ -282,6 +282,11 @@ const AddJobRecruiter = () => {
                         className="shadow border rounded w-full py-3 px-4 text-gray-700 focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900"
                     />
                 </div> */}
+                <div className="mt-6 p-4 m-3 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 rounded shadow-sm">
+                    <p className="font-semibold">⚠️ Please review your form carefully before submitting.</p>
+                    <p className="mt-1">Once submitted, the job posting cannot be edited. For any assistance, contact us at <a href="mailto:cdp.khi@nu.edu.pk" className="underline text-blue-700">cdp.khi@nu.edu.pk</a>.</p>
+                </div>
+
 
                 {/* ✅ Submit Button */}
                 <div className="flex items-center justify-between">
@@ -293,7 +298,7 @@ const AddJobRecruiter = () => {
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate('/recruiter/jobs')}
+                        onClick={() => navigate('/recruiter')}
                         className="bg-gray-600 text-white py-2 px-6 rounded-lg font-bold hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500"
                     >
                         Cancel
