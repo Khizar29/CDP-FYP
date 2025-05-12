@@ -9,7 +9,6 @@ const AdminTestimonials = () => {
   const [filteredTestimonials, setFilteredTestimonials] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
   const testimonialsPerPage = 10;
 
   const fetchTestimonials = async (page = 1) => {
@@ -18,8 +17,7 @@ const AdminTestimonials = () => {
       const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/testimonials`, {
         params: {
           page: page,
-          limit: testimonialsPerPage,
-          searchTerm: searchTerm,
+          limit: testimonialsPerPage
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -35,7 +33,7 @@ const AdminTestimonials = () => {
 
   useEffect(() => {
     fetchTestimonials(currentPage);
-  }, [currentPage, searchTerm]);
+  }, [currentPage]);
 
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this testimonial?');
@@ -56,9 +54,6 @@ const AdminTestimonials = () => {
     }
   };
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -70,13 +65,6 @@ const AdminTestimonials = () => {
         <div className="flex flex-col md:flex-row md:justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-blue-900 mb-4 md:mb-0">Testimonials List</h2>
           <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-            <input
-              type="text"
-              placeholder="Search by Name or Message"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="w-full md:w-auto py-2 px-4 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-900"
-            />
             <Link
               to="/admin/testimonials/add"
               className="w-full md:w-auto inline-flex items-center justify-center bg-blue-900 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-300"

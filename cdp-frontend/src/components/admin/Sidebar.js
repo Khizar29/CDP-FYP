@@ -46,10 +46,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                     <FaUser className="mr-3" />
                     Faculty
                 </Link>
-                <Link to="/admin/users" onClick={toggleSidebar} className="flex items-center mt-4 py-2 px-6 text-xl text-gray-100 hover:bg-blue-700 rounded">
+                {/* <Link to="/admin/users" onClick={toggleSidebar} className="flex items-center mt-4 py-2 px-6 text-xl text-gray-100 hover:bg-blue-700 rounded">
                     <FaUser className="mr-3" />
                     Users
-                </Link>
+                </Link> */}
                 <Link to="/admin/newsfeeds" onClick={toggleSidebar} className="flex items-center mt-4 py-2 px-6 text-xl text-gray-100 hover:bg-blue-700 rounded">
                     <FaCalendarAlt className="mr-3" />
                     Events

@@ -1,4 +1,3 @@
-// src/components/ContactUs.js
 import React from 'react';
 import { FaEnvelope, FaLinkedin } from 'react-icons/fa';
 
@@ -7,19 +6,23 @@ const ContactUs = () => {
   const longitude = 67.2646838;
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100 px-4 py-12 sm:px-6 lg:px-8">
-      <div className="w-full max-w-7xl bg-gray-800 rounded-lg shadow-lg flex flex-col lg:flex-row overflow-hidden">
-        {/* Left Section - Contact Info */}
-        <div className="w-full lg:w-1/2 p-6 md:p-12 lg:p-16 bg-gradient-to-b from-blue-500 to-blue-300 bg-opacity-40 backdrop-filter backdrop-blur-lg text-white shadow-lg ">
+    <div className="min-h-[80vh] flex justify-center items-center bg-transparent px-2 py-6 sm:px-4 lg:px-6">
 
+      <div className="w-full max-w-5xl bg-gray-800 rounded-lg shadow-lg flex flex-col lg:flex-row overflow-hidden">
+        {/* Left Section - Contact Info */}
+        <div className="w-full lg:w-1/2 p-6 md:p-10 lg:p-12 bg-gradient-to-b from-blue-500 to-blue-300 bg-opacity-40 backdrop-filter backdrop-blur-lg text-white shadow-lg">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">Get in touch</h2>
+
           <div className="mb-8">
             <h3 className="text-md md:text-xl text-yellow-400 font-extrabold">Visit us</h3>
             <p className="lg:text-lg md:text-base">
               Office of Industrial Liaison, Career Services and Digital Media, FAST National University of Computer and Emerging Sciences, Karachi
             </p>
-            <p className="lg:text-lg md:text-base">St-4, Sector 17-D, NH 5, Karachi, Karachi City, Sindh</p>
+            <p className="lg:text-lg md:text-base">
+              St-4, Sector 17-D, NH 5, Karachi, Karachi City, Sindh
+            </p>
           </div>
+
           <div className="mb-8">
             <h3 className="text-md md:text-xl text-yellow-400 font-bold">Chat to us</h3>
             <p className="lg:text-lg md:text-base">Our friendly team is here to help.</p>
@@ -30,6 +33,7 @@ const ContactUs = () => {
               <a href="mailto:cso.khi@nu.edu.pk" className="text-white hover:underline">cso.khi@nu.edu.pk</a>
             </p>
           </div>
+
           <div className="mb-8">
             <h3 className="text-md md:text-xl text-yellow-300 font-bold">Call us</h3>
             <p className="lg:text-lg md:text-base">Mon-Fri from 9am to 3:30pm</p>
@@ -37,15 +41,17 @@ const ContactUs = () => {
               <a href="tel:+92-21-111-128-128" className="text-white hover:underline">+92-21-111-128-128</a>
             </p>
           </div>
+
           <div className="mb-8">
             <h3 className="text-md md:text-xl text-yellow-300 font-bold">Social media</h3>
             <div className="flex space-x-4">
               <a href="https://www.linkedin.com/in/aysha-siddiqui-9880451a2/" target="_blank" rel="noopener noreferrer" className="text-white hover:text-gray-300">
                 <FaLinkedin size={24} />
               </a>
-              {/* Add other social media links as needed */}
+              {/* Add more social icons if needed */}
             </div>
           </div>
+
           <div className="mb-8">
             <h3 className="text-md md:text-xl text-yellow-300 font-bold">Location</h3>
             <iframe
@@ -61,7 +67,7 @@ const ContactUs = () => {
         </div>
 
         {/* Right Section - Contact Form */}
-        <div className="w-full lg:w-1/2 p-6 md:p-12 lg:p-16 bg-gray-900 text-white">
+        <div className="w-full lg:w-1/2 p-6 md:p-10 lg:p-12 bg-gray-900 text-white">
           <form>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
