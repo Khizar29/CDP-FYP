@@ -23,11 +23,14 @@ const EditGraduateProfile = () => {
   const [zoom, setZoom] = useState(1);
   const [croppedImage, setCroppedImage] = useState(null);
 
-
+  const [imageError, setImageError] = useState(""); // To hold error messages for image size
   const [showGradToggle, setShowGradToggle] = useState(false);
   const [markingAsGraduate, setMarkingAsGraduate] = useState(false);
   const [graduationYearInput, setGraduationYearInput] = useState("");
   const [skillsInput, setSkillsInput] = useState("");
+
+  // Allowed image size in bytes (2MB)
+  const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
   const allowedFields = [
     "cgpa",
@@ -56,6 +59,8 @@ const EditGraduateProfile = () => {
   const modules = {
     toolbar: toolbarOptions,
   };
+
+
 
   useEffect(() => {
     const fetchGraduate = async () => {
@@ -112,11 +117,19 @@ const EditGraduateProfile = () => {
   // Dropzone configuration
   const onDrop = useCallback((acceptedFiles) => {
     const file = acceptedFiles[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      setImage(reader.result); // Set image for cropping
-    };
-    reader.readAsDataURL(file);
+
+    // Check file size
+    if (file.size > MAX_FILE_SIZE) {
+      setImageError("File size should not exceed 2MB.");
+      setImage(null); // Reset image
+    } else {
+      setImageError(""); // Clear any previous error
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImage(reader.result); // Set image for cropping
+      };
+      reader.readAsDataURL(file);
+    }
   }, []);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -142,7 +155,6 @@ const EditGraduateProfile = () => {
       console.error(e);
     }
   }, [image, croppedAreaPixels]);
-
 
   const handleMarkAsGraduate = async () => {
     try {
@@ -201,8 +213,6 @@ const EditGraduateProfile = () => {
         {
           headers: {
             "Content-Type": "multipart/form-data",
-          },
-          headers: {
             Authorization: `Bearer ${token}`,
           },
         }
@@ -226,7 +236,7 @@ const EditGraduateProfile = () => {
       <Header />
       <main className="container mx-auto bg-white shadow-lg rounded-lg overflow-hidden p-8">
         <form onSubmit={handleSubmit}>
-          {/* Dropzone and Cropper */}
+          {/* File upload and cropping */}
           <div {...getRootProps()} className={`border-2 border-dashed p-4 text-center mb-4 ${image ? "cursor-default" : "cursor-pointer"}`}>
             <input {...getInputProps()} />
             {image ? (
@@ -245,6 +255,10 @@ const EditGraduateProfile = () => {
               <p>{isDragActive ? "Drop the image here..." : "Drag 'n' drop an image here, or click to select an image"}</p>
             )}
           </div>
+
+          {imageError && (
+            <p className="text-red-600 text-sm mt-2">{imageError}</p> // Show error if image size is too large
+          )}
 
           {image && (
             <button
