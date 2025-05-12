@@ -111,10 +111,8 @@ const AddJob = () => {
           formData,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            headers: {
               'Content-Type': 'multipart/form-data',  // Set the content type to multipart/form-data
+              Authorization: `Bearer ${token}`,
             }
           }
         );
@@ -149,10 +147,8 @@ const AddJob = () => {
           { job_ad_text: encodedJobAdText },
           {
             headers: {
-              Authorization: `Bearer ${token}`,
-            },
-            headers: {
               'Content-Type': 'application/json', // Tells the server the request body is JSON
+              Authorization: `Bearer ${token}`,
             }
           }
         );
@@ -178,6 +174,14 @@ const AddJob = () => {
     }
   };
 
+  // Prevent the default form submission on pressing Enter in email fields
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -188,7 +192,6 @@ const AddJob = () => {
         },
       };
       const payload = { ...formData };
-
 
       if (job) {
         await axios.put(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs/${job._id}`, payload, config);
@@ -418,6 +421,7 @@ const AddJob = () => {
                     e.target.value = '';
                   }
                 }}
+                onKeyDown={handleKeyPress} // Prevent form submission when pressing enter
               />
             </div>
 
@@ -432,6 +436,7 @@ const AddJob = () => {
                     e.target.value = '';
                   }
                 }}
+                onKeyDown={handleKeyPress} // Prevent form submission when pressing enter
               />
             </div>
 
@@ -446,21 +451,24 @@ const AddJob = () => {
                     e.target.value = '';
                   }
                 }}
+                onKeyDown={handleKeyPress} // Prevent form submission when pressing enter
               />
             </div>
           </div>
         </div>
 
+        {/* Email input fields */}
         <div className="mb-6">
           <label className="block text-gray-700 text-sm font-bold mb-2">
             To
           </label>
           <EmailInput
-            key="toEmails"  // Add key to help React
+            key="toEmails"
             value={formData.toEmails}
             onChange={useCallback((emails) => handleEmailChange('toEmails', emails), [handleEmailChange])}
             placeholder="Enter email addresses"
             suggestions={emailSuggestions}
+            onKeyDown={handleKeyPress} // Prevent form submission when pressing enter
           />
         </div>
 
@@ -474,6 +482,7 @@ const AddJob = () => {
             onChange={useCallback((emails) => handleEmailChange('ccEmails', emails), [handleEmailChange])}
             placeholder="Enter CC email addresses"
             suggestions={emailSuggestions}
+            onKeyDown={handleKeyPress} // Prevent form submission when pressing enter
           />
         </div>
 
@@ -487,9 +496,11 @@ const AddJob = () => {
             onChange={useCallback((emails) => handleEmailChange('bccEmails', emails), [handleEmailChange])}
             placeholder="Enter BCC email addresses"
             suggestions={emailSuggestions}
+            onKeyDown={handleKeyPress} // Prevent form submission when pressing enter
           />
         </div>
 
+        {/* Submit button */}
         <div className="flex items-center justify-between">
           <button
             type="submit"
@@ -498,16 +509,10 @@ const AddJob = () => {
           >
             Submit
           </button>
-          <button
-            type="button"
-            onClick={() => navigate('/admin/jobs')}
-            className="bg-gray-600 text-white py-2 px-6 rounded-lg font-bold hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition duration-200"
-          >
-            Back
-          </button>
         </div>
       </form>
 
+      {/* Loading Modal */}
       <Modal
         isOpen={isLoading}
         contentLabel="Extracting Information"
