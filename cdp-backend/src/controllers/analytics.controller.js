@@ -360,6 +360,37 @@ const getJobPostingsByRecruiter = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Failed to fetch job postings by recruiter");
     }
 });
+
+const getJobCountByNiche = asyncHandler(async (req, res) => {
+  try {
+    const result = await Job.aggregate([
+      {
+        $match: { status: "approved" } // Optional: only count approved jobs
+      },
+      {
+        $group: {
+          _id: "$job_niche",
+          totalJobs: { $sum: 1 }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          niche: "$_id",
+          totalJobs: 1
+        }
+      },
+      { $sort: { totalJobs: -1 } },
+      
+    ]);
+    console.log("job niche")
+    return res.status(200).json(new ApiResponse(200, result, "Job count by niche"));
+  } catch (error) {
+    console.error("Error in getJobCountByNiche:", error);
+    return res.status(500).json(new ApiError(500, "Failed to fetch job niche counts"));
+  }
+});
+
 module.exports = {
 
     getMostSoughtJobs,
@@ -372,4 +403,6 @@ module.exports = {
     getSortedJobsByApplicationCount,
     getJobsPostedPerMonth,
     getJobPostingsByRecruiter,
+    getJobCountByNiche,
+
 };

@@ -75,7 +75,14 @@ const jobSchema = new Schema(
     applicationCount: {
       type: Number,
       default: 0,
+    },
+
+    job_niche: {
+      type: String,
+      trim: true,
+      default: "Others"
     }
+
   },
   {
     timestamps: true, // Automatically manage createdAt and updatedAt fields

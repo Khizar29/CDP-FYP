@@ -9,6 +9,8 @@ const fs = require('fs');
 const path = require('path');
 const Application = require("../models/jobapplication.model"); 
 const axios = require('axios');
+// const { classifyJobNiche } = require("../utils/nicheClassifier");
+
 
 const createJob = asyncHandler(async (req, res) => {
   let {
@@ -19,6 +21,7 @@ const createJob = asyncHandler(async (req, res) => {
     job_description,
     responsibilities,
     application_methods,
+    job_niche,
     toEmails,
     ccEmails,
     bccEmails
@@ -46,16 +49,18 @@ const createJob = asyncHandler(async (req, res) => {
 
   // Create job with all fields
   const job = new Job({
-    title,
-    company_name,
-    job_type,
-    qualification_req,
-    job_description,
-    responsibilities,
-    application_methods,
-    postedBy: req.user.id,
-    status
-  });
+  title,
+  company_name,
+  job_type,
+  qualification_req,
+  job_description,
+  responsibilities,
+  application_methods,
+  postedBy: req.user.id,
+  status,
+  job_niche // <-- add this
+});
+
 
   await job.save();
 
