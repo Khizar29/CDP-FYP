@@ -20,6 +20,7 @@ const AddJob = () => {
     title: job?.title || '',
     job_type: job?.job_type || '',
     no_of_openings: job?.no_of_openings || '',
+    job_niche: job?.job_niche || 'Others',
     qualification_req: job?.qualification_req || '',
     job_description: job?.job_description || '',
     responsibilities: job?.responsibilities || '',
@@ -124,6 +125,7 @@ const AddJob = () => {
           company_name: extractedInfo.company_name || prevFormData.company_name,
           title: extractedInfo.title || prevFormData.title,
           job_type: extractedInfo.job_type || prevFormData.job_type,
+          job_niche: extractedInfo.job_niche || prevFormData.job_niche,
           qualification_req: extractedInfo.qualification_req || prevFormData.qualification_req,
           job_description: extractedInfo.job_description || prevFormData.job_description,
           responsibilities: extractedInfo.responsibilities || prevFormData.responsibilities,
@@ -160,6 +162,7 @@ const AddJob = () => {
           company_name: extractedInfo.company_name || prevFormData.company_name,
           title: extractedInfo.title || prevFormData.title,
           job_type: extractedInfo.job_type || prevFormData.job_type,
+          job_niche: extractedInfo.job_niche || prevFormData.job_niche,
           qualification_req: extractedInfo.qualification_req || prevFormData.qualification_req,
           job_description: extractedInfo.job_description || prevFormData.job_description,
           responsibilities: extractedInfo.responsibilities || prevFormData.responsibilities,
@@ -334,6 +337,32 @@ const AddJob = () => {
         </div>
 
         <div className="mb-6">
+          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="job_niche">
+            Job Niche
+          </label>
+          <select
+            id="job_niche"
+            name="job_niche"
+            value={formData.job_niche}
+            onChange={(e) => setFormData({ ...formData, job_niche: e.target.value })}
+            className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
+            required
+          >
+            <option value="Frontend">Frontend</option>
+            <option value="Backend">Backend</option>
+            <option value="DevOps">DevOps</option>
+            <option value="Full Stack">Full Stack</option>
+            <option value="Cloud">Cloud</option>
+            <option value="Data Science">Data Science</option>
+            <option value="AI/ML">AI/ML</option>
+            <option value="Project Management">Project Management</option>
+            <option value="Cybersecurity">Cybersecurity</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+
+
+        <div className="mb-6">
           <label className="block text-gray-700 text-sm font-bold mb-2">Job Description</label>
           <ReactQuill
             value={formData.job_description}
@@ -501,15 +530,25 @@ const AddJob = () => {
         </div>
 
         {/* Submit button */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
+          {/* Submit Button */}
           <button
             type="submit"
             id="submit_job"
-            className="bg-blue-900 text-white py-2 px-6 rounded-lg font-bold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-opacity-50 transition duration-200"
+            className="bg-blue-900 text-white py-2 px-6 rounded-lg font-bold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-opacity-50 transition duration-200 w-full md:w-auto"
           >
             Submit
           </button>
+
+          {/* Go Back Button */}
+          <button
+            onClick={() => navigate(-1)}
+            className="bg-green-600 text-white py-2 px-6 rounded-lg font-bold hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-200 w-full md:w-auto"
+          >
+            Back
+          </button>
         </div>
+
       </form>
 
       {/* Loading Modal */}

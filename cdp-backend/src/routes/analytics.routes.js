@@ -12,6 +12,8 @@ const {
   getJobsPostedPerMonth,
   getJobPostingsByRecruiter,
   getSortedJobsByApplicationCount,
+  getJobCountByNiche,
+
 } = require("../controllers/analytics.controller");
 
 const router = express.Router();
@@ -28,5 +30,7 @@ router.get("/applications-per-company", verifyJWT, verifyAdmin, getAllJobsApplic
 router.get("/job-postings-per-month", verifyJWT, verifyAdmin, getJobsPostedPerMonth);
 router.get("/job-postings-by-recruiter", verifyJWT, verifyAdmin, getJobPostingsByRecruiter);
 router.get("/jobs-by-applications", verifyJWT, verifyAdmin, getSortedJobsByApplicationCount);
+router.get('/niches', verifyJWT, verifyAdmin, getJobCountByNiche);
+
 
 module.exports = router;
