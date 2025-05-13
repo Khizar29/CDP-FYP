@@ -31,11 +31,19 @@ const JobList = () => {
 
   const jobTypes = ["Remote", "Onsite", "Hybrid", "Internship"];
   const niches = [
-    "Backend Developer",
-    "Frontend Developer",
+    "Frontend",
+    "Backend",
+    "Full Stack",
+    "DevOps",
+    "Software Testing",
+    "Cloud",
     "Data Science",
-    "FullStack Developer",
-    "DevOps Engineer",
+    "AI",
+    "UI/UX Design",
+    "Business",
+    "Project Management",
+    "Cybersecurity",
+    "Others",
   ];
 
   // Animation Variants
@@ -122,19 +130,17 @@ const JobList = () => {
     }
 
     if (filters.niche) {
-      filtered = filtered.filter(
-        (job) =>
-          job.title.toLowerCase().includes(filters.niche.toLowerCase()) ||
-          job.qualification_req
-            .toLowerCase()
-            .includes(filters.niche.toLowerCase()) ||
-          job.job_description
-            .toLowerCase()
-            .includes(filters.niche.toLowerCase()) ||
-          job.responsibilities
-            .toLowerCase()
-            .includes(filters.niche.toLowerCase())
-      );
+      const nicheLower = filters.niche.toLowerCase();
+      filtered = filtered.filter((job) => {
+        const jobContent = `
+      ${job.title}
+      ${job.qualification_req}
+      ${job.job_description}
+      ${job.responsibilities}
+      ${job.job_niche}
+    `.toLowerCase();
+        return jobContent.includes(nicheLower);
+      });
     }
 
     setFilteredJobs(filtered);
