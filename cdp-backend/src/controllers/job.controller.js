@@ -466,11 +466,24 @@ const extractJobInfofromText = asyncHandler(async (req, res) => {
           1. job_type MUST be one of: "Onsite", "Remote", "Hybrid", "Internship"
           2. Location names (like Karachi, Lahore) should NEVER be considered as job_type
           3. If no clear job type is found, default to "Onsite"
+          4. Extract the job niche from the job ad text. If the niche is not mentioned or is unclear, set it to "Others". The possible values for niche are:
+            - "Frontend"
+            - "Backend"
+            - "Full Stack"
+            - "DevOps"
+            - "Software Testing"
+            - "Cloud"
+            - "Data Science"
+            - "AI/ML"
+            - "Project Management"
+            - "Cybersecurity"
+            - "Others"
 
           FIELDS TO EXTRACT:
           - company_name (string)
           - title (string)
           - job_type (one of: "Onsite", "Remote", "Hybrid", "Internship")
+          - job_niche (one of the predefined options)
           - qualification_req (string with bullet points)
           - job_description (string)
           - responsibilities (string with bullet points)
@@ -533,6 +546,16 @@ const extractJobInfofromText = asyncHandler(async (req, res) => {
         return method;
       });
     }
+
+        // Check if niche is valid, otherwise set to "Others"
+        const validNiches = [
+          "Frontend", "Backend", "Full Stack", "DevOps", "Software Testing",
+          "Cloud", "Data Science", "AI/ML", "Project Management", "Cybersecurity"
+        ];
+    
+        if (extractedInfo.job_niche && !validNiches.includes(extractedInfo.job_niche)) {
+          extractedInfo.job_niche = "Others";
+        }
     
     res.json(extractedInfo);
   } catch (error) {

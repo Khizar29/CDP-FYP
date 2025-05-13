@@ -59,7 +59,8 @@ const DashboardHome = () => {
           applicationsPerJobTypeRes,
           jobPostingsByRecruiterRes,
           jobApplicationsPerCompanyRes,
-          sortedJobsbyApplicationsRes
+          sortedJobsbyApplicationsRes,
+          jobPositngbyNicheRes,
         ] = await Promise.all([
           axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/graduates/count`, {
             headers: {
@@ -121,6 +122,11 @@ const DashboardHome = () => {
               Authorization: `Bearer ${token}`,
             },
           }),
+          axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/analytics/niches`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
         ]);
 
         setStats({
@@ -142,7 +148,9 @@ const DashboardHome = () => {
           applicationsPerJobType: applicationsPerJobTypeRes.data,
           jobPostingsByRecruiter: jobPostingsByRecruiterRes.data,
           jobApplicationsPerCompany: jobApplicationsPerCompanyRes.data,
-          sortedJobsbyApplications: sortedJobsbyApplicationsRes.data
+          sortedJobsbyApplications: sortedJobsbyApplicationsRes.data,
+          // Check for job niche data and ensure it exists
+          jobPositngbyNiche: jobPositngbyNicheRes.data?.data || [],
         });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -154,6 +162,7 @@ const DashboardHome = () => {
 
     fetchDashboardData();
   }, [user, navigate]);
+
 
   const StatCard = ({ icon: Icon, title, value, color }) => (
     <div className={`bg-white rounded-xl shadow-lg p-6 transform transition-all duration-300 hover:scale-105 border-l-4 ${color}`}>
@@ -178,7 +187,7 @@ const DashboardHome = () => {
 
   if (!user || user.role !== 'admin') return null;
 
-  const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
+  const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6','#F9C74F'];
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -365,6 +374,31 @@ const DashboardHome = () => {
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
+
+          {/* Job Niche Distribution */}
+
+          <ChartCard title="Job Niche Distribution">
+  <ResponsiveContainer width="100%" height={300}>
+    <PieChart>
+      <Pie
+        data={chartData.jobPositngbyNiche || []}  // Ensure data is an array, fallback to empty array
+        cx="50%"
+        cy="50%"
+        outerRadius={100}
+        dataKey="totalJobs"
+        nameKey="niche"
+        label
+      >
+        {(chartData.jobPositngbyNiche || []).map((entry, index) => (  // Safe map
+          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+        ))}
+      </Pie>
+      <Tooltip />
+      <Legend />
+    </PieChart>
+  </ResponsiveContainer>
+</ChartCard>
+
         </div>
       </div>
     </div>
