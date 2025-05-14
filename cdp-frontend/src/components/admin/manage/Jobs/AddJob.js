@@ -545,6 +545,7 @@ const AddJob = () => {
 
           {/* Go Back Button */}
           <button
+            type="button"
             onClick={() => navigate(-1)}
             className="bg-green-600 text-white py-2 px-6 rounded-lg font-bold hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 transition duration-200 w-full md:w-auto"
           >
