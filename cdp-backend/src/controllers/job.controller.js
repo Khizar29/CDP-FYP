@@ -26,8 +26,8 @@ const createJob = asyncHandler(async (req, res) => {
     bccEmails,
   } = req.body;
 
-  if (!req.user || !["admin", "recruiter"].includes(req.user.role)) {
-    throw new ApiError(403, "Forbidden: Admins and Recruiters only");
+  if (!req.user || !['admin', 'recruiter', 'faculty'].includes(req.user.role)) {
+    throw new ApiError(403, "Forbidden: Admins, Faculty and Recruiters only");
   }
 
   const status = req.user.role === "admin" ? "approved" : "pending";
@@ -370,6 +370,61 @@ const getRecruiterJobs = asyncHandler(async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 });
+
+const getFacultyJobs = asyncHandler(async (req, res) => {
+  try {
+    // Ensure only recruiters can access their own jobs
+    if (!req.user || req.user.role !== "faculty") {
+      console.error("Error: Unauthorized faculty access");
+      return res.status(403).json({ message: "Forbidden: faculty only" });
+    }
+
+    const { page = 1, limit = 10, searchTerm = "", filterDate = "" } = req.query;
+
+    // Ensure the query fetches only jobs posted by the faculty
+    const query = { postedBy: req.user.id };
+
+    //  Apply Search Query
+    if (searchTerm) {
+      query.$or = [
+        { company_name: { $regex: searchTerm, $options: "i" } },
+        { title: { $regex: searchTerm, $options: "i" } },
+      ];
+    }
+
+    //  Apply Date Filter
+    if (filterDate) {
+      const start = new Date(filterDate);
+      const end = new Date(filterDate);
+      end.setDate(end.getDate() + 1);
+      query.posted_on = { $gte: start, $lt: end };
+    }
+
+    //  Get total number of jobs
+    const total = await Job.countDocuments(query);
+
+    //  Apply Pagination and Sorting
+    const startIndex = (page - 1) * limit;
+    const jobs = await Job.find(query)
+      .sort({ posted_on: -1 }) // Newest jobs first
+      .skip(startIndex)
+      .limit(parseInt(limit))
+      .populate("postedBy", "fullName email");
+
+    return res.status(200).json({
+      data: jobs,
+      totalPages: limit > 0 ? Math.ceil(total / limit) : 1,
+      currentPage: page,
+      totalJobs: total,
+    });
+  } catch (error) {
+    console.error("Server Error in getfacultyJobs:", error);
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
+  }
+});
+
 const approveJob = asyncHandler(async (req, res) => {
   const { jobId } = req.params;
   const { status } = req.body; // Can be 'approved' or 'rejected'
@@ -382,7 +437,7 @@ const approveJob = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Invalid status value");
   }
 
-  const job = await Job.findById(jobId);
+  const job = await Job.findById(jobId).populate('postedBy', 'email fullName'); // Populate postedBy with email and fullName
   if (!job) throw new ApiError(404, "Job not found");
 
   job.status = status;
@@ -396,50 +451,66 @@ const approveJob = asyncHandler(async (req, res) => {
       pass: process.env.GMAIL_PASSWORD,
     },
   });
+
   // Email sending logic for approved jobs
   if (job.status === "approved") {
-    // Only use toEmails field for recipients
-    // const allRecipients = [...new Set(toEmails)];
-
-    // if (allRecipients.length > 0) {
     const subject = `Exciting Career Opportunity: ${job.title}`;
 
     // Generate application links HTML
-    const applicationLinks = job.application_methods
-      .map((method) => {
-        if (method.type === "email") {
-          return `<li>Email: <a href="mailto:${method.value}${method.instructions ? `?subject=${encodeURIComponent(method.instructions)}` : ""}">${method.value}</a>${method.instructions ? ` (${method.instructions})` : ""}</li>`;
-        }
-        return `<li>Website: <a href="${method.value}">${method.value}</a></li>`;
-      })
-      .join("");
+    const applicationLinks = job.application_methods.map(method => {
+      if (method.type === 'email') {
+        return `<li>Email: <a href="mailto:${method.value}${method.instructions ? `?subject=${encodeURIComponent(method.instructions)}` : ''}">${method.value}</a>${method.instructions ? ` (${method.instructions})` : ''}</li>`;
+      }
+      return `<li>Website: <a href="${method.value}">${method.value}</a></li>`;
+    }).join('');
 
     const html = `
-        <p>Dear Students,</p>
-        <p>We are excited to share an excellent career opportunity with you:</p>
-        <h3>${job.title} at ${job.company_name}</h3>
-        <p><strong>Job Type:</strong> ${job.job_type}</p>
-        ${job.job_description ? `<div>${job.job_description}</div>` : ""}
-        
-        ${job.qualification_req ? `<h4>Qualifications:</h4><div>${job.qualification_req}</div>` : ""}
-        ${job.responsibilities ? `<h4>Responsibilities:</h4><div>${job.responsibilities}</div>` : ""}
+      <p>Dear Students,</p>
+      <p>We are excited to share an excellent career opportunity with you:</p>
+      <h3>${job.title} at ${job.company_name}</h3>
+      <p><strong>Job Type:</strong> ${job.job_type}</p>
+      ${job.job_description ? `<div>${job.job_description}</div>` : ''}
+      
+      ${job.qualification_req ? `<h4>Qualifications:</h4><div>${job.qualification_req}</div>` : ''}
+      ${job.responsibilities ? `<h4>Responsibilities:</h4><div>${job.responsibilities}</div>` : ''}
 
-        <h4>How to Apply:</h4>
-        <ul>${applicationLinks}</ul>
-        
-        <p style="font-size: medium; color: black;">
-        <b>Best Regards,</b><br>
-        Industrial Liaison/Career Services Office<br>
-        021 111 128 128 ext. 184
-      `;
+      <h4>How to Apply:</h4>
+      <ul>${applicationLinks}</ul>
+      
+      <p style="font-size: medium; color: black;">
+      <b>Best Regards,</b><br>
+      Industrial Liaison/Career Services Office<br>
+      021 111 128 128 ext. 184
+    `;
 
     try {
       await transporter.sendMail({
         from: `"Career Services and IL Office Karachi" <${process.env.GMAIL}>`,
         to: "allstudents.khi@nu.edu.pk",
-        cc: job.postedBy.email,
-        // cc: ccEmails.length ? ccEmails.join(",") : undefined,
-        // bcc: bccEmails.length ? bccEmails.join(",") : undefined,
+        cc: job.postedBy.email, // Now populated with email
+        subject,
+        html,
+      });
+    } catch (emailError) {
+      console.error("📧 Email Error:", emailError);
+    }
+  } else {
+    const subject = `Job Application Rejected: ${job.title}`;
+
+    const html = `
+      <p>Dear ${job.postedBy.fullName},</p>
+      <p>We regret to inform you that your job application for the position of <b>${job.title}</b> has been rejected.</p>
+      <p>Thank you for your interest in our company.</p>
+      <p style="font-size: medium; color: black;">
+      <b>Best Regards,</b><br>
+      Industrial Liaison/Career Services Office<br>
+      021 111 128 128 ext. 184
+    `;
+
+    try {
+      await transporter.sendMail({
+        from: `"Career Services and IL Office Karachi" <${process.env.GMAIL}>`,
+        to: job.postedBy.email, // Now populated with email
         subject,
         html,
       });
@@ -447,11 +518,10 @@ const approveJob = asyncHandler(async (req, res) => {
       console.error("📧 Email Error:", emailError);
     }
   }
-  // }
 
-  return res
-    .status(200)
-    .json(new ApiResponse(200, job, `Job has been ${status}`));
+  res.status(200).json({
+    message: `Job status updated to ${status} successfully`,
+  });
 });
 
 const convertPdfToImage = async (pdfPath, outputPath) => {
@@ -716,6 +786,7 @@ module.exports = {
   getJobById,
   getJobCount,
   getRecruiterJobs,
+  getFacultyJobs,
   approveJob,
   extractJobInfofromText,
   extractJobInfoFromImageWithGroq,

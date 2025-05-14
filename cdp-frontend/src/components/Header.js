@@ -114,7 +114,7 @@ const Header = ({ scrollToSection }) => {
                     </Link>
                   )}
                   {user.role === 'faculty' && (
-                    <Link to="/faculty" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                    <Link to="/faculty/announcements" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                       <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" /> Faculty Panel
                     </Link>
                   )}
@@ -206,7 +206,7 @@ const Header = ({ scrollToSection }) => {
                       )}
                       {/* Faculty Panel Link */}
                       {user.role === 'faculty' && (
-                        <Link to="/faculty" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                        <Link to="/faculty/announcements" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                           <FontAwesomeIcon icon={faChalkboardTeacher} className="mr-2" /> Faculty Panel
                         </Link>
                       )}

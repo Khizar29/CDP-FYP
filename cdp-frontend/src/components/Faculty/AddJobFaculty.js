@@ -5,8 +5,8 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { UserContext } from '../../contexts/UserContext';
 
-const AddJobRecruiter = () => {
-    const { user } = useContext(UserContext); // Get logged-in recruiter
+const AddJobFaculty = () => {
+    const { user } = useContext(UserContext); // Get logged-in Faculty
     const navigate = useNavigate();
 
     // ✅ Define the form state (only allowed fields)
@@ -63,7 +63,7 @@ const AddJobRecruiter = () => {
             await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, formData, config);
 
             alert('Job Posted Successfully. Awaiting admin approval.');
-            navigate('/recruiter'); // ✅ Redirect to recruiter dashboard
+            navigate('/faculty/jobs'); // ✅ Redirect to recruiter dashboard
         } catch (error) {
             console.error('Error posting job:', error);
             alert('Error posting job: ' + error.message);
@@ -336,4 +336,4 @@ const AddJobRecruiter = () => {
     );
 };
 
-export default AddJobRecruiter;
+export default AddJobFaculty;

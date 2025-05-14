@@ -38,6 +38,10 @@ const SidebarFaculty = ({ isOpen, toggleSidebar }) => {
                     <FaNewspaper className="mr-3 text-x1" />
                     Newsfeed
                 </Link>
+                <Link to="/faculty/jobs" onClick={toggleSidebar} className="flex items-center py-3 px-6 text-lg text-gray-100 hover:bg-blue-700 rounded">
+                    <FaNewspaper className="mr-3 text-x1" />
+                    Jobs
+                </Link>
             </nav>
         </aside>
     );
