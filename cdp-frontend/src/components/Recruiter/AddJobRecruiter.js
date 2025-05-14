@@ -14,6 +14,7 @@ const AddJobRecruiter = () => {
         company_name: '',
         title: '',
         job_type: '',
+        job_niche: '',
         qualification_req: '',
         job_description: '',
         responsibilities: '',
@@ -114,6 +115,32 @@ const AddJobRecruiter = () => {
                         <option value="Remote">Remote</option>
                         <option value="Hybrid">Hybrid</option>
                         <option value="Internship">Internship</option>
+                    </select>
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="job_niche">
+                        Job Niche
+                    </label>
+                    <select
+                        id="job_niche"
+                        name="job_niche"
+                        value={formData.job_niche}
+                        onChange={(e) => setFormData({ ...formData, job_niche: e.target.value })}
+                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-blue-900 focus:ring-2 focus:ring-blue-900 transition duration-200"
+                        required
+                    >
+                        <option value="Others">Others</option>
+                        <option value="Frontend">Frontend</option>
+                        <option value="Backend">Backend</option>
+                        <option value="Full Stack">Full Stack</option>
+                        <option value="DevOps">DevOps</option>
+                        <option value="Software Testing">Software Testing</option>
+                        <option value="Cloud">Cloud</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="AI/ML">AI/ML</option>
+                        <option value="Project Management">Project Management</option>
+                        <option value="Cybersecurity">Cybersecurity</option>
                     </select>
                 </div>
 
