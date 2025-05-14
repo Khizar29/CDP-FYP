@@ -1,16 +1,15 @@
-const Job = require('../models/job.model.js');
-const asyncHandler = require('../utils/asyncHandler.js');
-const ApiError = require('../utils/ApiError.js');
-const ApiResponse = require('../utils/ApiResponse.js');
-const nodemailer = require('nodemailer');
-const { Groq } = require('groq-sdk');
+const Job = require("../models/job.model.js");
+const asyncHandler = require("../utils/asyncHandler.js");
+const ApiError = require("../utils/ApiError.js");
+const ApiResponse = require("../utils/ApiResponse.js");
+const nodemailer = require("nodemailer");
+const { Groq } = require("groq-sdk");
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
-const fs = require('fs');
-const path = require('path');
-const Application = require("../models/jobapplication.model"); 
-const axios = require('axios');
+const fs = require("fs");
+const path = require("path");
+const Application = require("../models/jobapplication.model");
+const axios = require("axios");
 // const { classifyJobNiche } = require("../utils/nicheClassifier");
-
 
 const createJob = asyncHandler(async (req, res) => {
   let {
@@ -24,7 +23,7 @@ const createJob = asyncHandler(async (req, res) => {
     job_niche,
     toEmails,
     ccEmails,
-    bccEmails
+    bccEmails,
   } = req.body;
 
   if (!req.user || !['admin', 'recruiter', 'faculty'].includes(req.user.role)) {
@@ -34,33 +33,38 @@ const createJob = asyncHandler(async (req, res) => {
   const status = req.user.role === "admin" ? "approved" : "pending";
 
   // Normalize email arrays
-  toEmails = Array.isArray(toEmails) ? toEmails : (toEmails ? [toEmails] : []);
-  ccEmails = Array.isArray(ccEmails) ? ccEmails : (ccEmails ? [ccEmails] : []);
-  bccEmails = Array.isArray(bccEmails) ? bccEmails : (bccEmails ? [bccEmails] : []);
+  toEmails = Array.isArray(toEmails) ? toEmails : toEmails ? [toEmails] : [];
+  ccEmails = Array.isArray(ccEmails) ? ccEmails : ccEmails ? [ccEmails] : [];
+  bccEmails = Array.isArray(bccEmails)
+    ? bccEmails
+    : bccEmails
+      ? [bccEmails]
+      : [];
 
   // Validate and normalize application methods
   application_methods = Array.isArray(application_methods)
-    ? application_methods.map(method => ({
-      type: ['email', 'website', 'form'].includes(method.type) ? method.type : 'website',
-      value: method.value || '',
-      instructions: method.instructions || ''
-    }))
+    ? application_methods.map((method) => ({
+        type: ["email", "website", "form"].includes(method.type)
+          ? method.type
+          : "website",
+        value: method.value || "",
+        instructions: method.instructions || "",
+      }))
     : [];
 
   // Create job with all fields
   const job = new Job({
-  title,
-  company_name,
-  job_type,
-  qualification_req,
-  job_description,
-  responsibilities,
-  application_methods,
-  postedBy: req.user.id,
-  status,
-  job_niche // <-- add this
-});
-
+    title,
+    company_name,
+    job_type,
+    qualification_req,
+    job_description,
+    responsibilities,
+    application_methods,
+    postedBy: req.user.id,
+    status,
+    job_niche, // <-- add this
+  });
 
   await job.save();
 
@@ -81,22 +85,24 @@ const createJob = asyncHandler(async (req, res) => {
       const subject = `Exciting Career Opportunity: ${title}`;
 
       // Generate application links HTML
-      const applicationLinks = application_methods.map(method => {
-        if (method.type === 'email') {
-          return `<li>Email: <a href="mailto:${method.value}${method.instructions ? `?subject=${encodeURIComponent(method.instructions)}` : ''}">${method.value}</a>${method.instructions ? ` (${method.instructions})` : ''}</li>`;
-        }
-        return `<li>Website: <a href="${method.value}">${method.value}</a></li>`;
-      }).join('');
+      const applicationLinks = application_methods
+        .map((method) => {
+          if (method.type === "email") {
+            return `<li>Email: <a href="mailto:${method.value}${method.instructions ? `?subject=${encodeURIComponent(method.instructions)}` : ""}">${method.value}</a>${method.instructions ? ` (${method.instructions})` : ""}</li>`;
+          }
+          return `<li>Website: <a href="${method.value}">${method.value}</a></li>`;
+        })
+        .join("");
 
       const html = `
         <p>Dear Students,</p>
         <p>We are excited to share an excellent career opportunity with you:</p>
         <h3>${title} at ${company_name}</h3>
         <p><strong>Job Type:</strong> ${job_type}</p>
-        ${job_description ? `<div>${job_description}</div>` : ''}
+        ${job_description ? `<div>${job_description}</div>` : ""}
         
-        ${qualification_req ? `<h4>Qualifications:</h4><div>${qualification_req}</div>` : ''}
-        ${responsibilities ? `<h4>Responsibilities:</h4><div>${responsibilities}</div>` : ''}
+        ${qualification_req ? `<h4>Qualifications:</h4><div>${qualification_req}</div>` : ""}
+        ${responsibilities ? `<h4>Responsibilities:</h4><div>${responsibilities}</div>` : ""}
 
         <h4>How to Apply:</h4>
         <ul>${applicationLinks}</ul>
@@ -136,17 +142,19 @@ const createJob = asyncHandler(async (req, res) => {
           <h3>${title} at ${company_name}</h3>
           <p><strong>Application Methods:</strong></p>
           <ul>
-            ${application_methods.map(m => `<li>${m.type}: ${m.value}${m.instructions ? ` (${m.instructions})` : ''}</li>`).join('')}
+            ${application_methods.map((m) => `<li>${m.type}: ${m.value}${m.instructions ? ` (${m.instructions})` : ""}</li>`).join("")}
           </ul>
           <p>Please review in the admin dashboard.</p>
-        `
+        `,
       });
     } catch (emailError) {
       console.error("📧 Admin Email Error:", emailError);
     }
   }
 
-  return res.status(201).json(new ApiResponse(201, job, "Job posted successfully"));
+  return res
+    .status(201)
+    .json(new ApiResponse(201, job, "Job posted successfully"));
 });
 
 const updateJob = asyncHandler(async (req, res) => {
@@ -159,15 +167,15 @@ const updateJob = asyncHandler(async (req, res) => {
     qualification_req,
     job_description,
     responsibilities,
-    application_methods
+    application_methods,
   } = req.body;
 
-  if (!req.user || req.user.role !== 'admin') {
-    throw new ApiError(403, 'Forbidden: Admins only');
+  if (!req.user || req.user.role !== "admin") {
+    throw new ApiError(403, "Forbidden: Admins only");
   }
 
   const job = await Job.findById(jobId);
-  if (!job) throw new ApiError(404, 'Job not found');
+  if (!job) throw new ApiError(404, "Job not found");
 
   // Update all fields
   job.title = title || job.title;
@@ -180,52 +188,62 @@ const updateJob = asyncHandler(async (req, res) => {
 
   // Update application methods if provided
   if (Array.isArray(application_methods)) {
-    job.application_methods = application_methods.map(method => ({
-      type: ['email', 'website', 'form'].includes(method.type) ? method.type : 'website',
-      value: method.value || '',
-      instructions: method.instructions || ''
+    job.application_methods = application_methods.map((method) => ({
+      type: ["email", "website", "form"].includes(method.type)
+        ? method.type
+        : "website",
+      value: method.value || "",
+      instructions: method.instructions || "",
     }));
   }
 
   job.updated_on = Date.now();
   await job.save();
 
-  return res.status(200).json(new ApiResponse(200, job, 'Job updated successfully'));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, job, "Job updated successfully"));
 });
-
-
 
 // Delete a job (Admin only)
 const deleteJob = asyncHandler(async (req, res) => {
   const { jobId } = req.params;
 
-  if (!req.user || req.user.role !== 'admin') {
-    throw new ApiError(403, 'Forbidden: Admins only');
+  if (!req.user || req.user.role !== "admin") {
+    throw new ApiError(403, "Forbidden: Admins only");
   }
 
   const job = await Job.findByIdAndDelete(jobId);
 
   if (!job) {
-    throw new ApiError(404, 'Job not found');
+    throw new ApiError(404, "Job not found");
   }
 
-  return res.status(200).json(new ApiResponse(200, null, 'Job deleted successfully'));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, "Job deleted successfully"));
 });
 
 // Fetch all jobs with filters
 const getAllJobs = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, searchTerm = '', filterDate = '', filterStatus = '' } = req.query;
+  const {
+    page = 1,
+    limit = 10,
+    searchTerm = "",
+    filterDate = "",
+    filterStatus = "",
+  } = req.query;
 
   const query = {};
 
   if (!req.user) {
-    throw new ApiError(403, 'Forbidden: Please login');
+    throw new ApiError(403, "Forbidden: Please login");
   }
   // Search query
   if (searchTerm) {
     query.$or = [
-      { company_name: { $regex: searchTerm, $options: 'i' } },
-      { title: { $regex: searchTerm, $options: 'i' } },
+      { company_name: { $regex: searchTerm, $options: "i" } },
+      { title: { $regex: searchTerm, $options: "i" } },
     ];
   }
 
@@ -254,7 +272,7 @@ const getAllJobs = asyncHandler(async (req, res) => {
     .sort({ posted_on: -1 })
     .skip((pageNum - 1) * limitNum)
     .limit(limitNum)
-    .populate('postedBy', 'email');
+    .populate("postedBy", "email");
 
   return res.status(200).json({
     data: jobs,
@@ -270,19 +288,27 @@ const getJobById = asyncHandler(async (req, res) => {
   const job = await Job.findById(jobId);
 
   if (!job) {
-    throw new ApiError(404, 'Job not found');
+    throw new ApiError(404, "Job not found");
   }
 
-  return res.status(200).json(new ApiResponse(200, job, 'Job fetched successfully'));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, job, "Job fetched successfully"));
 });
 
 // Get job count
 const getJobCount = asyncHandler(async (req, res) => {
   try {
     const count = await Job.countDocuments();
-    return res.status(200).json(new ApiResponse(200, { count }, 'Job count retrieved successfully'));
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, { count }, "Job count retrieved successfully")
+      );
   } catch (error) {
-    return res.status(500).json(new ApiError(500, 'Error counting jobs', error.message));
+    return res
+      .status(500)
+      .json(new ApiError(500, "Error counting jobs", error.message));
   }
 });
 
@@ -294,7 +320,12 @@ const getRecruiterJobs = asyncHandler(async (req, res) => {
       return res.status(403).json({ message: "Forbidden: Recruiters only" });
     }
 
-    const { page = 1, limit = 10, searchTerm = "", filterDate = "" } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      searchTerm = "",
+      filterDate = "",
+    } = req.query;
 
     // Ensure the query fetches only jobs posted by the recruiter
     const query = { postedBy: req.user.id };
@@ -506,12 +537,12 @@ const convertPdfToImage = async (pdfPath, outputPath) => {
     create: {
       width: Math.floor(width),
       height: Math.floor(height),
-      channels: 3,  // RGB channels
-      background: { r: 255, g: 255, b: 255 },  // white background
+      channels: 3, // RGB channels
+      background: { r: 255, g: 255, b: 255 }, // white background
     },
   })
     .png()
-    .toFile(outputPath);  // Save as PNG
+    .toFile(outputPath); // Save as PNG
 
   return outputPath; // Return the path where the image was saved
 };
@@ -521,13 +552,16 @@ const extractJobInfofromText = asyncHandler(async (req, res) => {
     let { job_ad_text } = req.body;
     console.log("Job Ad Text Received in Backend:", job_ad_text);
 
-        // URL decode job_ad_text before processing
-        job_ad_text = decodeURIComponent(job_ad_text);
-    
-        // Remove the Location line if present
-        job_ad_text = job_ad_text.replace(/Location:.*\n/g, "");
+    // URL decode job_ad_text before processing
+    job_ad_text = decodeURIComponent(job_ad_text);
 
-        console.log("Final text sent to model after decoding and removing line:", job_ad_text);
+    // Remove the Location line if present
+    job_ad_text = job_ad_text.replace(/Location:.*\n/g, "");
+
+    console.log(
+      "Final text sent to model after decoding and removing line:",
+      job_ad_text
+    );
 
     const completion = await groq.chat.completions.create({
       messages: [
@@ -547,7 +581,9 @@ const extractJobInfofromText = asyncHandler(async (req, res) => {
             - "Software Testing"
             - "Cloud"
             - "Data Science"
-            - "AI/ML"
+            - "AI"
+            - "UI/UX Design"
+            - "Business"
             - "Project Management"
             - "Cybersecurity"
             - "Others"
@@ -591,112 +627,135 @@ const extractJobInfofromText = asyncHandler(async (req, res) => {
             ]
           }
          
-        `},
+        `,
+        },
         {
           role: "user",
-          content: job_ad_text
-        }
+          content: job_ad_text,
+        },
       ],
       model: "llama-3.3-70b-versatile",
       response_format: { type: "json_object" },
-      temperature: 0.1
+      temperature: 0.1,
     });
 
-    let extractedInfo = JSON.parse(completion.choices[0]?.message?.content || "{}");
-    
+    let extractedInfo = JSON.parse(
+      completion.choices[0]?.message?.content || "{}"
+    );
+
     // Post-processing to clean up the data
     if (extractedInfo.application_methods) {
-      extractedInfo.application_methods = extractedInfo.application_methods.map(method => {
-        // Clean email values
-        if (method.type === 'email' && method.value.includes('mailto:')) {
-          method.value = method.value.replace('mailto:', '');
+      extractedInfo.application_methods = extractedInfo.application_methods.map(
+        (method) => {
+          // Clean email values
+          if (method.type === "email" && method.value.includes("mailto:")) {
+            method.value = method.value.replace("mailto:", "");
+          }
+          // Ensure website URLs have protocol
+          if (
+            (method.type === "website" || method.type === "form") &&
+            !method.value.startsWith("http")
+          ) {
+            method.value = `https://${method.value}`;
+          }
+          return method;
         }
-        // Ensure website URLs have protocol
-        if ((method.type === 'website' || method.type === 'form') && 
-            !method.value.startsWith('http')) {
-          method.value = `https://${method.value}`;
-        }
-        return method;
-      });
+      );
     }
 
-        // Check if niche is valid, otherwise set to "Others"
-        const validNiches = [
-          "Frontend", "Backend", "Full Stack", "DevOps", "Software Testing",
-          "Cloud", "Data Science", "AI/ML", "Project Management", "Cybersecurity"
-        ];
-    
-        if (extractedInfo.job_niche && !validNiches.includes(extractedInfo.job_niche)) {
-          extractedInfo.job_niche = "Others";
-        }
-    
+    // Check if niche is valid, otherwise set to "Others"
+    const validNiches = [
+      "Frontend",
+      "Backend",
+      "Full Stack",
+      "DevOps",
+      "Software Testing",
+      "Cloud",
+      "Data Science",
+      "AI",
+      "UI/UX Design",
+      "Business",
+      "Project Management",
+      "Cybersecurity",
+      "Others",
+    ];
+
+    if (
+      extractedInfo.job_niche &&
+      !validNiches.includes(extractedInfo.job_niche)
+    ) {
+      extractedInfo.job_niche = "Others";
+    }
+
     res.json(extractedInfo);
   } catch (error) {
-    console.error('Error:', error);
-    res.status(500).json({ error: 'Failed to extract job information' });
+    console.error("Error:", error);
+    res.status(500).json({ error: "Failed to extract job information" });
   }
 });
 
 // Function to convert image to base64
 const encodeImageToBase64 = (imagePath) => {
   const image = fs.readFileSync(imagePath);
-  return image.toString('base64');
+  return image.toString("base64");
 };
 
 // Controller function to handle OCR using Groq Vision API and then extract job info
 const extractJobInfoFromImageWithGroq = asyncHandler(async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
+      return res.status(400).json({ error: "No file uploaded" });
     }
 
     const filePath = req.file.path;
     const fileType = req.file.mimetype;
-    let extractedText = '';
+    let extractedText = "";
 
-    if (fileType.startsWith('image/')) {
+    if (fileType.startsWith("image/")) {
       // Convert image to base64
       const base64Image = encodeImageToBase64(filePath);
-      
+
       // Prepare the API request to Groq Vision API
-      const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
-      const apiKey = process.env.GROQ_API_KEY;  // Assuming you're storing your API key in an environment variable
+      const apiUrl = "https://api.groq.com/openai/v1/chat/completions";
+      const apiKey = process.env.GROQ_API_KEY; // Assuming you're storing your API key in an environment variable
 
       // Setup the message payload
       const payload = {
         messages: [
           {
-            role: 'user',
+            role: "user",
             content: [
-              { type: 'text', text: "What's in this image?" },
+              { type: "text", text: "What's in this image?" },
               {
-                type: 'image_url',
+                type: "image_url",
                 image_url: {
-                  url: `data:image/jpeg;base64,${base64Image}`
-                }
-              }
-            ]
-          }
+                  url: `data:image/jpeg;base64,${base64Image}`,
+                },
+              },
+            ],
+          },
         ],
-        model: 'meta-llama/llama-4-scout-17b-16e-instruct'  // Using Groq Vision model
+        model: "meta-llama/llama-4-scout-17b-16e-instruct", // Using Groq Vision model
       };
 
       // Make the API request to Groq Vision
       const response = await axios.post(apiUrl, payload, {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
       });
 
       // Extract the text from the Groq response
-      extractedText = response.data.choices[0]?.message?.content || '';
+      extractedText = response.data.choices[0]?.message?.content || "";
 
       if (!extractedText) {
-        return res.status(500).json({ error: 'Failed to extract text from image' });
+        return res
+          .status(500)
+          .json({ error: "Failed to extract text from image" });
       }
 
-      console.log('Extracted Text from Image:', extractedText);
+      console.log("Extracted Text from Image:", extractedText);
 
       // Clean up the uploaded file after processing
       fs.unlinkSync(filePath);
@@ -705,16 +764,16 @@ const extractJobInfoFromImageWithGroq = asyncHandler(async (req, res) => {
       const jobAdText = { job_ad_text: extractedText };
 
       // Here, you can pass `req` and `res` to the `extractJobInfofromText` function
-      req.body = jobAdText;  // Add job_ad_text to the request body
-      return extractJobInfofromText(req, res);  // Call the text extraction function
-
+      req.body = jobAdText; // Add job_ad_text to the request body
+      return extractJobInfofromText(req, res); // Call the text extraction function
     } else {
-      return res.status(400).json({ error: 'Only image files are supported for OCR' });
+      return res
+        .status(400)
+        .json({ error: "Only image files are supported for OCR" });
     }
-
   } catch (error) {
-    console.error('Error processing image with Groq Vision API:', error);
-    res.status(500).json({ error: 'Failed to process image' });
+    console.error("Error processing image with Groq Vision API:", error);
+    res.status(500).json({ error: "Failed to process image" });
   }
 });
 
