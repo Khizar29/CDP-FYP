@@ -187,7 +187,7 @@ const DashboardHome = () => {
 
   if (!user || user.role !== 'admin') return null;
 
-  const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6','#F9C74F'];
+  const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#F9C74F'];
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -266,7 +266,7 @@ const DashboardHome = () => {
             </ResponsiveContainer>
           </ChartCard>
 
-          {/* Most Sought Jobs */}
+          {/* Most Sought Jobs
           <ChartCard title="Most Sought-After Jobs">
             <ResponsiveContainer width="100%" height={300}>
               <BarChart layout="vertical" data={chartData.mostSoughtJobs.slice(0, 5)}>
@@ -281,6 +281,29 @@ const DashboardHome = () => {
                 <Tooltip />
                 <Bar dataKey="applicationCount" fill="#3B82F6" radius={[0, 4, 4, 0]} />
               </BarChart>
+            </ResponsiveContainer>
+          </ChartCard> */}
+                    {/* Job Niche Distribution */}
+
+                    <ChartCard title="Job Niche Distribution">
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={chartData.jobPositngbyNiche || []}  // Ensure data is an array, fallback to empty array
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  dataKey="totalJobs"
+                  nameKey="niche"
+                  label
+                >
+                  {(chartData.jobPositngbyNiche || []).map((entry, index) => (  // Safe map
+                    <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
             </ResponsiveContainer>
           </ChartCard>
 
@@ -374,31 +397,6 @@ const DashboardHome = () => {
               </BarChart>
             </ResponsiveContainer>
           </ChartCard>
-
-          {/* Job Niche Distribution */}
-
-          <ChartCard title="Job Niche Distribution">
-  <ResponsiveContainer width="100%" height={300}>
-    <PieChart>
-      <Pie
-        data={chartData.jobPositngbyNiche || []}  // Ensure data is an array, fallback to empty array
-        cx="50%"
-        cy="50%"
-        outerRadius={100}
-        dataKey="totalJobs"
-        nameKey="niche"
-        label
-      >
-        {(chartData.jobPositngbyNiche || []).map((entry, index) => (  // Safe map
-          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-        ))}
-      </Pie>
-      <Tooltip />
-      <Legend />
-    </PieChart>
-  </ResponsiveContainer>
-</ChartCard>
-
         </div>
       </div>
     </div>
