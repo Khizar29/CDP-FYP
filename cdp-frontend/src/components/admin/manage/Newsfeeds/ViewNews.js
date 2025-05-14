@@ -9,17 +9,7 @@ const ViewNews = () => {
   return (
     <div className="p-4 flex flex-col mx-auto items-center">
       {/* Render the NewsDetail component for admin view */}
-      <NewsDetail />
-      
-      {/* Container to center the button */}
-      <div className="flex justify-center mt-6">
-        <button 
-          onClick={() => navigate('/admin/newsfeeds')}
-          className="bg-blue-500 text-white py-2 px-6 rounded"
-        >
-          Back to List
-        </button>
-      </div>
+      <NewsDetail isAdminView={true} />
     </div>
   );
 };

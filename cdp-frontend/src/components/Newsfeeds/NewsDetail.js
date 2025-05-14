@@ -1,4 +1,3 @@
-
 // src/components/NewsFeed/NewsDetail.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -14,7 +13,7 @@ import {
 } from '@mui/material';
 import { motion } from 'framer-motion';
 
-const NewsDetail = () => {
+const NewsDetail = ({ isAdminView = false }) => {
   const { id } = useParams();
   const [newsItem, setNewsItem] = useState(null);
   const [newsList, setNewsList] = useState([]);
@@ -95,7 +94,7 @@ const NewsDetail = () => {
             {newsItem.title}
           </Typography>
 
-          {/* IMAGE (Upgraded Styling) */}
+          {/* IMAGE */}
           <Box
             sx={{
               width: '100%',
@@ -150,7 +149,7 @@ const NewsDetail = () => {
           <Grid container spacing={2} justifyContent="center">
             <Grid item xs={12} sm={4}>
               <Button
-                onClick={() => navigate('/news')}
+                onClick={() => navigate(isAdminView ? '/admin/newsfeeds' : '/news')}
                 variant="outlined"
                 color="primary"
                 fullWidth
@@ -161,43 +160,48 @@ const NewsDetail = () => {
                   fontSize: '1rem',
                 }}
               >
-                Back to Newsfeed
+                Back to {isAdminView ? 'Admin List' : 'Newsfeed'}
               </Button>
             </Grid>
-            <Grid item xs={6} sm={4}>
-              <Button
-                onClick={handlePrevious}
-                variant="contained"
-                color="primary"
-                disabled={currentIndex === 0}
-                fullWidth
-                sx={{
-                  fontWeight: 'bold',
-                  borderRadius: '30px',
-                  padding: '0.75rem',
-                  fontSize: '1rem',
-                }}
-              >
-                Previous
-              </Button>
-            </Grid>
-            <Grid item xs={6} sm={4}>
-              <Button
-                onClick={handleNext}
-                variant="contained"
-                color="primary"
-                disabled={currentIndex === newsList.length - 1}
-                fullWidth
-                sx={{
-                  fontWeight: 'bold',
-                  borderRadius: '30px',
-                  padding: '0.75rem',
-                  fontSize: '1rem',
-                }}
-              >
-                Next
-              </Button>
-            </Grid>
+
+            {!isAdminView && (
+              <>
+                <Grid item xs={6} sm={4}>
+                  <Button
+                    onClick={handlePrevious}
+                    variant="contained"
+                    color="primary"
+                    disabled={currentIndex === 0}
+                    fullWidth
+                    sx={{
+                      fontWeight: 'bold',
+                      borderRadius: '30px',
+                      padding: '0.75rem',
+                      fontSize: '1rem',
+                    }}
+                  >
+                    Previous
+                  </Button>
+                </Grid>
+                <Grid item xs={6} sm={4}>
+                  <Button
+                    onClick={handleNext}
+                    variant="contained"
+                    color="primary"
+                    disabled={currentIndex === newsList.length - 1}
+                    fullWidth
+                    sx={{
+                      fontWeight: 'bold',
+                      borderRadius: '30px',
+                      padding: '0.75rem',
+                      fontSize: '1rem',
+                    }}
+                  >
+                    Next
+                  </Button>
+                </Grid>
+              </>
+            )}
           </Grid>
         </Paper>
       </motion.div>
