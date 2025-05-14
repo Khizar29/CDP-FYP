@@ -383,7 +383,7 @@ const getJobCountByNiche = asyncHandler(async (req, res) => {
       { $sort: { totalJobs: -1 } },
       
     ]);
-    console.log("job niche")
+
     return res.status(200).json(new ApiResponse(200, result, "Job count by niche"));
   } catch (error) {
     console.error("Error in getJobCountByNiche:", error);
