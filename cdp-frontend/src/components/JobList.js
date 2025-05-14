@@ -1,30 +1,50 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { UserContext } from '../contexts/UserContext';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBriefcase, faCalendarAlt, faSearch, faTimes, faFilter } from '@fortawesome/free-solid-svg-icons';
-import { motion, AnimatePresence } from 'framer-motion';
-import '../styles/JobList.css';
-import SignIn from './SignIn';
-import JobView from './admin/manage/Jobs/ViewJob';
+import React, { useEffect, useState, useContext, useCallback } from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { UserContext } from "../contexts/UserContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBriefcase,
+  faCalendarAlt,
+  faSearch,
+  faTimes,
+  faFilter,
+} from "@fortawesome/free-solid-svg-icons";
+import { motion, AnimatePresence } from "framer-motion";
+import "../styles/JobList.css";
+import SignIn from "./SignIn";
+import JobView from "./admin/manage/Jobs/ViewJob";
 
 const JobList = () => {
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [signInOpen, setSignInOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
-    jobType: '',
-    niche: '',
+    jobType: "",
+    niche: "",
   });
   const [selectedJob, setSelectedJob] = useState(null);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const { user } = useContext(UserContext);
 
-  const jobTypes = ['Remote', 'Onsite', 'Hybrid', 'Internship'];
-  const niches = ['Backend Developer', 'Frontend Developer', 'Data Science', 'FullStack Developer', 'DevOps Engineer'];
+  const jobTypes = ["Remote", "Onsite", "Hybrid", "Internship"];
+  const niches = [
+    "Frontend",
+    "Backend",
+    "Full Stack",
+    "DevOps",
+    "Software Testing",
+    "Cloud",
+    "Data Science",
+    "AI",
+    "UI/UX Design",
+    "Business",
+    "Project Management",
+    "Cybersecurity",
+    "Others",
+  ];
 
   // Animation Variants
   const containerVariants = {
@@ -53,21 +73,26 @@ const JobList = () => {
     try {
       const token = localStorage.getItem("accessToken");
 
-      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        params: {
-          page,
-          limit: 10,
-          filterStatus: 'approved',
-        },
-      });
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/v1/jobs`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          params: {
+            page,
+            limit: 10,
+            filterStatus: "approved",
+          },
+        }
+      );
 
-      setJobs((prevJobs) => (page === 1 ? response.data.data : [...prevJobs, ...response.data.data]));
+      setJobs((prevJobs) =>
+        page === 1 ? response.data.data : [...prevJobs, ...response.data.data]
+      );
       setHasMore(response.data.data.length > 0);
     } catch (error) {
-      console.error('Error fetching jobs:', error);
+      console.error("Error fetching jobs:", error);
     }
   }, [page]);
 
@@ -79,15 +104,24 @@ const JobList = () => {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 300);
 
-    filtered = filtered.filter((job) => new Date(job.posted_on) >= thirtyDaysAgo);
+    filtered = filtered.filter(
+      (job) => new Date(job.posted_on) >= thirtyDaysAgo
+    );
 
     if (searchTerm) {
-      filtered = filtered.filter((job) =>
-        job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.job_description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.qualification_req.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.responsibilities.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        job.job_type.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (job) =>
+          job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          job.job_description
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          job.qualification_req
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          job.responsibilities
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase()) ||
+          job.job_type.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -96,12 +130,17 @@ const JobList = () => {
     }
 
     if (filters.niche) {
-      filtered = filtered.filter((job) =>
-        job.title.toLowerCase().includes(filters.niche.toLowerCase()) ||
-        job.qualification_req.toLowerCase().includes(filters.niche.toLowerCase()) ||
-        job.job_description.toLowerCase().includes(filters.niche.toLowerCase()) ||
-        job.responsibilities.toLowerCase().includes(filters.niche.toLowerCase())
-      );
+      const nicheLower = filters.niche.toLowerCase();
+      filtered = filtered.filter((job) => {
+        const jobContent = `
+      ${job.title}
+      ${job.qualification_req}
+      ${job.job_description}
+      ${job.responsibilities}
+      ${job.job_niche}
+    `.toLowerCase();
+        return jobContent.includes(nicheLower);
+      });
     }
 
     setFilteredJobs(filtered);
@@ -118,7 +157,11 @@ const JobList = () => {
 
   // Load more jobs when user scrolls to the bottom
   const handleScroll = useCallback(() => {
-    if (window.innerHeight + document.documentElement.scrollTop + 1 >= document.documentElement.scrollHeight && hasMore) {
+    if (
+      window.innerHeight + document.documentElement.scrollTop + 1 >=
+        document.documentElement.scrollHeight &&
+      hasMore
+    ) {
       setPage((prevPage) => prevPage + 1);
     }
   }, [hasMore]);
@@ -136,8 +179,8 @@ const JobList = () => {
   }, [jobs, searchTerm, filters, applyFilters]);
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
   const handleJobClick = (job) => {
@@ -151,9 +194,12 @@ const JobList = () => {
   return (
     <div className="flex flex-col p-6 h-screen overflow-hidden">
       {/* Search and Filters */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
         <div className="relative flex-1 mr-4">
-          <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          <FontAwesomeIcon
+            icon={faSearch}
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+          />
           <input
             type="text"
             className="pl-10 w-full p-2 border rounded-lg"
@@ -165,13 +211,16 @@ const JobList = () => {
             <FontAwesomeIcon
               icon={faTimes}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 cursor-pointer"
-              onClick={() => setSearchTerm('')}
+              onClick={() => setSearchTerm("")}
             />
           )}
         </div>
-        <div className="flex space-x-4">
+        <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
           <div className="relative">
-            <FontAwesomeIcon icon={faFilter} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+            <FontAwesomeIcon
+              icon={faFilter}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            />
             <select
               name="jobType"
               className="pl-10 p-2 border rounded-lg"
@@ -186,8 +235,11 @@ const JobList = () => {
               ))}
             </select>
           </div>
-          <div className="relative">
-            <FontAwesomeIcon icon={faFilter} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
+          <div className="relative w-full sm:w-auto">
+            <FontAwesomeIcon
+              icon={faFilter}
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+            />
             <select
               name="niche"
               className="pl-10 p-2 border rounded-lg"
@@ -227,19 +279,32 @@ const JobList = () => {
                   whileTap={{ scale: 0.95 }}
                   variants={itemVariants}
                 >
-                  <h2 className="text-2xl font-bold text-blue-900 mb-2">{job.title}</h2>
-                  <p className="text-xl font-semibold mb-2 text-amber-400">{job.company_name}</p>
-                  <p
-                    className="text-gray-700 mb-2"
-                    id="jobtype"
-                  >
+                  <h2 className="text-2xl font-bold text-blue-900 mb-2">
+                    {job.title}
+                  </h2>
+                  <p className="text-xl font-semibold mb-2 text-amber-400">
+                    {job.company_name}
+                  </p>
+                  <p className="text-gray-700 mb-2" id="jobtype">
                     <FontAwesomeIcon icon={faBriefcase} /> {job.job_type}
                   </p>
                   <p className="text-gray-700 mb-2">
-                    <FontAwesomeIcon icon={faCalendarAlt} /> {new Date(job.posted_on).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    <FontAwesomeIcon icon={faCalendarAlt} />{" "}
+                    {new Date(job.posted_on).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
                   </p>
-                  <Link to="#" className="text-blue-600 hover:underline">Click here to apply</Link>
-                  <Link to="#" className="block w-[66px] mt-4 bg-blue-900 text-white py-2 px-4 rounded-full hover:bg-blue-600 transition duration-300">View</Link>
+                  <Link to="#" className="text-blue-600 hover:underline">
+                    Click here to apply
+                  </Link>
+                  <Link
+                    to="#"
+                    className="block w-[66px] mt-4 bg-blue-900 text-white py-2 px-4 rounded-full hover:bg-blue-600 transition duration-300"
+                  >
+                    View
+                  </Link>
                 </motion.div>
               ))}
             </motion.div>
@@ -275,4 +340,3 @@ const JobList = () => {
 };
 
 export default JobList;
-

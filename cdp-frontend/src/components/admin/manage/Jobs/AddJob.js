@@ -355,7 +355,9 @@ const AddJob = () => {
             <option value="Software Testing">Software Testing</option>
             <option value="Cloud">Cloud</option>
             <option value="Data Science">Data Science</option>
-            <option value="AI/ML">AI/ML</option>
+            <option value="AI">AI</option>
+            <option value="UI/UX Design">UI/UX Design</option>
+            <option value="Business">Business</option>
             <option value="Project Management">Project Management</option>
             <option value="Cybersecurity">Cybersecurity</option>
             <option value="Others">Others</option>
