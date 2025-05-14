@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { FaLinkedin } from "react-icons/fa";
 import fatimaImg from "../Images/fatima.jpeg";
 import aliImg from "../Images/ali.jpeg"; // Placeholder for Syed Muhammad Ali's image
-// import khizarImg from "../Images/khizar.jpeg"; // Placeholder for Syed Khizar Ali's image
+import khizarImg from "../Images/IMG_8487.jpg"; // Placeholder for Syed Khizar Ali's image
 
 const About = React.forwardRef((props, ref) => {
   const [showDev, setShowDev] = useState(false);
@@ -88,7 +88,7 @@ const About = React.forwardRef((props, ref) => {
                     className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transform hover:-translate-y-1 transition duration-300 p-6 flex flex-col items-center text-center cursor-pointer"
                   >
                     <img
-                      src="https://via.placeholder.com/160"
+                      src={khizarImg}
                       alt="Syed Khizar Ali"
                       className="w-40 h-40 rounded-full object-cover border-4 border-blue-100 shadow-md"
                     />
@@ -104,7 +104,7 @@ const About = React.forwardRef((props, ref) => {
                       every student's career.
                     </p>
                     <p className="text-sm text-gray-500 mt-1">
-                      khizar@example.com
+                      s.khizarali03@gmail.com
                     </p>
                     <FaLinkedin className="mt-3 text-blue-600 text-2xl" />
                   </a>
