@@ -17,6 +17,7 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import ForgotPasswordModal from "./ForgotPassword";
+import { toast } from 'react-hot-toast';
 
 const defaultTheme = createTheme();
 
@@ -35,6 +36,7 @@ export default function SignIn({ onClose }) {
     try {
       const success = await login({ email, password });
       if (success) {
+        toast.success("Welcome! You have signed in successfully 🎉");
         if (onClose) onClose();
         navigate("/");
       } else {
@@ -44,6 +46,7 @@ export default function SignIn({ onClose }) {
       setErrorMessage(error.response?.data?.message || "An error occurred. Please try again.");
     }
   };
+  
 
   return (
     <ThemeProvider theme={defaultTheme}>
