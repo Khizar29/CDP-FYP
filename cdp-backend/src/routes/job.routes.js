@@ -10,6 +10,7 @@ const {
   getJobById,
   getJobCount,
   getRecruiterJobs,
+  getFacultyJobs,
   approveJob,
   extractJobInfofromText,
   extractJobInfoFromImageWithGroq,
@@ -24,9 +25,10 @@ router.use(verifyJWT);
 // Routes accessible to all authenticated users
 router.get('/count', getJobCount);
 router.get('/', getAllJobs);
-router.post('/', verifyRole(['admin', 'recruiter']), createJob);
+router.post('/', verifyRole(['admin', 'recruiter','faculty']), createJob);
 
 router.get('/recruiter', verifyRole(['recruiter']), getRecruiterJobs);
+router.get('/faculty', verifyRole(['faculty']), getFacultyJobs);
 router.post('/extract-from-image', upload.single('job_ad_file'), extractJobInfoFromImageWithGroq);
 router.post('/extract', verifyAdmin, extractJobInfofromText);
 

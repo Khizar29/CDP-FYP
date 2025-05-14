@@ -4,7 +4,7 @@ import React, { useRef } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { UserProvider } from './contexts/UserContext';
 import Header from './components/Header';
-import About from './components/About'; 
+import About from './components/About';
 import Footer from './components/Footer';
 import SignIn from './components/SignIn';
 import Home from './components/Home';
@@ -51,6 +51,8 @@ import FacultyNewsfeed from './components/Faculty/FacultyNewsfeed';
 import FacultyAddNews from './components/Faculty/FacultyAddNews';
 import FacultyEditNews from './components/Faculty/FacultyEditNews';
 import FacultyViewNews from './components/Faculty/FacultyViewNews';
+import FacultyManageJobs from './components/Faculty/PostedJobs';
+import AddJobFaculty from './components/Faculty/AddJobFaculty';
 
 
 
@@ -80,7 +82,7 @@ function App() {
   return (
     <UserProvider>
       <Router>
-      <Toaster /> 
+        <Toaster />
         <Routes>
           {/* User Routes */}
           <Route path="/" element={<UserLayout><Home /></UserLayout>} />
@@ -101,7 +103,7 @@ function App() {
 
           {/* Admin Dashboard */}
           <Route path="/admin/*" element={
-             <ProtectedRoute allowedRoles={['admin']}>
+            <ProtectedRoute allowedRoles={['admin']}>
               <AdminLayout />
             </ProtectedRoute>
           }>
@@ -128,27 +130,29 @@ function App() {
 
           {/* Recruiter Dashboard */}
           <Route path="/recruiter/*" element={
-             <ProtectedRoute allowedRoles={['recruiter']}>
-              <RecruiterLayout/>
+            <ProtectedRoute allowedRoles={['recruiter']}>
+              <RecruiterLayout />
             </ProtectedRoute>
           }>
-            <Route path="" element= {<RecruiterManageJobs/>}/>
-            <Route path="addjob" element= {<AddJobRecruiter/>}/>
+            <Route path="" element={<RecruiterManageJobs />} />
+            <Route path="addjob" element={<AddJobRecruiter />} />
           </Route>
 
           {/* Faculty Dashboard */}
           <Route path="/faculty/*" element={
-             <ProtectedRoute allowedRoles={['faculty']}>
-              <FacultyLayout/>
+            <ProtectedRoute allowedRoles={['faculty']}>
+              <FacultyLayout />
             </ProtectedRoute>
           }>
-            <Route path="announcements" element= {<FacultyManageAnnouncements/>}/>
-            <Route path="announcements/add" element= {<AddAnnouncement/>}/>
+            <Route path="jobs" element={<FacultyManageJobs />} />
+            <Route path="jobs/addjob" element={<AddJobFaculty />} />
+            <Route path="announcements" element={<FacultyManageAnnouncements />} />
+            <Route path="announcements/add" element={<AddAnnouncement />} />
             <Route path="announcements/edit/:announcementId" element={<EditAnnouncement />} />
             <Route path="newsfeed" element={<FacultyNewsfeed />} />
             <Route path="newsfeed/add" element={<FacultyAddNews />} />
             <Route path="newsfeed/edit/:id" element={<FacultyEditNews />} />
-            <Route path="newsfeed/view/:id" element={<FacultyViewNews/>} />
+            <Route path="newsfeed/view/:id" element={<FacultyViewNews />} />
 
 
 
