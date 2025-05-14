@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, useLocation  } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import DOMPurify from "dompurify";
 import placeholder from "../../Images/placeholder.png";
 import axios from "axios";
@@ -108,45 +108,48 @@ const ProfilePage = () => {
       <Header />
       <div className="w-full bg-[#d39fed]  py-4 px-6 shadow-sm text-xl font-semibold text-center">
       </div>
-
-      <main className="container mx-auto bg-white shadow-lg rounded-lg flex flex-col md:flex-row px-12 py-8 mb-12 relative">
-        <div className="w-full flex flex-col items-center bg-[#C1E4FB] p-6 rounded-lg shadow-md mb-8 max-w-sm mx-auto">
-          <img
-            src={profileImageUrl}
-            alt={`Profile of ${alumni.fullName}`}
-            className="rounded-lg w-64 h-64 object-cover mb-6 shadow-md"
-          />
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-yellow-500">
-              {alumni.fullName}
-            </h1>
-            <p className="text-sm font-bold text-gray-500 mt-2">
-              {alumni.tagline || "No tagline available"}
-            </p>
-            <p className="text-sky-600 font-bold text-md mt-1">{alumni.nuId}</p>
-            <p className="text-sky-600 font-bold text-md mt-1">
-              Class of {alumni.yearOfGraduation}
-            </p>
-            <p className="text-sky-600 font-bold text-md mt-1">
-              {alumni.discipline}
-            </p>
-            <p className="text-sky-600 font-bold text-md mt-1">
-              CGPA: {alumni.cgpa}
-            </p>
-            <div className="mt-4">
-              <p className="text-gray-500 text-sm flex items-center justify-center">
-                <EmailIcon className="mr-2" /> {alumni.nuEmail}
+      <main className="container mx-auto bg-white shadow-lg rounded-lg flex flex-col md:flex-row px-4 md:px-12 py-8 mb-12 relative gap-8">
+        {/* Left Sidebar */}
+        <div className="w-full md:w-1/3 max-w-sm flex-shrink-0">
+          <div className="sticky top-20 bg-[#C1E4FB] p-6 rounded-lg shadow-md">
+            <img
+              src={profileImageUrl}
+              alt={`Profile of ${alumni.fullName}`}
+              className="rounded-lg w-64 h-64 object-cover mx-auto mb-6 shadow-md"
+            />
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-yellow-500">
+                {alumni.fullName}
+              </h1>
+              <p className="text-sm font-bold text-gray-500 mt-2">
+                {alumni.tagline || "No tagline available"}
               </p>
-              <p className="text-gray-500 text-sm flex items-center justify-center">
-                <EmailIcon className="mr-2" /> {alumni.personalEmail}
+              <p className="text-sky-600 font-bold text-md mt-1">{alumni.nuId}</p>
+              <p className="text-sky-600 font-bold text-md mt-1">
+                Class of {alumni.yearOfGraduation}
               </p>
+              <p className="text-sky-600 font-bold text-md mt-1">
+                {alumni.discipline}
+              </p>
+              <p className="text-sky-600 font-bold text-md mt-1">
+                CGPA: {alumni.cgpa}
+              </p>
+              <div className="mt-4">
+                <p className="text-gray-500 text-sm flex items-center justify-center">
+                  <EmailIcon className="mr-2" /> {alumni.nuEmail}
+                </p>
+                <p className="text-gray-500 text-sm flex items-center justify-center">
+                  <EmailIcon className="mr-2" /> {alumni.personalEmail}
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="w-full md:w-2/3 mt-8 md:mt-0 md:ml-8">
+        {/* Right Content */}
+        <div className="w-full md:w-2/3 flex flex-col gap-8">
           {skillsArray.length > 0 && (
-            <div className="bg-[#C1E4FB] p-6 rounded-lg shadow-md mb-8">
+            <div className="bg-[#C1E4FB] p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-bold text-yellow-500 mb-4">Skills</h2>
               <div className="flex flex-wrap gap-2">
                 {skillsArray.map((skill, index) => (
@@ -161,39 +164,27 @@ const ProfilePage = () => {
             </div>
           )}
 
-          <div className="bg-[#C1E4FB] p-6 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-bold text-yellow-500">
-              Professional Experience
-            </h2>
+          <div className="bg-[#C1E4FB] p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold text-yellow-500">Professional Experience</h2>
             <div
               className="text-md text-sky-600 mt-2"
-              dangerouslySetInnerHTML={sanitizeHtml(
-                alumni.personalExperience || "No professional experience"
-              )}
-            ></div>
-          </div>
-
-          <div className="bg-[#C1E4FB] p-6 rounded-lg shadow-md mb-8">
-            <h2 className="text-xl font-bold text-yellow-500">
-              Certifications
-            </h2>
-            <div
-              className="text-md text-sky-600 mt-2"
-              dangerouslySetInnerHTML={sanitizeHtml(
-                alumni.certificate || "No certifications listed"
-              )}
+              dangerouslySetInnerHTML={sanitizeHtml(alumni.personalExperience || "No professional experience")}
             ></div>
           </div>
 
           <div className="bg-[#C1E4FB] p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-bold text-yellow-500">
-              Final Year Project
-            </h2>
+            <h2 className="text-xl font-bold text-yellow-500">Certifications</h2>
             <div
               className="text-md text-sky-600 mt-2"
-              dangerouslySetInnerHTML={sanitizeHtml(
-                alumni.fyp || "No final year project title available"
-              )}
+              dangerouslySetInnerHTML={sanitizeHtml(alumni.certificate || "No certifications listed")}
+            ></div>
+          </div>
+
+          <div className="bg-[#C1E4FB] p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-bold text-yellow-500">Final Year Project</h2>
+            <div
+              className="text-md text-sky-600 mt-2"
+              dangerouslySetInnerHTML={sanitizeHtml(alumni.fyp || "No final year project title available")}
             ></div>
           </div>
         </div>
@@ -233,11 +224,10 @@ const ProfilePage = () => {
         <button
           onClick={() => navigate(`/profile/${neighbors.prev}`)}
           disabled={!neighbors.prev}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-xl backdrop-blur-md bg-[#f4e1ce]/70 text-sm font-medium transition transform hover:-translate-y-1 hover:scale-105 ${
-            neighbors.prev
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-xl backdrop-blur-md bg-[#f4e1ce]/70 text-sm font-medium transition transform hover:-translate-y-1 hover:scale-105 ${neighbors.prev
               ? "text-[#5c2d91] hover:bg-[#f4e1ce]"
               : "text-gray-400 bg-gray-300 cursor-not-allowed"
-          }`}
+            }`}
         >
           <ArrowBackIosIcon fontSize="small" />
           Previous Graduate
@@ -247,11 +237,10 @@ const ProfilePage = () => {
         <button
           onClick={() => navigate(`/profile/${neighbors.next}`)}
           disabled={!neighbors.next}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-xl backdrop-blur-md bg-[#f4e1ce]/70 text-sm font-medium transition transform hover:-translate-y-1 hover:scale-105 ${
-            neighbors.next
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl shadow-xl backdrop-blur-md bg-[#f4e1ce]/70 text-sm font-medium transition transform hover:-translate-y-1 hover:scale-105 ${neighbors.next
               ? "text-[#5c2d91] hover:bg-[#f4e1ce]"
               : "text-gray-400 bg-gray-300 cursor-not-allowed"
-          }`}
+            }`}
         >
           Next Graduate
           <ArrowForwardIosIcon fontSize="small" />
